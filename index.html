@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Dosimetria</title>
+    <title>Calculadora de Dosimetria - TJ</title>
     <style>
         :root {
             --primary: #0f172a;
@@ -17,6 +17,7 @@
             --surface: #ffffff;
             --text: #334155;
             --border: #e2e8f0;
+            --disabled: #94a3b8;
         }
 
         body {
@@ -136,20 +137,31 @@
 
         .checkbox-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
             background: #f1f5f9;
             padding: 10px;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
+            line-height: 1.3;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-top: 2px;
         }
 
         .checkbox-item:hover {
             background: #e2e8f0;
         }
 
+        .checkbox-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
         .toggle-btn {
             background: var(--warning);
             color: white;
@@ -344,6 +356,33 @@
             border-top: 1px solid var(--border);
             margin-top: auto;
         }
+        
+        .fase2-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            background: #f8fafc;
+        }
+
+        .limit-warning {
+            color: var(--danger);
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        .prep-badge {
+            background-color: var(--warning);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: super;
+        }
 
         @media (max-width: 900px) {
             .dashboard-container { grid-template-columns: 1fr; }
@@ -469,35 +508,75 @@
                 </div>
             </div>
 
+            <!-- NOVA FASE 2 -->
             <div class="card">
                 <div class="card-header">
                     <h2>2ª Fase: Agravantes e Atenuantes</h2>
                 </div>
                 
-                <div style="background: #fef2f2; border: 1px dashed #fca5a5; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                    <label class="checkbox-item" style="background: transparent; color: #b91c1c; font-weight: bold; margin: 0; padding: 0;">
-                        <input type="checkbox" id="chkReincidente" onchange="calcularDosimetria()"> ⚠️ O Réu é Reincidente (Impacta o Regime - Art. 33, CP)
+                <div id="limiteAgravante" class="limit-warning">⚠️ Limite de 6 Agravantes atingido.</div>
+                <div class="fase2-container" style="margin-bottom: 20px;">
+                    <h3 style="font-size: 0.95rem; margin-top: 0; color: #ef4444;">🔴 Indique uma ou mais Agravantes:</h3>
+                    
+                    <label class="checkbox-item" style="background: #fef2f2; border: 1px solid #fca5a5; margin-bottom: 10px;">
+                        <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> 
+                        <strong>Reincidência</strong> <span class="prep-badge">Preponderante</span>
                     </label>
+                    
+                    <div class="input-box full-width" style="margin-bottom: 10px; display: none;" id="boxMultirreincidencia">
+                        <label style="color: #b91c1c;">É caso de Multirreincidência?</label>
+                        <select id="selMultirreincidencia" style="background: #fef2f2; border-color: #fca5a5;">
+                            <option value="nao">Não (Reincidência Simples)</option>
+                            <option value="sim">Sim (Multirreincidência)</option>
+                        </select>
+                    </div>
+
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel, ou de que podia resultar perigo comum</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas, de coabitação ou de hospitalidade, ou com violência contra a mulher na forma da lei específica</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra criança, maior de 60 (sessenta) anos, enfermo ou mulher grávida</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou qualquer calamidade pública, ou de desgraça particular do ofendido</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em estado de embriaguez preordenada</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que promove, ou organiza a cooperação no delito ou dirige a atividade dos demais agentes</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que coage ou induz outrem à execução material do delito</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que instiga ou determina a cometer o delito alguém sujeito à sua autoridade ou não-punível em virtude de condição ou qualidade pessoal</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Circunstância diversa das elencadas</label>
+                    </div>
+                    
+                    <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <label>Outras Agravantes (Preponderantes manuais):</label>
+                        <input type="number" id="agravantesPrepManual" value="0" min="0" style="width: 80px; display: inline-block; margin-left: 10px;" onchange="calcularDosimetria()">
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <div class="input-box">
-                        <label>Agravantes (1/6)</label>
-                        <input type="number" id="agravantesComuns" value="0" min="0">
+                <div id="limiteAtenuante" class="limit-warning">⚠️ Limite de 6 Atenuantes atingido.</div>
+                <div class="fase2-container">
+                    <h3 style="font-size: 0.95rem; margin-top: 0; color: #10b981;">🟢 Indique uma ou mais Atenuantes:</h3>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Agente menor de 21 (vinte e um), na data do fato, ou maior de 70 (setenta) anos, na data da sentença <span class="prep-badge" style="background-color: var(--success);">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Desconhecimento da lei</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge" style="background-color: var(--success);">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente procurado, por sua espontânea vontade e com eficiência, logo após o delito, evitar-lhe ou minorar-lhe as consequências, ou ter, antes do julgamento, reparado o dano</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito sob coação a que podia resistir, ou em cumprimento de ordem de autoridade superior, ou sob a influência de violenta emoção, provocada por ato injusto da vítima</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge" style="background-color: var(--success);">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância relevante, anterior ou posterior ao crime, embora não prevista expressamente em lei</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância diversa das elencadas</label>
                     </div>
-                    <div class="input-box">
-                        <label style="color: #ef4444;">Agravantes Preponderantes</label>
-                        <input type="number" id="agravantesPrep" value="0" min="0">
-                    </div>
-                    <div class="input-box">
-                        <label>Atenuantes (-1/6)</label>
-                        <input type="number" id="atenuantesComuns" value="0" min="0">
-                    </div>
-                    <div class="input-box">
-                        <label style="color: #10b981;">Atenuantes Preponderantes</label>
-                        <input type="number" id="atenuantesPrep" value="0" min="0">
+                    
+                    <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <label>Outras Atenuantes (Preponderantes manuais):</label>
+                        <input type="number" id="atenuantesPrepManual" value="0" min="0" style="width: 80px; display: inline-block; margin-left: 10px;" onchange="calcularDosimetria()">
                     </div>
                 </div>
+
             </div>
 
             <div class="card">
@@ -652,6 +731,7 @@
                     <div class="timeline-item">
                         <div class="result-title">Pena Provisória (2ª Fase)</div>
                         <div style="font-size: 0.9rem;" id="resPenaProv">-</div>
+                        <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 5px;" id="resAnalisePrep"></div>
                         <div id="avisoSumulaAtenuante" class="alerta-sumula">⚠️ Súmula 231 STJ: Travado no Mínimo</div>
                         <div id="avisoSumulaAgravante" class="alerta-sumula maximo">⚠️ Súmula 231 STJ: Travado no Máximo</div>
                     </div>
@@ -679,7 +759,6 @@
 
     </div>
 
-    <!-- RODAPÉ DE CRÉDITOS -->
     <div class="footer-creditos">
         Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
     </div>
@@ -687,6 +766,34 @@
     <script>
         let moduloDrogasAtivo = false;
         let textoDispositivoGlobal = ""; 
+
+        // Função para limitar checkboxes
+        function limitarCheckboxes(seletor, avisoId, limite) {
+            const boxes = document.querySelectorAll(seletor);
+            const selecionados = document.querySelectorAll(`${seletor}:checked`).length;
+            const aviso = document.getElementById(avisoId);
+            
+            if (selecionados >= limite) {
+                aviso.style.display = 'block';
+                boxes.forEach(box => {
+                    if (!box.checked) box.parentNode.classList.add('disabled');
+                });
+            } else {
+                aviso.style.display = 'none';
+                boxes.forEach(box => {
+                    box.parentNode.classList.remove('disabled');
+                });
+            }
+            
+            // Lógica específica para exibir multirreincidência
+            if (seletor === '.agravante') {
+                const isReincidente = document.getElementById('chkReincidente').checked;
+                document.getElementById('boxMultirreincidencia').style.display = isReincidente ? 'block' : 'none';
+                if (!isReincidente) document.getElementById('selMultirreincidencia').value = 'nao';
+            }
+
+            calcularDosimetria();
+        }
 
         function copiarDispositivo() {
             navigator.clipboard.writeText(textoDispositivoGlobal).then(() => {
@@ -708,11 +815,14 @@
             if(moduloDrogasAtivo) toggleDrogas();
             document.getElementById('seletorCrime').value = 'manual';
             document.querySelectorAll('.art59').forEach(cb => cb.checked = false);
-            document.getElementById('chkReincidente').checked = false;
-            document.getElementById('agravantesComuns').value = 0;
-            document.getElementById('agravantesPrep').value = 0;
-            document.getElementById('atenuantesComuns').value = 0;
-            document.getElementById('atenuantesPrep').value = 0;
+            document.querySelectorAll('.agravante').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.atenuante').forEach(cb => cb.checked = false);
+            
+            limitarCheckboxes('.agravante', 'limiteAgravante', 6);
+            limitarCheckboxes('.atenuante', 'limiteAtenuante', 6);
+            
+            document.getElementById('agravantesPrepManual').value = 0;
+            document.getElementById('atenuantesPrepManual').value = 0;
             document.getElementById('minorante').value = "0";
             document.getElementById('majorante').value = "0";
             document.getElementById('tipoConcurso').value = 'nenhum';
@@ -863,31 +973,81 @@
             const totalDesfavoraveis = checksArt59.length;
             
             let listaDesfavoraveis = [];
-            checksArt59.forEach(cb => listaDesfavoraveis.push(cb.parentNode.textContent.trim()));
+            checksArt59.forEach(cb => listaDesfavoraveis.push(cb.parentNode.textContent.trim().replace(' Prep', '')));
 
             let penaBase = minDias + (((maxDias - minDias) / divisorBase) * totalDesfavoraveis);
             let multaBase = temMulta ? (minMulta + (((maxMulta - minMulta) / divisorBase) * totalDesfavoraveis)) : 0;
 
-            // 2ª FASE
-            const agrComum = parseFloat(document.getElementById('agravantesComuns').value) || 0;
-            const agrPrep = parseFloat(document.getElementById('agravantesPrep').value) || 0;
-            const ateComum = parseFloat(document.getElementById('atenuantesComuns').value) || 0;
-            const atePrep = parseFloat(document.getElementById('atenuantesPrep').value) || 0;
-            const isReincidente = document.getElementById('chkReincidente').checked;
+            // 2ª FASE - Análise de Preponderância (Art. 67, CP)
+            let listaAgravantes = [];
+            let listaAtenuantes = [];
+            let agrPrep = parseInt(document.getElementById('agravantesPrepManual').value) || 0;
+            let agrComum = 0;
+            let atePrep = parseInt(document.getElementById('atenuantesPrepManual').value) || 0;
+            let ateComum = 0;
+
+            let isReincidente = document.getElementById('chkReincidente').checked;
+            let isMultirreincidente = document.getElementById('selMultirreincidencia').value === 'sim';
+            let temConfissao = document.querySelector('.atenuante.confissao').checked;
+
+            document.querySelectorAll('.agravante:checked').forEach(cb => {
+                let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
+                listaAgravantes.push(textoCb);
+                if (cb.classList.contains('prep')) agrPrep++;
+                else agrComum++;
+            });
+
+            document.querySelectorAll('.atenuante:checked').forEach(cb => {
+                let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
+                listaAtenuantes.push(textoCb);
+                if (cb.classList.contains('prep')) atePrep++;
+                else ateComum++;
+            });
+
+            // Lógica STJ compensação: Confissão vs Reincidência
+            let textoAnalise = "";
+            let agrEfetivaPrep = agrPrep;
+            let ateEfetivaPrep = atePrep;
+
+            if (isReincidente && temConfissao) {
+                if (isMultirreincidente) {
+                    textoAnalise = "Conforme STJ (Tema 585 e afins), a multirreincidência prepondera sobre a confissão espontânea. ";
+                    // Não compensa tudo, a agravante prevalece (mantemos os valores originais para a matemática)
+                } else {
+                    textoAnalise = "Conforme Tema 585/STJ, a agravante da reincidência e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
+                    agrEfetivaPrep--; // Subtrai 1 de cada para efeito matemático
+                    ateEfetivaPrep--;
+                }
+            } else if (agrPrep > 0 && atePrep > 0) {
+                 // Simplificação para outras preponderantes que se anulam
+                 let compensar = Math.min(agrEfetivaPrep, ateEfetivaPrep);
+                 agrEfetivaPrep -= compensar;
+                 ateEfetivaPrep -= compensar;
+                 if(!textoAnalise) textoAnalise = "Houve compensação entre circunstâncias preponderantes antagônicas. ";
+            }
+            
+            // Mesma lógica para comuns
+            if (agrComum > 0 && ateComum > 0) {
+                 let compensarComum = Math.min(agrComum, ateComum);
+                 agrComum -= compensarComum;
+                 ateComum -= compensarComum;
+                 textoAnalise += "Circunstâncias genéricas antagônicas foram compensadas.";
+            }
 
             let penaProv = penaBase;
             let multaProv = multaBase;
 
+            // Aplica as frações nos valores EFETIVOS resultantes da compensação
             penaProv += (penaBase * (1/6)) * agrComum;
-            penaProv += (penaBase * (1/5)) * agrPrep;
+            penaProv += (penaBase * (1/5)) * agrEfetivaPrep;
             penaProv -= (penaBase * (1/6)) * ateComum;
-            penaProv -= (penaBase * (1/5)) * atePrep;
+            penaProv -= (penaBase * (1/5)) * ateEfetivaPrep;
 
             if (temMulta) {
                 multaProv += (multaBase * (1/6)) * agrComum;
-                multaProv += (multaBase * (1/5)) * agrPrep;
+                multaProv += (multaBase * (1/5)) * agrEfetivaPrep;
                 multaProv -= (multaBase * (1/6)) * ateComum;
-                multaProv -= (multaBase * (1/5)) * atePrep;
+                multaProv -= (multaBase * (1/5)) * ateEfetivaPrep;
             }
 
             // Súmula 231 STJ
@@ -1026,20 +1186,17 @@
             if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
 
             texto += "2ª FASE (PENA PROVISÓRIA): ";
-            let txtAgravAten = [];
-            if (agrComum > 0) txtAgravAten.push(`${agrComum} agravante(s) comum(ns)`);
-            if (agrPrep > 0) txtAgravAten.push(`${agrPrep} agravante(s) preponderante(s)`);
-            if (ateComum > 0) txtAgravAten.push(`${ateComum} atenuante(s) comum(ns)`);
-            if (atePrep > 0) txtAgravAten.push(`${atePrep} atenuante(s) preponderante(s)`);
             
-            if (txtAgravAten.length > 0) {
-                texto += `Reconheço a presença de ${txtAgravAten.join(' e ')}. `;
+            if (listaAgravantes.length > 0 || listaAtenuantes.length > 0) {
+                if (listaAgravantes.length > 0) texto += `Reconheço a(s) agravante(s) de: ${listaAgravantes.join('; ')}. `;
+                if (listaAtenuantes.length > 0) texto += `Reconheço a(s) atenuante(s) de: ${listaAtenuantes.join('; ')}. `;
+                if (textoAnalise) texto += textoAnalise;
             } else {
                 texto += `Inexistem circunstâncias agravantes ou atenuantes genéricas a serem valoradas. `;
             }
 
-            if (aplicouAtenuanteSumula) texto += `Em estrita observância à Súmula 231 do STJ, a incidência da circunstância atenuante não pode conduzir à redução da pena abaixo do mínimo legal. `;
-            if (aplicouAgravanteSumula) texto += `Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
+            if (aplicouAtenuanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância atenuante não pode conduzir à redução da pena abaixo do mínimo legal. `;
+            if (aplicouAgravanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
             
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
             if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
@@ -1090,6 +1247,7 @@
 
             document.getElementById('resPenaBase').innerHTML = txtBase;
             document.getElementById('resPenaProv').innerHTML = txtProv;
+            document.getElementById('resAnalisePrep').innerText = textoAnalise; // Mostra aviso de compensação
             document.getElementById('resPenaTerc').innerHTML = txtTerc;
             
             document.getElementById('avisoSumulaAtenuante').style.display = aplicouAtenuanteSumula ? 'block' : 'none';
@@ -1122,7 +1280,7 @@
             if (nomeRegime === 'FECHADO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--danger)';
             else if (nomeRegime === 'SEMIABERTO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--warning)';
             else if (nomeRegime === 'ABERTO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--success)';
-            else document.getElementById('resRegimeBadge').style.backgroundColor = '#64748b'; // Extinto
+            else document.getElementById('resRegimeBadge').style.backgroundColor = '#64748b'; 
         }
 
         window.onload = function() {
