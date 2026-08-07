@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Dosimetria</title>
+    <title>Calculadora de Dosimetria - TJ</title>
     <style>
         :root {
             --primary: #0f172a;
@@ -12,6 +12,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --purple: #6366f1;
             --bg: #f8fafc;
             --surface: #ffffff;
             --text: #334155;
@@ -271,8 +272,15 @@
             border-color: rgba(239, 68, 68, 0.4);
         }
 
-        button.btn-calcular {
-            background-color: var(--accent);
+        .botoes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button.btn-copiar {
+            background-color: var(--purple);
             color: white;
             border: none;
             padding: 15px;
@@ -281,13 +289,25 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            margin-top: 20px;
             transition: background 0.3s;
         }
 
-        button.btn-calcular:hover {
-            background-color: #2563eb;
+        button.btn-copiar:hover { background-color: #4f46e5; }
+        
+        button.btn-calcular {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
         }
+
+        button.btn-calcular:hover { background-color: #2563eb; }
 
         button.btn-limpar {
             background-color: #64748b;
@@ -299,13 +319,10 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
             transition: background 0.3s;
         }
 
-        button.btn-limpar:hover {
-            background-color: #475569;
-        }
+        button.btn-limpar:hover { background-color: #475569; }
 
         .footer-creditos {
             text-align: center;
@@ -318,13 +335,8 @@
         }
 
         @media (max-width: 900px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-            }
-            .results-column {
-                position: static;
-                order: -1; 
-            }
+            .dashboard-container { grid-template-columns: 1fr; }
+            .results-column { position: static; order: -1; }
         }
     </style>
 </head>
@@ -630,34 +642,52 @@
                     </div>
                 </div>
 
-                <button class="btn-calcular" onclick="window.print()">🖨️ Imprimir Resumo</button>
-                <button class="btn-limpar" onclick="limparDados()" type="button">🧹 Limpar Tudo</button>
+                <div class="botoes-container">
+                    <button class="btn-copiar" id="btnCopiarTexto" onclick="copiarDispositivo()" type="button">📋 Copiar Dispositivo (Texto)</button>
+                    <button class="btn-calcular" onclick="window.print()" type="button">🖨️ Imprimir Resumo</button>
+                    <button class="btn-limpar" onclick="limparDados()" type="button">🧹 Limpar Tudo</button>
+                </div>
             </div>
         </div>
 
     </div>
 
     <!-- RODAPÉ DE CRÉDITOS -->
-    <div class="footer-creditos">Thiago Melo</strong> | Assessor Jurídico no TJTO
+    <div class="footer-creditos">
+        Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
     </div>
 
     <script>
         let moduloDrogasAtivo = false;
+        let textoDispositivoGlobal = ""; // Variável que armazena o texto gerado
+
+        // FUNÇÃO DE COPIAR TEXTO GERADO
+        function copiarDispositivo() {
+            navigator.clipboard.writeText(textoDispositivoGlobal).then(() => {
+                const btn = document.getElementById('btnCopiarTexto');
+                const originalText = btn.innerText;
+                btn.innerText = "✅ Texto Copiado com Sucesso!";
+                btn.style.backgroundColor = "#10b981"; // Muda para verde
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = "var(--purple)";
+                }, 3000);
+            }).catch(err => {
+                alert('Erro ao copiar o texto. Tente novamente.');
+            });
+        }
 
         function limparDados() {
             if(moduloDrogasAtivo) toggleDrogas();
-
             document.getElementById('seletorCrime').value = 'manual';
-            
             document.querySelectorAll('.art59').forEach(cb => cb.checked = false);
-
             document.getElementById('agravantesComuns').value = 0;
             document.getElementById('agravantesPrep').value = 0;
             document.getElementById('atenuantesComuns').value = 0;
             document.getElementById('atenuantesPrep').value = 0;
             document.getElementById('minorante').value = "0";
             document.getElementById('majorante').value = "0";
-
             document.getElementById('tipoConcurso').value = 'nenhum';
             document.getElementById('concAnos').value = 0;
             document.getElementById('concMeses').value = 0;
@@ -668,13 +698,11 @@
             document.getElementById('concMultiplicador').value = "2";
             document.getElementById('concQtdCrimesEsp').value = 2;
             mudarConcurso();
-
             document.getElementById('dataPrisao').value = '';
             document.getElementById('dataSoltura').value = '';
             document.getElementById('detracaoAnos').value = 0;
             document.getElementById('detracaoMeses').value = 0;
             document.getElementById('detracaoDias').value = 0;
-
             carregarCrime(); 
         }
 
@@ -801,9 +829,11 @@
 
             // 1ª FASE
             let divisorBase = moduloDrogasAtivo ? 10 : 8; 
-            const normaisCheck = document.querySelectorAll('.art59.normal:checked').length;
-            const drogasCheck = document.querySelectorAll('.art59.droga:checked').length;
-            const totalDesfavoraveis = normaisCheck + drogasCheck;
+            const checksArt59 = document.querySelectorAll('.art59:checked');
+            const totalDesfavoraveis = checksArt59.length;
+            
+            let listaDesfavoraveis = [];
+            checksArt59.forEach(cb => listaDesfavoraveis.push(cb.parentNode.textContent.trim()));
 
             let penaBase = minDias + (((maxDias - minDias) / divisorBase) * totalDesfavoraveis);
             let multaBase = temMulta ? (minMulta + (((maxMulta - minMulta) / divisorBase) * totalDesfavoraveis)) : 0;
@@ -829,7 +859,7 @@
                 multaProv -= (multaBase * (1/5)) * atePrep;
             }
 
-            // Verificação da Súmula 231 STJ
+            // Súmula 231 STJ
             let aplicouAtenuanteSumula = false;
             let aplicouAgravanteSumula = false;
 
@@ -848,8 +878,10 @@
             }
 
             // 3ª FASE
-            const minorante = parseFloat(document.getElementById('minorante').value);
-            const majorante = parseFloat(document.getElementById('majorante').value);
+            const selMinorante = document.getElementById('minorante');
+            const selMajorante = document.getElementById('majorante');
+            const minorante = parseFloat(selMinorante.value);
+            const majorante = parseFloat(selMajorante.value);
 
             let penaTerc = penaProv;
             let multaTerc = multaProv;
@@ -866,7 +898,8 @@
             // 4ª FASE: CONCURSO DE CRIMES
             let penaConcurso = penaTerc;
             let multaConcurso = multaTerc;
-            const tipoConc = document.getElementById('tipoConcurso').value;
+            const tipoConcSelect = document.getElementById('tipoConcurso');
+            const tipoConc = tipoConcSelect.value;
             let aplicouConcurso = false;
 
             if (tipoConc === 'material') {
@@ -904,6 +937,72 @@
 
             let penaFinalDetraida = penaConcurso - totalDetracaoDias;
             if (penaFinalDetraida < 0) penaFinalDetraida = 0; 
+
+
+            // GERADOR DE TEXTO (DISPOSITIVO)
+            let texto = "--- DOSIMETRIA DA PENA ---\n\n";
+
+            // Texto 1ª Fase
+            texto += "1ª FASE (PENA-BASE): ";
+            if(listaDesfavoraveis.length > 0) {
+                texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico a existência de circunstâncias judiciais desfavoráveis ao réu, consistentes em: ${listaDesfavoraveis.join(', ')}. `;
+            } else {
+                texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico que as circunstâncias judiciais são, em sua maioria, favoráveis ou neutras. `;
+            }
+            texto += `Dessa forma, fixo a pena-base em ${formatarDias(penaBase)}`;
+            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
+
+            // Texto 2ª Fase
+            texto += "2ª FASE (PENA PROVISÓRIA): ";
+            let txtAgravAten = [];
+            if (agrComum > 0) txtAgravAten.push(`${agrComum} agravante(s) comum(ns)`);
+            if (agrPrep > 0) txtAgravAten.push(`${agrPrep} agravante(s) preponderante(s)`);
+            if (ateComum > 0) txtAgravAten.push(`${ateComum} atenuante(s) comum(ns)`);
+            if (atePrep > 0) txtAgravAten.push(`${atePrep} atenuante(s) preponderante(s)`);
+            
+            if (txtAgravAten.length > 0) {
+                texto += `Reconheço a presença de ${txtAgravAten.join(' e ')}. `;
+            } else {
+                texto += `Inexistem circunstâncias agravantes ou atenuantes genéricas a serem valoradas. `;
+            }
+
+            if (aplicouAtenuanteSumula) texto += `Em estrita observância à Súmula 231 do STJ, a incidência da circunstância atenuante não pode conduzir à redução da pena abaixo do mínimo legal. `;
+            if (aplicouAgravanteSumula) texto += `Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
+            
+            texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
+            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
+
+            // Texto 3ª Fase
+            texto += "3ª FASE (PENA DEFINITIVA): ";
+            if (minorante === 0 && majorante === 0) {
+                texto += "Na terceira fase, não constato a presença de causas de aumento ou de diminuição de pena. ";
+            } else {
+                if (minorante > 0) texto += `Verifico a presença de causa de diminuição de pena, razão pela qual reduzo a reprimenda na fração de ${selMinorante.options[selMinorante.selectedIndex].text}. `;
+                if (majorante > 0) texto += `Verifico a presença de causa de aumento de pena, razão pela qual exaspero a reprimenda na fração de ${selMajorante.options[selMajorante.selectedIndex].text}. `;
+            }
+            texto += `Sendo assim, torno a pena definitiva em ${formatarDias(penaTerc)}`;
+            if(temMulta) texto += ` e ${Math.round(multaTerc)} dias-multa.\n\n`; else texto += ".\n\n";
+
+            // Texto Concurso
+            if (aplicouConcurso) {
+                texto += "CONCURSO DE CRIMES: ";
+                texto += `Em virtude do reconhecimento de ${tipoConcSelect.options[tipoConcSelect.selectedIndex].text}, a reprimenda unificada perfaz o total de ${formatarDias(penaConcurso)}`;
+                if(temMulta) texto += ` e ${Math.round(multaConcurso)} dias-multa, cumulados nos termos do art. 72 do CP.\n\n`; else texto += ".\n\n";
+            }
+
+            // Texto Detração
+            if (totalDetracaoDias > 0) {
+                texto += "DETRAÇÃO (ART. 42, CP): ";
+                texto += `Considerando o período de ${formatarDias(totalDetracaoDias)} em que o sentenciado permaneceu preso provisoriamente, procedo ao abatimento do quantum determinado pelo art. 387, § 2º, do CPP. A pena restante a cumprir, portanto, passa a ser de ${formatarDias(penaFinalDetraida)}.\n\n`;
+            }
+
+            texto += "--- RESULTADO FINAL ---\n";
+            texto += `PENA PRIVATIVA DE LIBERDADE: ${formatarDias(penaFinalDetraida)}.\n`;
+            if (temMulta) texto += `PENA DE MULTA: ${Math.round(multaConcurso)} dias-multa.`;
+
+            // Guarda o texto na variável global para o botão copiar
+            textoDispositivoGlobal = texto;
+
 
             // ATUALIZAR INTERFACE
             let txtBase = `<b>P. Lib:</b> ${formatarDias(penaBase)}`;
