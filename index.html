@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Dosimetria - TJ</title>
+    <title>Calculadora de Dosimetria</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a;       /* Azul Judiciário Profundo */
+            --primary: #1e3a8a;       
             --primary-hover: #1e40af;
-            --accent: #2563eb;        /* Azul de Ação */
-            --success: #059669;       /* Verde Elegante */
-            --warning: #d97706;       /* Laranja de Alerta */
-            --danger: #dc2626;        /* Vermelho Erro */
-            --bg: #f3f4f6;            /* Fundo Cinza Super Claro */
-            --surface: #ffffff;       /* Cartões Brancos */
-            --text-main: #1f2937;     /* Texto Principal */
-            --text-muted: #6b7280;    /* Texto Secundário */
-            --border: #e5e7eb;        /* Bordas Suaves */
+            --accent: #2563eb;        
+            --success: #059669;       
+            --warning: #d97706;       
+            --danger: #dc2626;        
+            --purple: #6366f1;
+            --bg: #f3f4f6;            
+            --surface: #ffffff;       
+            --text-main: #1f2937;     
+            --text-muted: #6b7280;    
+            --border: #e5e7eb;        
         }
 
         body {
@@ -32,7 +33,6 @@
             line-height: 1.5;
         }
 
-        /* BARRA SUPERIOR */
         .navbar {
             background-color: var(--surface);
             color: var(--primary);
@@ -62,7 +62,6 @@
             font-weight: 500;
         }
 
-        /* ESTRUTURA PRINCIPAL */
         .dashboard-container {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -80,7 +79,6 @@
             gap: 25px;
         }
 
-        /* CARTÕES (CARDS) */
         .card {
             background: var(--surface);
             border-radius: 12px;
@@ -117,7 +115,6 @@
             border-radius: 2px;
         }
 
-        /* FORMULÁRIOS */
         .input-group {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -155,10 +152,7 @@
             width: 100%;
         }
 
-        input:hover, select:hover {
-            border-color: #d1d5db;
-        }
-
+        input:hover, select:hover { border-color: #d1d5db; }
         input:focus, select:focus {
             outline: none;
             border-color: var(--accent);
@@ -166,7 +160,6 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        /* CHECKBOXES MELHORADOS (Estilo Pílula/Cartão) */
         .checkbox-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -239,7 +232,6 @@
             display: none;
         }
 
-        /* BOTÕES PEQUENOS E TOGGLES */
         .toggle-btn {
             background: var(--surface);
             color: var(--warning);
@@ -257,7 +249,6 @@
             color: white;
         }
 
-        /* COLUNA RESULTADOS (PAINEL FIXO) */
         .results-column {
             position: sticky;
             top: 90px;
@@ -280,6 +271,36 @@
             letter-spacing: 1px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 12px;
+        }
+
+        .didatico-toggle {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .didatico-toggle:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .didatico-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: #a855f7;
+            cursor: pointer;
+        }
+
+        .didatico-toggle span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e2e8f0;
         }
 
         .result-title {
@@ -358,7 +379,12 @@
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        /* BOTÕES DE AÇÃO */
+        .alerta-sumula.maximo {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
         .botoes-container {
             display: flex;
             flex-direction: column;
@@ -401,7 +427,6 @@
             margin-top: auto;
         }
 
-        /* SCROLL CUSTOMIZADO PARA CAIXA DE AGRAVANTES */
         .fase2-container {
             max-height: 450px;
             overflow-y: auto;
@@ -430,9 +455,9 @@
 
     <div class="dashboard-container">
         
-        <!-- COLUNA ESQUERDA: FORMULÁRIOS -->
         <div class="forms-column">
             
+            <!-- FASE 1 - PENA EM ABSTRATO -->
             <div class="card">
                 <div class="card-header">
                     <h2>Pena em Abstrato</h2>
@@ -516,6 +541,7 @@
                 </div>
             </div>
 
+            <!-- FASE 1 - CIRCUNSTÂNCIAS JUDICIAIS -->
             <div class="card">
                 <div class="card-header">
                     <h2>1ª Fase: Circunstâncias Judiciais</h2>
@@ -539,7 +565,7 @@
                 </div>
             </div>
 
-            <!-- FASE 2 -->
+            <!-- FASE 2 - AGRAVANTES E ATENUANTES -->
             <div class="card">
                 <div class="card-header">
                     <h2>2ª Fase: Agravantes e Atenuantes</h2>
@@ -617,9 +643,9 @@
                         </label>
                     </div>
                 </div>
-
             </div>
 
+            <!-- FASE 3 - MAJORANTES E MINORANTES -->
             <div class="card">
                 <div class="card-header">
                     <h2>3ª Fase: Majorantes e Minorantes</h2>
@@ -714,6 +740,7 @@
                 </div>
             </div>
 
+            <!-- DETRAÇÃO -->
             <div class="card" style="border-left: 4px solid var(--accent);">
                 <div class="card-header">
                     <h2>Detração Penal (Art. 42, CP)</h2>
@@ -733,7 +760,7 @@
                     </div>
                 </div>
 
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0;">Ou insira/ajuste o tempo manualmente (ex: prisões fracionadas):</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0;">Ou insira/ajuste o tempo manualmente:</p>
                 <div class="input-group">
                     <div class="input-box"><label>Anos</label><input type="number" id="detracaoAnos" value="0" min="0"></div>
                     <div class="input-box"><label>Meses</label><input type="number" id="detracaoMeses" value="0" min="0"></div>
@@ -747,6 +774,12 @@
         <div class="results-column">
             <div class="result-card">
                 <h2>Resumo da Sentença</h2>
+
+                <!-- NOVO MODO DIDÁTICO TOGGLE -->
+                <label class="didatico-toggle" title="Ativa explicações sobre a jurisprudência aplicável ao cálculo">
+                    <input type="checkbox" id="chkDidatico" onchange="calcularDosimetria()">
+                    <span>🎓 Ativar Modo Didático (STJ/STF)</span>
+                </label>
                 
                 <div class="result-block">
                     <div class="result-title">Pena Definitiva (Restante a cumprir)</div>
@@ -791,7 +824,6 @@
 
     </div>
 
-    <!-- RODAPÉ DE CRÉDITOS -->
     <div class="footer-creditos">
         Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
     </div>
@@ -800,13 +832,11 @@
         let moduloDrogasAtivo = false;
         let textoDispositivoGlobal = ""; 
 
-        // Função para manter as duas checkboxes de reincidência sincronizadas
         function sincronizarReincidencia(fonteId, destinoId) {
             document.getElementById(destinoId).checked = document.getElementById(fonteId).checked;
             calcularDosimetria();
         }
 
-        // Função para limitar checkboxes
         function limitarCheckboxes(seletor, avisoId, limite) {
             const boxes = document.querySelectorAll(seletor);
             const selecionados = document.querySelectorAll(`${seletor}:checked`).length;
@@ -865,6 +895,7 @@
             document.getElementById('chkReincidenteAux').checked = false;
             document.getElementById('selMultirreincidencia').value = 'nao';
             document.getElementById('boxMultirreincidencia').style.display = 'none';
+            document.getElementById('chkDidatico').checked = false;
 
             limitarCheckboxes('.agravante', 'limiteAgravante', 6);
             limitarCheckboxes('.atenuante', 'limiteAtenuante', 6);
@@ -986,7 +1017,7 @@
         }
 
         function formatarDias(totalDias) {
-            if (totalDias <= 0) return '0 dias (Pena cumprida)';
+            if (totalDias <= 0) return '0 dias (Pena cumprida integralmente)';
             totalDias = Math.round(totalDias);
             const anos = Math.floor(totalDias / 360);
             const resto = totalDias % 360;
@@ -1002,6 +1033,7 @@
 
         function calcularDosimetria() {
             const temMulta = document.getElementById('temMulta').checked;
+            const modoDidatico = document.getElementById('chkDidatico').checked;
             const unidade = document.getElementById('unidadePena').value;
             const minInput = parseFloat(document.getElementById('minPena').value) || 0;
             const maxInput = parseFloat(document.getElementById('maxPena').value) || 0;
@@ -1026,7 +1058,8 @@
                 listaDesfavoraveis.push(txt);
             });
 
-            let penaBase = minDias + (((maxDias - minDias) / divisorBase) * totalDesfavoraveis);
+            let incrementoPena = ((maxDias - minDias) / divisorBase) * totalDesfavoraveis;
+            let penaBase = minDias + incrementoPena;
             let multaBase = temMulta ? (minMulta + (((maxMulta - minMulta) / divisorBase) * totalDesfavoraveis)) : 0;
 
             // 2ª FASE
@@ -1059,6 +1092,7 @@
             let textoAnalise = "";
             let agrEfetivaPrep = agrPrep;
             let ateEfetivaPrep = atePrep;
+            let aplicouCompensacaoEspecial = false;
 
             if (isReincidente && temConfissao) {
                 if (isMultirreincidente) {
@@ -1067,6 +1101,7 @@
                     textoAnalise = "Conforme Tema 585/STJ, a agravante da reincidência e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
                     agrEfetivaPrep--; 
                     ateEfetivaPrep--;
+                    aplicouCompensacaoEspecial = true;
                 }
             } else if (agrEfetivaPrep > 0 && ateEfetivaPrep > 0) {
                  let compensar = Math.min(agrEfetivaPrep, ateEfetivaPrep);
@@ -1084,6 +1119,8 @@
 
             let penaProv = penaBase;
             let multaProv = multaBase;
+
+            let teveAgravoAtenuante = (agrComum > 0 || agrEfetivaPrep > 0 || ateComum > 0 || ateEfetivaPrep > 0);
 
             penaProv += (penaBase * (1/6)) * agrComum;
             penaProv += (penaBase * (1/5)) * agrEfetivaPrep;
@@ -1178,6 +1215,7 @@
             let nomeRegime = "";
             let anosRegime = penaFinalDetraida / 360;
             let isReclusao = document.getElementById('tipoPrisao').value === 'reclusao';
+            let sumula269Ativada = false;
 
             if (isReclusao) {
                 if (anosRegime > 8) {
@@ -1186,7 +1224,11 @@
                     if (isReincidente) { nomeRegime = "FECHADO"; alineaRegime = "alíneas 'a' e 'b' (a contrario sensu)"; } 
                     else { nomeRegime = "SEMIABERTO"; alineaRegime = "alínea 'b'"; }
                 } else {
-                    if (isReincidente) { nomeRegime = "SEMIABERTO"; alineaRegime = "alíneas 'b' e 'c' c/c Súmula 269 STJ"; } 
+                    if (isReincidente) { 
+                        nomeRegime = "SEMIABERTO"; 
+                        alineaRegime = "alíneas 'b' e 'c' c/c Súmula 269 STJ"; 
+                        sumula269Ativada = true;
+                    } 
                     else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
                 }
             } else { 
@@ -1210,7 +1252,12 @@
                 texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico que as circunstâncias judiciais são, em sua maioria, favoráveis ou neutras. `;
             }
             texto += `Dessa forma, fixo a pena-base em ${formatarDias(penaBase)}`;
-            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
+            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n`; else texto += ".\n";
+            
+            if (modoDidatico && totalDesfavoraveis > 0) {
+                texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Segundo entendimento do STJ, o aumento na primeira fase obedece, como regra geral, à fração de 1/6 (ou 1/8 no caso do art. 59) sobre o intervalo entre as penas mínima e máxima para cada circunstância desfavorável.]\n`;
+            }
+            texto += "\n";
 
             texto += "2ª FASE (PENA PROVISÓRIA): ";
             if (listaAgravantes.length > 0 || listaAtenuantes.length > 0) {
@@ -1220,10 +1267,24 @@
             } else {
                 texto += `Inexistem circunstâncias agravantes ou atenuantes genéricas a serem valoradas. `;
             }
+
             if (aplicouAtenuanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância atenuante não pode conduzir à redução da pena abaixo do mínimo legal. `;
             if (aplicouAgravanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
+            
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
-            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
+            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n`; else texto += ".\n";
+
+            if (modoDidatico) {
+                if (teveAgravoAtenuante) {
+                    texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: O Código Penal não estabelece frações fixas para a segunda fase, mas a jurisprudência consolidada do STJ preconiza o uso da fração ideal de 1/6 para cada agravante ou atenuante genérica.`;
+                }
+                if (aplicouCompensacaoEspecial && teveAgravoAtenuante) {
+                    texto += ` Ademais, segundo o STJ (Tema 585), a atenuante da confissão diz respeito à personalidade do agente, devendo ser compensada com a agravante da reincidência, exceto nos casos de multirreincidência, que exige maior reprovação.]\n`;
+                } else if (teveAgravoAtenuante) {
+                    texto += `]\n`;
+                }
+            }
+            texto += "\n";
 
             texto += "3ª FASE (PENA DEFINITIVA): ";
             if (minorante === 0 && majorante === 0) {
@@ -1238,7 +1299,11 @@
             if (aplicouConcurso) {
                 texto += "CONCURSO DE CRIMES: ";
                 texto += `Em virtude do reconhecimento de ${tipoConcSelect.options[tipoConcSelect.selectedIndex].text}, a reprimenda unificada perfaz o total de ${formatarDias(penaConcurso)}`;
-                if(temMulta) texto += ` e ${Math.round(multaConcurso)} dias-multa, cumulados nos termos do art. 72 do CP.\n\n`; else texto += ".\n\n";
+                if(temMulta) texto += ` e ${Math.round(multaConcurso)} dias-multa, cumulados nos termos do art. 72 do CP.\n`; else texto += ".\n";
+                if (modoDidatico && temMulta) {
+                     texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Conforme o Art. 72 do CP, no concurso de crimes as penas de multa são aplicadas distinta e integralmente, por isso o valor da multa sofreu acréscimo proporcional ao número de delitos.]\n`;
+                }
+                texto += "\n";
             }
 
             if (totalDetracaoDias > 0) {
@@ -1248,7 +1313,11 @@
 
             if (penaFinalDetraida > 0) {
                 texto += "REGIME INICIAL DE CUMPRIMENTO:\n";
-                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, e considerando o quantum de pena a ser cumprido (${formatarDias(penaFinalDetraida)}) bem como a condição do réu (${isReincidente ? 'reincidente' : 'primário'}), fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n\n`;
+                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, e considerando o quantum de pena a ser cumprido (${formatarDias(penaFinalDetraida)}) bem como a condição do réu (${isReincidente ? 'reincidente' : 'primário'}), fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n`;
+                if (modoDidatico && sumula269Ativada) {
+                     texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Súmula 269, STJ - "É admissível a adoção do regime prisional semi-aberto aos reincidentes condenados a pena igual ou inferior a quatro anos se favoráveis as circunstâncias judiciais."]\n`;
+                }
+                texto += "\n";
             }
 
             texto += "--- RESULTADO FINAL ---\n";
