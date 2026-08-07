@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Dosimetria - TJ</title>
+    <title>Calculadora de Dosimetria</title>
     <style>
         :root {
             --primary: #0f172a;
@@ -229,6 +229,17 @@
             margin-top: 5px;
         }
 
+        .regime-badge {
+            background-color: #3b82f6;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
         .timeline {
             border-left: 2px solid #334155;
             padding-left: 15px;
@@ -361,44 +372,52 @@
                     <div class="input-box full-width">
                         <label>Tipo Penal (Catálogo do CP)</label>
                         <select id="seletorCrime" onchange="carregarCrime()">
-                            <option value="manual" data-min="1" data-max="4" data-unidade="anos" data-multa="true">Outro Crime / Preenchimento Manual</option>
+                            <option value="manual" data-min="1" data-max="4" data-unidade="anos" data-multa="true" data-prisao="reclusao">Outro Crime / Preenchimento Manual</option>
                             <optgroup label="Crimes Contra a Pessoa">
-                                <option value="121" data-min="6" data-max="20" data-unidade="anos" data-multa="false">Homicídio Simples (Art. 121, caput)</option>
-                                <option value="121q" data-min="12" data-max="30" data-unidade="anos" data-multa="false">Homicídio Qualificado (Art. 121, § 2º)</option>
-                                <option value="121a" data-min="20" data-max="40" data-unidade="anos" data-multa="false">Feminicídio (Art. 121-A)</option>
-                                <option value="129" data-min="3" data-max="12" data-unidade="meses" data-multa="false">Lesão Corporal Simples (Art. 129, caput)</option>
-                                <option value="129g" data-min="1" data-max="5" data-unidade="anos" data-multa="false">Lesão Corporal Grave (Art. 129, § 1º)</option>
-                                <option value="129vd" data-min="2" data-max="5" data-unidade="anos" data-multa="false">Lesão Corporal - Violência Doméstica (Art. 129, § 9º)</option>
-                                <option value="147" data-min="1" data-max="6" data-unidade="meses" data-multa="false">Ameaça (Art. 147)</option>
-                                <option value="148" data-min="1" data-max="3" data-unidade="anos" data-multa="false">Sequestro e Cárcere Privado (Art. 148)</option>
+                                <option value="121" data-min="6" data-max="20" data-unidade="anos" data-multa="false" data-prisao="reclusao">Homicídio Simples (Art. 121, caput)</option>
+                                <option value="121q" data-min="12" data-max="30" data-unidade="anos" data-multa="false" data-prisao="reclusao">Homicídio Qualificado (Art. 121, § 2º)</option>
+                                <option value="121a" data-min="20" data-max="40" data-unidade="anos" data-multa="false" data-prisao="reclusao">Feminicídio (Art. 121-A)</option>
+                                <option value="129" data-min="3" data-max="12" data-unidade="meses" data-multa="false" data-prisao="detencao">Lesão Corporal Simples (Art. 129, caput)</option>
+                                <option value="129g" data-min="1" data-max="5" data-unidade="anos" data-multa="false" data-prisao="reclusao">Lesão Corporal Grave (Art. 129, § 1º)</option>
+                                <option value="129vd" data-min="2" data-max="5" data-unidade="anos" data-multa="false" data-prisao="reclusao">Lesão Corporal - Violência Doméstica (Art. 129, § 9º)</option>
+                                <option value="147" data-min="1" data-max="6" data-unidade="meses" data-multa="false" data-prisao="detencao">Ameaça (Art. 147)</option>
+                                <option value="148" data-min="1" data-max="3" data-unidade="anos" data-multa="false" data-prisao="reclusao">Sequestro e Cárcere Privado (Art. 148)</option>
                             </optgroup>
                             <optgroup label="Crimes Contra o Patrimônio">
-                                <option value="155" data-min="1" data-max="6" data-unidade="anos" data-multa="true">Furto Simples (Art. 155, caput)</option>
-                                <option value="155q" data-min="2" data-max="8" data-unidade="anos" data-multa="true">Furto Qualificado (Art. 155, § 4º)</option>
-                                <option value="157" data-min="6" data-max="10" data-unidade="anos" data-multa="true">Roubo Simples (Art. 157, caput)</option>
-                                <option value="158" data-min="4" data-max="10" data-unidade="anos" data-multa="true">Extorsão (Art. 158, caput)</option>
-                                <option value="159" data-min="8" data-max="15" data-unidade="anos" data-multa="false">Extorsão mediante Sequestro (Art. 159, caput)</option>
-                                <option value="171" data-min="1" data-max="5" data-unidade="anos" data-multa="true">Estelionato (Art. 171, caput)</option>
-                                <option value="180" data-min="2" data-max="6" data-unidade="anos" data-multa="true">Receptação Simples (Art. 180, caput)</option>
+                                <option value="155" data-min="1" data-max="6" data-unidade="anos" data-multa="true" data-prisao="reclusao">Furto Simples (Art. 155, caput)</option>
+                                <option value="155q" data-min="2" data-max="8" data-unidade="anos" data-multa="true" data-prisao="reclusao">Furto Qualificado (Art. 155, § 4º)</option>
+                                <option value="157" data-min="6" data-max="10" data-unidade="anos" data-multa="true" data-prisao="reclusao">Roubo Simples (Art. 157, caput)</option>
+                                <option value="158" data-min="4" data-max="10" data-unidade="anos" data-multa="true" data-prisao="reclusao">Extorsão (Art. 158, caput)</option>
+                                <option value="159" data-min="8" data-max="15" data-unidade="anos" data-multa="false" data-prisao="reclusao">Extorsão mediante Sequestro (Art. 159, caput)</option>
+                                <option value="171" data-min="1" data-max="5" data-unidade="anos" data-multa="true" data-prisao="reclusao">Estelionato (Art. 171, caput)</option>
+                                <option value="180" data-min="2" data-max="6" data-unidade="anos" data-multa="true" data-prisao="reclusao">Receptação Simples (Art. 180, caput)</option>
                             </optgroup>
                             <optgroup label="Crimes Contra a Dignidade Sexual">
-                                <option value="213" data-min="6" data-max="10" data-unidade="anos" data-multa="false">Estupro (Art. 213, caput)</option>
-                                <option value="215a" data-min="1" data-max="5" data-unidade="anos" data-multa="false">Importunação Sexual (Art. 215-A)</option>
-                                <option value="217a" data-min="10" data-max="18" data-unidade="anos" data-multa="true">Estupro de Vulnerável (Art. 217-A)</option>
+                                <option value="213" data-min="6" data-max="10" data-unidade="anos" data-multa="false" data-prisao="reclusao">Estupro (Art. 213, caput)</option>
+                                <option value="215a" data-min="1" data-max="5" data-unidade="anos" data-multa="false" data-prisao="reclusao">Importunação Sexual (Art. 215-A)</option>
+                                <option value="217a" data-min="10" data-max="18" data-unidade="anos" data-multa="true" data-prisao="reclusao">Estupro de Vulnerável (Art. 217-A)</option>
                             </optgroup>
                             <optgroup label="Crimes Contra a Administração Pública">
-                                <option value="312" data-min="2" data-max="12" data-unidade="anos" data-multa="true">Peculato (Art. 312, caput)</option>
-                                <option value="316" data-min="2" data-max="12" data-unidade="anos" data-multa="true">Concussão (Art. 316)</option>
-                                <option value="317" data-min="2" data-max="12" data-unidade="anos" data-multa="true">Corrupção Passiva (Art. 317, caput)</option>
-                                <option value="333" data-min="2" data-max="12" data-unidade="anos" data-multa="true">Corrupção Ativa (Art. 333, caput)</option>
+                                <option value="312" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Peculato (Art. 312, caput)</option>
+                                <option value="316" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Concussão (Art. 316)</option>
+                                <option value="317" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Corrupção Passiva (Art. 317, caput)</option>
+                                <option value="333" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Corrupção Ativa (Art. 333, caput)</option>
                             </optgroup>
                         </select>
                     </div>
 
-                    <div class="input-box full-width" style="margin-top: 5px; margin-bottom: 5px;">
-                        <label class="checkbox-item" style="width: fit-content; background: #e2e8f0; color: #1e293b; font-weight: bold;">
-                            <input type="checkbox" id="temMulta" onchange="toggleMulta()" checked> 💰 Este crime prevê Pena de Multa Cumulativa
+                    <div class="input-box" style="margin-top: 5px; margin-bottom: 5px;">
+                        <label class="checkbox-item" style="background: #e2e8f0; color: #1e293b; font-weight: bold;">
+                            <input type="checkbox" id="temMulta" onchange="toggleMulta()" checked> 💰 Este crime prevê Multa
                         </label>
+                    </div>
+
+                    <div class="input-box">
+                        <label>Tipo de Prisão</label>
+                        <select id="tipoPrisao" onchange="calcularDosimetria()">
+                            <option value="reclusao">Reclusão</option>
+                            <option value="detencao">Detenção</option>
+                        </select>
                     </div>
 
                     <div class="input-box">
@@ -454,6 +473,13 @@
                 <div class="card-header">
                     <h2>2ª Fase: Agravantes e Atenuantes</h2>
                 </div>
+                
+                <div style="background: #fef2f2; border: 1px dashed #fca5a5; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                    <label class="checkbox-item" style="background: transparent; color: #b91c1c; font-weight: bold; margin: 0; padding: 0;">
+                        <input type="checkbox" id="chkReincidente" onchange="calcularDosimetria()"> ⚠️ O Réu é Reincidente (Impacta o Regime - Art. 33, CP)
+                    </label>
+                </div>
+
                 <div class="input-group">
                     <div class="input-box">
                         <label>Agravantes (1/6)</label>
@@ -615,6 +641,7 @@
                     <div class="result-title">Pena Definitiva (Restante a cumprir)</div>
                     <div class="result-value highlight" id="resPenaDefinitiva">0 anos</div>
                     <div class="result-multa" id="resMultaDefinitiva" style="display: block;">0 dias-multa</div>
+                    <div class="regime-badge" id="resRegimeBadge">REGIME: ABERTO</div>
                 </div>
 
                 <div class="timeline">
@@ -659,15 +686,14 @@
 
     <script>
         let moduloDrogasAtivo = false;
-        let textoDispositivoGlobal = ""; // Variável que armazena o texto gerado
+        let textoDispositivoGlobal = ""; 
 
-        // FUNÇÃO DE COPIAR TEXTO GERADO
         function copiarDispositivo() {
             navigator.clipboard.writeText(textoDispositivoGlobal).then(() => {
                 const btn = document.getElementById('btnCopiarTexto');
                 const originalText = btn.innerText;
                 btn.innerText = "✅ Texto Copiado com Sucesso!";
-                btn.style.backgroundColor = "#10b981"; // Muda para verde
+                btn.style.backgroundColor = "#10b981"; 
                 
                 setTimeout(() => {
                     btn.innerText = originalText;
@@ -682,6 +708,7 @@
             if(moduloDrogasAtivo) toggleDrogas();
             document.getElementById('seletorCrime').value = 'manual';
             document.querySelectorAll('.art59').forEach(cb => cb.checked = false);
+            document.getElementById('chkReincidente').checked = false;
             document.getElementById('agravantesComuns').value = 0;
             document.getElementById('agravantesPrep').value = 0;
             document.getElementById('atenuantesComuns').value = 0;
@@ -735,6 +762,7 @@
                 document.getElementById('minPena').value = option.getAttribute('data-min');
                 document.getElementById('maxPena').value = option.getAttribute('data-max');
                 document.getElementById('unidadePena').value = option.getAttribute('data-unidade');
+                document.getElementById('tipoPrisao').value = option.getAttribute('data-prisao');
                 
                 const hasMulta = option.getAttribute('data-multa') === 'true';
                 document.getElementById('temMulta').checked = hasMulta;
@@ -745,6 +773,7 @@
                 document.getElementById('minPena').value = 1;
                 document.getElementById('maxPena').value = 4;
                 document.getElementById('unidadePena').value = 'anos';
+                document.getElementById('tipoPrisao').value = 'reclusao';
                 
                 document.getElementById('temMulta').checked = true;
                 toggleMulta();
@@ -762,6 +791,7 @@
                 document.getElementById('unidadePena').value = 'anos';
                 document.getElementById('minPena').value = 5;
                 document.getElementById('maxPena').value = 15;
+                document.getElementById('tipoPrisao').value = 'reclusao';
                 
                 document.getElementById('temMulta').checked = true;
                 document.getElementById('minMulta').value = 500;
@@ -843,6 +873,7 @@
             const agrPrep = parseFloat(document.getElementById('agravantesPrep').value) || 0;
             const ateComum = parseFloat(document.getElementById('atenuantesComuns').value) || 0;
             const atePrep = parseFloat(document.getElementById('atenuantesPrep').value) || 0;
+            const isReincidente = document.getElementById('chkReincidente').checked;
 
             let penaProv = penaBase;
             let multaProv = multaBase;
@@ -938,11 +969,53 @@
             let penaFinalDetraida = penaConcurso - totalDetracaoDias;
             if (penaFinalDetraida < 0) penaFinalDetraida = 0; 
 
+            // DETERMINAÇÃO DO REGIME (Art. 33 CP)
+            let alineaRegime = "";
+            let nomeRegime = "";
+            let anosRegime = penaFinalDetraida / 360;
+            let isReclusao = document.getElementById('tipoPrisao').value === 'reclusao';
+
+            if (isReclusao) {
+                if (anosRegime > 8) {
+                    nomeRegime = "FECHADO";
+                    alineaRegime = "alínea 'a'";
+                } else if (anosRegime > 4 && anosRegime <= 8) {
+                    if (isReincidente) {
+                        nomeRegime = "FECHADO";
+                        alineaRegime = "alíneas 'a' e 'b' (a contrario sensu)";
+                    } else {
+                        nomeRegime = "SEMIABERTO";
+                        alineaRegime = "alínea 'b'";
+                    }
+                } else {
+                    if (isReincidente) {
+                        nomeRegime = "SEMIABERTO";
+                        alineaRegime = "alíneas 'b' e 'c' c/c Súmula 269 STJ";
+                    } else {
+                        nomeRegime = "ABERTO";
+                        alineaRegime = "alínea 'c'";
+                    }
+                }
+            } else { // Detenção
+                if (anosRegime > 4) {
+                    nomeRegime = "SEMIABERTO";
+                    alineaRegime = isReincidente ? "alínea 'b' (a contrario sensu)" : "alínea 'b'";
+                } else {
+                    if (isReincidente) {
+                        nomeRegime = "SEMIABERTO";
+                        alineaRegime = "alíneas 'b' e 'c' (a contrario sensu)";
+                    } else {
+                        nomeRegime = "ABERTO";
+                        alineaRegime = "alínea 'c'";
+                    }
+                }
+            }
+            if (penaFinalDetraida <= 0) nomeRegime = "EXTINTO PELO CUMPRIMENTO";
+
 
             // GERADOR DE TEXTO (DISPOSITIVO)
             let texto = "--- DOSIMETRIA DA PENA ---\n\n";
 
-            // Texto 1ª Fase
             texto += "1ª FASE (PENA-BASE): ";
             if(listaDesfavoraveis.length > 0) {
                 texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico a existência de circunstâncias judiciais desfavoráveis ao réu, consistentes em: ${listaDesfavoraveis.join(', ')}. `;
@@ -952,7 +1025,6 @@
             texto += `Dessa forma, fixo a pena-base em ${formatarDias(penaBase)}`;
             if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
 
-            // Texto 2ª Fase
             texto += "2ª FASE (PENA PROVISÓRIA): ";
             let txtAgravAten = [];
             if (agrComum > 0) txtAgravAten.push(`${agrComum} agravante(s) comum(ns)`);
@@ -972,7 +1044,6 @@
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
             if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
 
-            // Texto 3ª Fase
             texto += "3ª FASE (PENA DEFINITIVA): ";
             if (minorante === 0 && majorante === 0) {
                 texto += "Na terceira fase, não constato a presença de causas de aumento ou de diminuição de pena. ";
@@ -983,24 +1054,26 @@
             texto += `Sendo assim, torno a pena definitiva em ${formatarDias(penaTerc)}`;
             if(temMulta) texto += ` e ${Math.round(multaTerc)} dias-multa.\n\n`; else texto += ".\n\n";
 
-            // Texto Concurso
             if (aplicouConcurso) {
                 texto += "CONCURSO DE CRIMES: ";
                 texto += `Em virtude do reconhecimento de ${tipoConcSelect.options[tipoConcSelect.selectedIndex].text}, a reprimenda unificada perfaz o total de ${formatarDias(penaConcurso)}`;
                 if(temMulta) texto += ` e ${Math.round(multaConcurso)} dias-multa, cumulados nos termos do art. 72 do CP.\n\n`; else texto += ".\n\n";
             }
 
-            // Texto Detração
             if (totalDetracaoDias > 0) {
                 texto += "DETRAÇÃO (ART. 42, CP): ";
-                texto += `Considerando o período de ${formatarDias(totalDetracaoDias)} em que o sentenciado permaneceu preso provisoriamente, procedo ao abatimento do quantum determinado pelo art. 387, § 2º, do CPP. A pena restante a cumprir, portanto, passa a ser de ${formatarDias(penaFinalDetraida)}.\n\n`;
+                texto += `Considerando o período de ${formatarDias(totalDetracaoDias)} em que o sentenciado permaneceu preso provisoriamente, procedo ao abatimento do quantum determinado pelo art. 387, § 2º, do CPP. A pena restante a cumprir passa a ser de ${formatarDias(penaFinalDetraida)}.\n\n`;
+            }
+
+            if (penaFinalDetraida > 0) {
+                texto += "REGIME INICIAL DE CUMPRIMENTO:\n";
+                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, e considerando o quantum de pena a ser cumprido (${formatarDias(penaFinalDetraida)}) bem como a condição do réu (${isReincidente ? 'reincidente' : 'primário'}), fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n\n`;
             }
 
             texto += "--- RESULTADO FINAL ---\n";
-            texto += `PENA PRIVATIVA DE LIBERDADE: ${formatarDias(penaFinalDetraida)}.\n`;
+            texto += `PENA PRIVATIVA DE LIBERDADE: ${formatarDias(penaFinalDetraida)} (${nomeRegime}).\n`;
             if (temMulta) texto += `PENA DE MULTA: ${Math.round(multaConcurso)} dias-multa.`;
 
-            // Guarda o texto na variável global para o botão copiar
             textoDispositivoGlobal = texto;
 
 
@@ -1044,6 +1117,12 @@
             if (temMulta) {
                 document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaConcurso)} dias-multa`;
             }
+
+            document.getElementById('resRegimeBadge').innerText = `REGIME: ${nomeRegime}`;
+            if (nomeRegime === 'FECHADO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--danger)';
+            else if (nomeRegime === 'SEMIABERTO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--warning)';
+            else if (nomeRegime === 'ABERTO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--success)';
+            else document.getElementById('resRegimeBadge').style.backgroundColor = '#64748b'; // Extinto
         }
 
         window.onload = function() {
