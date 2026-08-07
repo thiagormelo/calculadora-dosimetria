@@ -4,94 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Dosimetria - TJ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0f172a;
-            --secondary: #1e293b;
-            --accent: #3b82f6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --purple: #6366f1;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #334155;
-            --border: #e2e8f0;
-            --disabled: #94a3b8;
+            --primary: #1e3a8a;       /* Azul Judiciário Profundo */
+            --primary-hover: #1e40af;
+            --accent: #2563eb;        /* Azul de Ação */
+            --success: #059669;       /* Verde Elegante */
+            --warning: #d97706;       /* Laranja de Alerta */
+            --danger: #dc2626;        /* Vermelho Erro */
+            --bg: #f3f4f6;            /* Fundo Cinza Super Claro */
+            --surface: #ffffff;       /* Cartões Brancos */
+            --text-main: #1f2937;     /* Texto Principal */
+            --text-muted: #6b7280;    /* Texto Secundário */
+            --border: #e5e7eb;        /* Bordas Suaves */
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
-            color: var(--text);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            line-height: 1.5;
         }
 
+        /* BARRA SUPERIOR */
         .navbar {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 30px;
+            background-color: var(--surface);
+            color: var(--primary);
+            padding: 15px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .navbar h1 {
             margin: 0;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
+        .navbar span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ESTRUTURA PRINCIPAL */
         .dashboard-container {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            max-width: 1200px;
-            margin: 20px auto;
+            gap: 25px;
+            max-width: 1280px;
+            margin: 30px auto;
             padding: 0 20px;
             flex: 1;
+            align-items: start;
         }
 
         .forms-column {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
+        /* CARTÕES (CARDS) */
         .card {
             background: var(--surface);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);
             border: 1px solid var(--border);
         }
 
         .card-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
         }
 
         .card-header h2 {
             margin: 0;
-            font-size: 1.1rem;
-            color: var(--secondary);
+            font-size: 1.15rem;
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        .card-header h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background-color: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* FORMULÁRIOS */
         .input-group {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
+            align-items: end;
         }
 
         .input-box {
@@ -104,161 +135,194 @@
         }
 
         label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 6px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
         }
 
         input[type="number"], input[type="date"], select {
-            padding: 10px;
+            padding: 12px 15px;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.95rem;
-            background-color: #f8fafc;
-            transition: border-color 0.2s;
+            font-family: inherit;
+            background-color: #fafafa;
+            color: var(--text-main);
+            transition: all 0.2s ease;
             box-sizing: border-box;
             width: 100%;
+        }
+
+        input:hover, select:hover {
+            border-color: #d1d5db;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--accent);
-            background-color: #ffffff;
+            background-color: var(--surface);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
+        /* CHECKBOXES MELHORADOS (Estilo Pílula/Cartão) */
         .checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
         }
 
         .checkbox-item {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 6px;
+            gap: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 8px;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: background 0.2s;
-            line-height: 1.3;
+            transition: all 0.2s;
+            line-height: 1.4;
+            color: var(--text-main);
         }
 
         .checkbox-item input[type="checkbox"] {
             margin-top: 2px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
         }
 
         .checkbox-item:hover {
-            background: #e2e8f0;
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .checkbox-item:has(input:checked) {
+            background: #eff6ff;
+            border-color: #93c5fd;
+            color: #1e3a8a;
         }
 
         .checkbox-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
             pointer-events: none;
+            background: #f1f5f9;
         }
         
+        .prep-badge {
+            background-color: var(--warning);
+            color: white;
+            font-size: 0.65rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .prep-badge.success { background-color: var(--success); }
+
+        .limit-warning {
+            background-color: #fef2f2;
+            color: var(--danger);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border: 1px solid #fca5a5;
+            display: none;
+        }
+
+        /* BOTÕES PEQUENOS E TOGGLES */
         .toggle-btn {
+            background: var(--surface);
+            color: var(--warning);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid var(--warning);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
             background: var(--warning);
             color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            border: none;
-            font-weight: bold;
         }
 
-        .drogas-section {
-            display: none;
-            background: #fef3c7;
-            border: 1px solid #fde68a;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .date-calculator-box {
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px dashed #cbd5e1;
-        }
-
+        /* COLUNA RESULTADOS (PAINEL FIXO) */
         .results-column {
             position: sticky;
-            top: 20px;
-            height: fit-content;
+            top: 90px;
         }
 
         .result-card {
             background: var(--primary);
             color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.4);
         }
 
         .result-card h2 {
-            margin: 0 0 20px 0;
-            color: #94a3b8;
-            font-size: 1rem;
+            margin: 0 0 25px 0;
+            color: #93c5fd;
+            font-size: 1.05rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 10px;
-        }
-
-        .result-block {
-            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 12px;
         }
 
         .result-title {
             font-size: 0.85rem;
             color: #cbd5e1;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
         .result-value {
-            font-size: 1.4rem;
-            font-weight: bold;
+            font-size: 1.6rem;
+            font-weight: 700;
             color: #ffffff;
-        }
-
-        .result-value.highlight {
-            color: var(--success);
-            font-size: 1.8rem;
+            line-height: 1.2;
         }
 
         .result-multa {
-            color: var(--warning);
+            color: #fbbf24;
             font-size: 1.1rem;
-            margin-top: 5px;
+            font-weight: 600;
+            margin-top: 6px;
         }
 
         .regime-badge {
-            background-color: #3b82f6;
+            background-color: var(--accent);
             color: white;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.9rem;
-            font-weight: bold;
+            font-weight: 700;
             display: inline-block;
-            margin-top: 8px;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .timeline {
-            border-left: 2px solid #334155;
-            padding-left: 15px;
-            margin-top: 20px;
+            border-left: 2px solid rgba(255,255,255,0.2);
+            padding-left: 20px;
+            margin-top: 30px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .timeline-item {
@@ -268,121 +332,88 @@
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -21px;
-            top: 5px;
+            left: -26px;
+            top: 6px;
             width: 10px;
             height: 10px;
-            background: var(--accent);
+            background: #93c5fd;
             border-radius: 50%;
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+
+        .timeline-text {
+            font-size: 0.95rem;
+            color: #f8fafc;
         }
 
         .alerta-sumula {
             display: none;
-            background-color: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-top: 5px;
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            width: fit-content;
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #fde68a;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 8px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        .alerta-sumula.maximo {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            border-color: rgba(239, 68, 68, 0.4);
-        }
-
+        /* BOTÕES DE AÇÃO */
         .botoes-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 25px;
+            gap: 12px;
+            margin-top: 35px;
         }
 
-        button.btn-copiar {
-            background-color: var(--purple);
-            color: white;
+        .btn {
             border: none;
-            padding: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            transition: background 0.3s;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        button.btn-copiar:hover { background-color: #4f46e5; }
+        .btn-copiar { background-color: var(--surface); color: var(--primary); }
+        .btn-copiar:hover { background-color: #f8fafc; transform: translateY(-1px); }
         
-        button.btn-calcular {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
+        .btn-calcular { background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-calcular:hover { background-color: rgba(255,255,255,0.2); }
 
-        button.btn-calcular:hover { background-color: #2563eb; }
-
-        button.btn-limpar {
-            background-color: #64748b;
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
-
-        button.btn-limpar:hover { background-color: #475569; }
+        .btn-limpar { background-color: transparent; color: #cbd5e1; text-decoration: underline; padding: 5px; font-size: 0.9rem;}
+        .btn-limpar:hover { color: white; }
 
         .footer-creditos {
             text-align: center;
-            padding: 20px;
-            color: #64748b;
+            padding: 25px;
+            color: var(--text-muted);
             font-size: 0.85rem;
-            background-color: #ffffff;
+            background-color: var(--surface);
             border-top: 1px solid var(--border);
             margin-top: auto;
         }
-        
+
+        /* SCROLL CUSTOMIZADO PARA CAIXA DE AGRAVANTES */
         .fase2-container {
-            max-height: 400px;
+            max-height: 450px;
             overflow-y: auto;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px;
-            background: #f8fafc;
-        }
-
-        .limit-warning {
-            color: var(--danger);
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: none;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
         }
         
-        .prep-badge {
-            background-color: var(--warning);
-            color: white;
-            font-size: 0.65rem;
-            padding: 2px 5px;
-            border-radius: 4px;
-            margin-left: 5px;
-            vertical-align: super;
-        }
+        .fase2-container::-webkit-scrollbar { width: 8px; }
+        .fase2-container::-webkit-scrollbar-track { background: transparent; }
+        .fase2-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
 
         @media (max-width: 900px) {
             .dashboard-container { grid-template-columns: 1fr; }
@@ -394,7 +425,7 @@
 
     <div class="navbar">
         <h1>⚖️ e-Dosimetria</h1>
-        <span style="font-size: 0.9rem; color: #94a3b8;">Sistema de Cálculo Penal</span>
+        <span>Sistema de Cálculo Penal do Gabinete</span>
     </div>
 
     <div class="dashboard-container">
@@ -445,9 +476,9 @@
                         </select>
                     </div>
 
-                    <div class="input-box" style="margin-top: 5px; margin-bottom: 5px;">
-                        <label class="checkbox-item" style="background: #e2e8f0; color: #1e293b; font-weight: bold;">
-                            <input type="checkbox" id="temMulta" onchange="toggleMulta()" checked> 💰 Este crime prevê Multa
+                    <div class="input-box full-width">
+                        <label class="checkbox-item" style="border: none; padding: 0; background: transparent; width: fit-content; font-weight: 600; color: var(--warning);">
+                            <input type="checkbox" id="temMulta" onchange="toggleMulta()" checked> Este crime prevê Pena de Multa Cumulativa
                         </label>
                     </div>
 
@@ -467,19 +498,19 @@
                         </select>
                     </div>
                     <div class="input-box">
-                        <label>Mínimo (Priv. Lib.)</label>
+                        <label>Mínimo Legal</label>
                         <input type="number" id="minPena" value="1" min="0">
                     </div>
                     <div class="input-box">
-                        <label>Máximo (Priv. Lib.)</label>
+                        <label>Máximo Legal</label>
                         <input type="number" id="maxPena" value="4" min="0">
                     </div>
                     <div class="input-box" id="boxMinMulta">
-                        <label>Multa Mínima</label>
+                        <label>Multa Mín. (Dias)</label>
                         <input type="number" id="minMulta" value="10" min="10">
                     </div>
                     <div class="input-box" id="boxMaxMulta">
-                        <label>Multa Máxima</label>
+                        <label>Multa Máx. (Dias)</label>
                         <input type="number" id="maxMulta" value="360" min="10">
                     </div>
                 </div>
@@ -508,24 +539,30 @@
                 </div>
             </div>
 
-            <!-- NOVA FASE 2 -->
+            <!-- FASE 2 -->
             <div class="card">
                 <div class="card-header">
                     <h2>2ª Fase: Agravantes e Atenuantes</h2>
                 </div>
                 
-                <div id="limiteAgravante" class="limit-warning">⚠️ Limite de 6 Agravantes atingido.</div>
-                <div class="fase2-container" style="margin-bottom: 20px;">
-                    <h3 style="font-size: 0.95rem; margin-top: 0; color: #ef4444;">🔴 Indique uma ou mais Agravantes:</h3>
+                <div style="background: #fef2f2; border: 1px dashed #fca5a5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <label class="checkbox-item" style="background: transparent; border: none; color: #b91c1c; font-weight: 600; margin: 0; padding: 0;">
+                        <input type="checkbox" id="chkReincidente" onchange="calcularDosimetria()"> O Réu é Reincidente (Impacta o Regime Inicial)
+                    </label>
+                </div>
+
+                <div id="limiteAgravante" class="limit-warning">O limite de 6 Agravantes foi atingido.</div>
+                <div class="fase2-container" style="margin-bottom: 25px;">
+                    <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--danger);">Indique uma ou mais Agravantes:</h3>
                     
-                    <label class="checkbox-item" style="background: #fef2f2; border: 1px solid #fca5a5; margin-bottom: 10px;">
-                        <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> 
-                        <strong>Reincidência</strong> <span class="prep-badge">Preponderante</span>
+                    <label class="checkbox-item" style="background: #fff5f5; border-color: #fecaca; margin-bottom: 12px;">
+                        <input type="checkbox" class="agravante prep" id="chkReincidenteAux" onchange="sincronizarReincidencia('chkReincidenteAux', 'chkReincidente'); limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> 
+                        Reincidência <span class="prep-badge">Preponderante</span>
                     </label>
                     
-                    <div class="input-box full-width" style="margin-bottom: 10px; display: none;" id="boxMultirreincidencia">
+                    <div class="input-box full-width" style="margin-bottom: 15px; display: none;" id="boxMultirreincidencia">
                         <label style="color: #b91c1c;">É caso de Multirreincidência?</label>
-                        <select id="selMultirreincidencia" style="background: #fef2f2; border-color: #fca5a5;">
+                        <select id="selMultirreincidencia" style="background: #fff5f5; border-color: #fecaca;">
                             <option value="nao">Não (Reincidência Simples)</option>
                             <option value="sim">Sim (Multirreincidência)</option>
                         </select>
@@ -535,45 +572,49 @@
                         <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel, ou de que podia resultar perigo comum</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas, de coabitação ou de hospitalidade, ou com violência contra a mulher na forma da lei específica</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra criança, maior de 60 (sessenta) anos, enfermo ou mulher grávida</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra criança, maior de 60 anos, enfermo ou mulher grávida</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou qualquer calamidade pública, ou de desgraça particular do ofendido</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou calamidade pública</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em estado de embriaguez preordenada</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que promove, ou organiza a cooperação no delito ou dirige a atividade dos demais agentes</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que promove, organiza a cooperação ou dirige a atividade dos demais agentes</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que coage ou induz outrem à execução material do delito</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que instiga ou determina a cometer o delito alguém sujeito à sua autoridade ou não-punível em virtude de condição ou qualidade pessoal</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que instiga a cometer o delito alguém sujeito à sua autoridade</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Circunstância diversa das elencadas</label>
                     </div>
                     
-                    <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                        <label>Outras Agravantes (Preponderantes manuais):</label>
-                        <input type="number" id="agravantesPrepManual" value="0" min="0" style="width: 80px; display: inline-block; margin-left: 10px;" onchange="calcularDosimetria()">
+                    <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--text-main);">
+                            Outras Agravantes Manuais (Preponderantes):
+                            <input type="number" id="agravantesPrepManual" value="0" min="0" style="width: 80px;" onchange="calcularDosimetria()">
+                        </label>
                     </div>
                 </div>
 
-                <div id="limiteAtenuante" class="limit-warning">⚠️ Limite de 6 Atenuantes atingido.</div>
+                <div id="limiteAtenuante" class="limit-warning">O limite de 6 Atenuantes foi atingido.</div>
                 <div class="fase2-container">
-                    <h3 style="font-size: 0.95rem; margin-top: 0; color: #10b981;">🟢 Indique uma ou mais Atenuantes:</h3>
+                    <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--success);">Indique uma ou mais Atenuantes:</h3>
                     <div class="checkbox-grid">
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Agente menor de 21 (vinte e um), na data do fato, ou maior de 70 (setenta) anos, na data da sentença <span class="prep-badge" style="background-color: var(--success);">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Agente menor de 21, na data do fato, ou maior de 70 anos, na data da sentença <span class="prep-badge success">Prep</span></label>
                         <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Desconhecimento da lei</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge" style="background-color: var(--success);">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente procurado, por sua espontânea vontade e com eficiência, logo após o delito, evitar-lhe ou minorar-lhe as consequências, ou ter, antes do julgamento, reparado o dano</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito sob coação a que podia resistir, ou em cumprimento de ordem de autoridade superior, ou sob a influência de violenta emoção, provocada por ato injusto da vítima</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge" style="background-color: var(--success);">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância relevante, anterior ou posterior ao crime, embora não prevista expressamente em lei</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter procurado, por espontânea vontade, logo após o delito, evitar ou minorar as consequências, ou reparado o dano</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter cometido o delito sob coação resistível, ou sob influência de violenta emoção provocada por ato injusto da vítima</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância relevante, anterior ou posterior ao crime, não prevista expressamente</label>
                         <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância diversa das elencadas</label>
                     </div>
                     
-                    <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                        <label>Outras Atenuantes (Preponderantes manuais):</label>
-                        <input type="number" id="atenuantesPrepManual" value="0" min="0" style="width: 80px; display: inline-block; margin-left: 10px;" onchange="calcularDosimetria()">
+                    <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--text-main);">
+                            Outras Atenuantes Manuais (Preponderantes):
+                            <input type="number" id="atenuantesPrepManual" value="0" min="0" style="width: 80px;" onchange="calcularDosimetria()">
+                        </label>
                     </div>
                 </div>
 
@@ -625,7 +666,7 @@
                 </div>
 
                 <div id="boxConcursoSoma" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <p style="font-size: 0.85rem; color: #64748b; margin: 0 0 10px 0;">Insira a pena dos <b>outros crimes</b> já calculados para somar ao atual (Art. 69 / Art. 70, 2ª parte):</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Insira a pena dos <b>outros crimes</b> já calculados para somar ao atual:</p>
                     <div class="input-group">
                         <div class="input-box"><label>Anos</label><input type="number" id="concAnos" value="0" min="0"></div>
                         <div class="input-box"><label>Meses</label><input type="number" id="concMeses" value="0" min="0"></div>
@@ -635,7 +676,7 @@
                 </div>
 
                 <div id="boxConcursoFracao" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <p style="font-size: 0.85rem; color: #64748b; margin: 0 0 10px 0;">Aumento da Pena Privativa de Liberdade (Art. 70 / Art. 71):</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Aumento da Pena Privativa de Liberdade:</p>
                     <div class="input-group">
                         <div class="input-box">
                             <label>Fração de Aumento</label>
@@ -649,14 +690,14 @@
                             </select>
                         </div>
                         <div class="input-box" id="boxConcMultaQtd">
-                            <label style="color: #f59e0b;" title="Art. 72, CP: As multas são aplicadas distinta e integralmente.">Nº Total de Crimes (Art. 72, CP)</label>
+                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes (Art. 72, CP)</label>
                             <input type="number" id="concQtdCrimes" value="2" min="2">
                         </div>
                     </div>
                 </div>
 
                 <div id="boxConcursoMult" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <p style="font-size: 0.85rem; color: #64748b; margin: 0 0 10px 0;">Crime Continuado Específico (Art. 71, parágrafo único):</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Crime Continuado Específico:</p>
                     <div class="input-group">
                         <div class="input-box">
                             <label>Multiplicador</label>
@@ -666,7 +707,7 @@
                             </select>
                         </div>
                         <div class="input-box" id="boxConcMultaQtdEsp">
-                            <label style="color: #f59e0b;" title="Art. 72, CP: As multas são aplicadas distinta e integralmente.">Nº Total de Crimes (Art. 72, CP)</label>
+                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes (Art. 72, CP)</label>
                             <input type="number" id="concQtdCrimesEsp" value="2" min="2">
                         </div>
                     </div>
@@ -679,7 +720,7 @@
                 </div>
                 
                 <div class="date-calculator-box">
-                    <p style="font-size: 0.85rem; color: #64748b; margin: 0 0 10px 0;">Calcule pelo período de prisão (inclui o 1º dia - Art. 10, CP):</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Calcule pelo período de prisão (inclui o 1º dia - Art. 10, CP):</p>
                     <div class="input-group">
                         <div class="input-box">
                             <label>Data da Prisão</label>
@@ -692,20 +733,11 @@
                     </div>
                 </div>
 
-                <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">Ou insira/ajuste o tempo manualmente (ex: prisões fracionadas):</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0;">Ou insira/ajuste o tempo manualmente (ex: prisões fracionadas):</p>
                 <div class="input-group">
-                    <div class="input-box">
-                        <label>Anos</label>
-                        <input type="number" id="detracaoAnos" value="0" min="0">
-                    </div>
-                    <div class="input-box">
-                        <label>Meses</label>
-                        <input type="number" id="detracaoMeses" value="0" min="0">
-                    </div>
-                    <div class="input-box">
-                        <label>Dias</label>
-                        <input type="number" id="detracaoDias" value="0" min="0">
-                    </div>
+                    <div class="input-box"><label>Anos</label><input type="number" id="detracaoAnos" value="0" min="0"></div>
+                    <div class="input-box"><label>Meses</label><input type="number" id="detracaoMeses" value="0" min="0"></div>
+                    <div class="input-box"><label>Dias</label><input type="number" id="detracaoDias" value="0" min="0"></div>
                 </div>
             </div>
 
@@ -726,39 +758,40 @@
                 <div class="timeline">
                     <div class="timeline-item">
                         <div class="result-title">Pena-Base (1ª Fase)</div>
-                        <div style="font-size: 0.9rem;" id="resPenaBase">-</div>
+                        <div class="timeline-text" id="resPenaBase">-</div>
                     </div>
                     <div class="timeline-item">
                         <div class="result-title">Pena Provisória (2ª Fase)</div>
-                        <div style="font-size: 0.9rem;" id="resPenaProv">-</div>
-                        <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 5px;" id="resAnalisePrep"></div>
+                        <div class="timeline-text" id="resPenaProv">-</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px; font-weight: 500;" id="resAnalisePrep"></div>
                         <div id="avisoSumulaAtenuante" class="alerta-sumula">⚠️ Súmula 231 STJ: Travado no Mínimo</div>
                         <div id="avisoSumulaAgravante" class="alerta-sumula maximo">⚠️ Súmula 231 STJ: Travado no Máximo</div>
                     </div>
                     <div class="timeline-item">
                         <div class="result-title">Total da 3ª Fase</div>
-                        <div style="font-size: 0.9rem;" id="resPenaTerc">-</div>
+                        <div class="timeline-text" id="resPenaTerc">-</div>
                     </div>
                     <div class="timeline-item" id="resConcursoItem" style="display: none;">
-                        <div class="result-title" style="color: #f59e0b;">Concurso de Crimes</div>
-                        <div style="font-size: 0.9rem;" id="resPenaConcurso">-</div>
+                        <div class="result-title" style="color: #fbbf24;">Concurso de Crimes</div>
+                        <div class="timeline-text" id="resPenaConcurso">-</div>
                     </div>
                     <div class="timeline-item" style="border-left: none;">
-                        <div class="result-title" style="color: #ef4444;">Detração Aplicada</div>
-                        <div style="font-size: 0.9rem; color: #fca5a5;" id="resDetracao">-</div>
+                        <div class="result-title" style="color: #fca5a5;">Detração Aplicada</div>
+                        <div class="timeline-text" style="color: #fca5a5;" id="resDetracao">-</div>
                     </div>
                 </div>
 
                 <div class="botoes-container">
-                    <button class="btn-copiar" id="btnCopiarTexto" onclick="copiarDispositivo()" type="button">📋 Copiar Dispositivo (Texto)</button>
-                    <button class="btn-calcular" onclick="window.print()" type="button">🖨️ Imprimir Resumo</button>
-                    <button class="btn-limpar" onclick="limparDados()" type="button">🧹 Limpar Tudo</button>
+                    <button class="btn btn-copiar" id="btnCopiarTexto" onclick="copiarDispositivo()" type="button">📋 Copiar Dispositivo de Sentença</button>
+                    <button class="btn btn-calcular" onclick="window.print()" type="button">🖨️ Imprimir Resumo</button>
+                    <button class="btn btn-limpar" onclick="limparDados()" type="button">Limpar Tudo e Recomeçar</button>
                 </div>
             </div>
         </div>
 
     </div>
 
+    <!-- RODAPÉ DE CRÉDITOS -->
     <div class="footer-creditos">
         Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
     </div>
@@ -766,6 +799,12 @@
     <script>
         let moduloDrogasAtivo = false;
         let textoDispositivoGlobal = ""; 
+
+        // Função para manter as duas checkboxes de reincidência sincronizadas
+        function sincronizarReincidencia(fonteId, destinoId) {
+            document.getElementById(destinoId).checked = document.getElementById(fonteId).checked;
+            calcularDosimetria();
+        }
 
         // Função para limitar checkboxes
         function limitarCheckboxes(seletor, avisoId, limite) {
@@ -785,9 +824,11 @@
                 });
             }
             
-            // Lógica específica para exibir multirreincidência
             if (seletor === '.agravante') {
-                const isReincidente = document.getElementById('chkReincidente').checked;
+                const isReincidente = document.getElementById('chkReincidenteAux').checked || document.getElementById('chkReincidente').checked;
+                document.getElementById('chkReincidente').checked = isReincidente;
+                document.getElementById('chkReincidenteAux').checked = isReincidente;
+                
                 document.getElementById('boxMultirreincidencia').style.display = isReincidente ? 'block' : 'none';
                 if (!isReincidente) document.getElementById('selMultirreincidencia').value = 'nao';
             }
@@ -800,11 +841,13 @@
                 const btn = document.getElementById('btnCopiarTexto');
                 const originalText = btn.innerText;
                 btn.innerText = "✅ Texto Copiado com Sucesso!";
-                btn.style.backgroundColor = "#10b981"; 
+                btn.style.backgroundColor = "var(--success)"; 
+                btn.style.color = "white";
                 
                 setTimeout(() => {
                     btn.innerText = originalText;
-                    btn.style.backgroundColor = "var(--purple)";
+                    btn.style.backgroundColor = "var(--surface)";
+                    btn.style.color = "var(--primary)";
                 }, 3000);
             }).catch(err => {
                 alert('Erro ao copiar o texto. Tente novamente.');
@@ -818,6 +861,11 @@
             document.querySelectorAll('.agravante').forEach(cb => cb.checked = false);
             document.querySelectorAll('.atenuante').forEach(cb => cb.checked = false);
             
+            document.getElementById('chkReincidente').checked = false;
+            document.getElementById('chkReincidenteAux').checked = false;
+            document.getElementById('selMultirreincidencia').value = 'nao';
+            document.getElementById('boxMultirreincidencia').style.display = 'none';
+
             limitarCheckboxes('.agravante', 'limiteAgravante', 6);
             limitarCheckboxes('.atenuante', 'limiteAtenuante', 6);
             
@@ -938,7 +986,7 @@
         }
 
         function formatarDias(totalDias) {
-            if (totalDias <= 0) return '0 dias (Pena cumprida integralmente)';
+            if (totalDias <= 0) return '0 dias (Pena cumprida)';
             totalDias = Math.round(totalDias);
             const anos = Math.floor(totalDias / 360);
             const resto = totalDias % 360;
@@ -973,12 +1021,15 @@
             const totalDesfavoraveis = checksArt59.length;
             
             let listaDesfavoraveis = [];
-            checksArt59.forEach(cb => listaDesfavoraveis.push(cb.parentNode.textContent.trim().replace(' Prep', '')));
+            checksArt59.forEach(cb => {
+                let txt = cb.parentNode.textContent.trim().replace(' Prep', '');
+                listaDesfavoraveis.push(txt);
+            });
 
             let penaBase = minDias + (((maxDias - minDias) / divisorBase) * totalDesfavoraveis);
             let multaBase = temMulta ? (minMulta + (((maxMulta - minMulta) / divisorBase) * totalDesfavoraveis)) : 0;
 
-            // 2ª FASE - Análise de Preponderância (Art. 67, CP)
+            // 2ª FASE
             let listaAgravantes = [];
             let listaAtenuantes = [];
             let agrPrep = parseInt(document.getElementById('agravantesPrepManual').value) || 0;
@@ -986,16 +1037,17 @@
             let atePrep = parseInt(document.getElementById('atenuantesPrepManual').value) || 0;
             let ateComum = 0;
 
-            let isReincidente = document.getElementById('chkReincidente').checked;
+            let isReincidente = document.getElementById('chkReincidente').checked || document.getElementById('chkReincidenteAux').checked;
             let isMultirreincidente = document.getElementById('selMultirreincidencia').value === 'sim';
             let temConfissao = document.querySelector('.atenuante.confissao').checked;
 
             document.querySelectorAll('.agravante:checked').forEach(cb => {
                 let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
-                listaAgravantes.push(textoCb);
+                if (textoCb !== "Reincidência") listaAgravantes.push(textoCb);
                 if (cb.classList.contains('prep')) agrPrep++;
                 else agrComum++;
             });
+            if (isReincidente) listaAgravantes.unshift(isMultirreincidente ? "Multirreincidência" : "Reincidência");
 
             document.querySelectorAll('.atenuante:checked').forEach(cb => {
                 let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
@@ -1004,7 +1056,6 @@
                 else ateComum++;
             });
 
-            // Lógica STJ compensação: Confissão vs Reincidência
             let textoAnalise = "";
             let agrEfetivaPrep = agrPrep;
             let ateEfetivaPrep = atePrep;
@@ -1012,21 +1063,18 @@
             if (isReincidente && temConfissao) {
                 if (isMultirreincidente) {
                     textoAnalise = "Conforme STJ (Tema 585 e afins), a multirreincidência prepondera sobre a confissão espontânea. ";
-                    // Não compensa tudo, a agravante prevalece (mantemos os valores originais para a matemática)
                 } else {
                     textoAnalise = "Conforme Tema 585/STJ, a agravante da reincidência e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
-                    agrEfetivaPrep--; // Subtrai 1 de cada para efeito matemático
+                    agrEfetivaPrep--; 
                     ateEfetivaPrep--;
                 }
-            } else if (agrPrep > 0 && atePrep > 0) {
-                 // Simplificação para outras preponderantes que se anulam
+            } else if (agrEfetivaPrep > 0 && ateEfetivaPrep > 0) {
                  let compensar = Math.min(agrEfetivaPrep, ateEfetivaPrep);
                  agrEfetivaPrep -= compensar;
                  ateEfetivaPrep -= compensar;
                  if(!textoAnalise) textoAnalise = "Houve compensação entre circunstâncias preponderantes antagônicas. ";
             }
             
-            // Mesma lógica para comuns
             if (agrComum > 0 && ateComum > 0) {
                  let compensarComum = Math.min(agrComum, ateComum);
                  agrComum -= compensarComum;
@@ -1037,7 +1085,6 @@
             let penaProv = penaBase;
             let multaProv = multaBase;
 
-            // Aplica as frações nos valores EFETIVOS resultantes da compensação
             penaProv += (penaBase * (1/6)) * agrComum;
             penaProv += (penaBase * (1/5)) * agrEfetivaPrep;
             penaProv -= (penaBase * (1/6)) * ateComum;
@@ -1050,7 +1097,6 @@
                 multaProv -= (multaBase * (1/5)) * ateEfetivaPrep;
             }
 
-            // Súmula 231 STJ
             let aplicouAtenuanteSumula = false;
             let aplicouAgravanteSumula = false;
 
@@ -1086,7 +1132,7 @@
                 if(temMulta) multaTerc += (multaTerc * majorante);
             }
 
-            // 4ª FASE: CONCURSO DE CRIMES
+            // 4ª FASE: CONCURSO
             let penaConcurso = penaTerc;
             let multaConcurso = multaTerc;
             const tipoConcSelect = document.getElementById('tipoConcurso');
@@ -1106,7 +1152,6 @@
             } else if (tipoConc === 'formal_continuado') {
                 const frac = parseFloat(document.getElementById('concFracao').value);
                 const qtd = parseInt(document.getElementById('concQtdCrimes').value) || 1;
-                
                 penaConcurso += (penaTerc * frac);
                 if(temMulta) multaConcurso = (multaTerc * qtd);
                 aplicouConcurso = true;
@@ -1114,7 +1159,6 @@
             } else if (tipoConc === 'continuado_esp') {
                 const mult = parseFloat(document.getElementById('concMultiplicador').value);
                 const qtd = parseInt(document.getElementById('concQtdCrimesEsp').value) || 1;
-                
                 penaConcurso = penaTerc * mult;
                 if(temMulta) multaConcurso = (multaTerc * qtd);
                 aplicouConcurso = true;
@@ -1129,7 +1173,7 @@
             let penaFinalDetraida = penaConcurso - totalDetracaoDias;
             if (penaFinalDetraida < 0) penaFinalDetraida = 0; 
 
-            // DETERMINAÇÃO DO REGIME (Art. 33 CP)
+            // REGIME INICIAL
             let alineaRegime = "";
             let nomeRegime = "";
             let anosRegime = penaFinalDetraida / 360;
@@ -1137,48 +1181,31 @@
 
             if (isReclusao) {
                 if (anosRegime > 8) {
-                    nomeRegime = "FECHADO";
-                    alineaRegime = "alínea 'a'";
+                    nomeRegime = "FECHADO"; alineaRegime = "alínea 'a'";
                 } else if (anosRegime > 4 && anosRegime <= 8) {
-                    if (isReincidente) {
-                        nomeRegime = "FECHADO";
-                        alineaRegime = "alíneas 'a' e 'b' (a contrario sensu)";
-                    } else {
-                        nomeRegime = "SEMIABERTO";
-                        alineaRegime = "alínea 'b'";
-                    }
+                    if (isReincidente) { nomeRegime = "FECHADO"; alineaRegime = "alíneas 'a' e 'b' (a contrario sensu)"; } 
+                    else { nomeRegime = "SEMIABERTO"; alineaRegime = "alínea 'b'"; }
                 } else {
-                    if (isReincidente) {
-                        nomeRegime = "SEMIABERTO";
-                        alineaRegime = "alíneas 'b' e 'c' c/c Súmula 269 STJ";
-                    } else {
-                        nomeRegime = "ABERTO";
-                        alineaRegime = "alínea 'c'";
-                    }
+                    if (isReincidente) { nomeRegime = "SEMIABERTO"; alineaRegime = "alíneas 'b' e 'c' c/c Súmula 269 STJ"; } 
+                    else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
                 }
-            } else { // Detenção
+            } else { 
                 if (anosRegime > 4) {
-                    nomeRegime = "SEMIABERTO";
-                    alineaRegime = isReincidente ? "alínea 'b' (a contrario sensu)" : "alínea 'b'";
+                    nomeRegime = "SEMIABERTO"; alineaRegime = isReincidente ? "alínea 'b' (a contrario sensu)" : "alínea 'b'";
                 } else {
-                    if (isReincidente) {
-                        nomeRegime = "SEMIABERTO";
-                        alineaRegime = "alíneas 'b' e 'c' (a contrario sensu)";
-                    } else {
-                        nomeRegime = "ABERTO";
-                        alineaRegime = "alínea 'c'";
-                    }
+                    if (isReincidente) { nomeRegime = "SEMIABERTO"; alineaRegime = "alíneas 'b' e 'c' (a contrario sensu)"; } 
+                    else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
                 }
             }
             if (penaFinalDetraida <= 0) nomeRegime = "EXTINTO PELO CUMPRIMENTO";
 
 
-            // GERADOR DE TEXTO (DISPOSITIVO)
+            // GERADOR DE TEXTO 
             let texto = "--- DOSIMETRIA DA PENA ---\n\n";
 
             texto += "1ª FASE (PENA-BASE): ";
             if(listaDesfavoraveis.length > 0) {
-                texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico a existência de circunstâncias judiciais desfavoráveis ao réu, consistentes em: ${listaDesfavoraveis.join(', ')}. `;
+                texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico a existência de circunstâncias judiciais desfavoráveis ao réu, consistentes em: ${listaDesfavoraveis.join('; ')}. `;
             } else {
                 texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico que as circunstâncias judiciais são, em sua maioria, favoráveis ou neutras. `;
             }
@@ -1186,7 +1213,6 @@
             if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
 
             texto += "2ª FASE (PENA PROVISÓRIA): ";
-            
             if (listaAgravantes.length > 0 || listaAtenuantes.length > 0) {
                 if (listaAgravantes.length > 0) texto += `Reconheço a(s) agravante(s) de: ${listaAgravantes.join('; ')}. `;
                 if (listaAtenuantes.length > 0) texto += `Reconheço a(s) atenuante(s) de: ${listaAtenuantes.join('; ')}. `;
@@ -1194,10 +1220,8 @@
             } else {
                 texto += `Inexistem circunstâncias agravantes ou atenuantes genéricas a serem valoradas. `;
             }
-
             if (aplicouAtenuanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância atenuante não pode conduzir à redução da pena abaixo do mínimo legal. `;
             if (aplicouAgravanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
-            
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
             if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
 
@@ -1233,21 +1257,20 @@
 
             textoDispositivoGlobal = texto;
 
-
             // ATUALIZAR INTERFACE
             let txtBase = `<b>P. Lib:</b> ${formatarDias(penaBase)}`;
             let txtProv = `<b>P. Lib:</b> ${formatarDias(penaProv)}`;
             let txtTerc = `<b>P. Lib:</b> ${formatarDias(penaTerc)}`;
             
             if (temMulta) {
-                txtBase += ` <br><span style="color: #f59e0b;">(Multa: ${Math.round(multaBase)} dias)</span>`;
-                txtProv += ` <br><span style="color: #f59e0b;">(Multa: ${Math.round(multaProv)} dias)</span>`;
-                txtTerc += ` <br><span style="color: #f59e0b;">(Multa: ${Math.round(multaTerc)} dias)</span>`;
+                txtBase += ` <br><span style="color: #fbbf24;">(Multa: ${Math.round(multaBase)} dias)</span>`;
+                txtProv += ` <br><span style="color: #fbbf24;">(Multa: ${Math.round(multaProv)} dias)</span>`;
+                txtTerc += ` <br><span style="color: #fbbf24;">(Multa: ${Math.round(multaTerc)} dias)</span>`;
             }
 
             document.getElementById('resPenaBase').innerHTML = txtBase;
             document.getElementById('resPenaProv').innerHTML = txtProv;
-            document.getElementById('resAnalisePrep').innerText = textoAnalise; // Mostra aviso de compensação
+            document.getElementById('resAnalisePrep').innerText = textoAnalise; 
             document.getElementById('resPenaTerc').innerHTML = txtTerc;
             
             document.getElementById('avisoSumulaAtenuante').style.display = aplicouAtenuanteSumula ? 'block' : 'none';
@@ -1256,9 +1279,7 @@
             if (aplicouConcurso) {
                 document.getElementById('resConcursoItem').style.display = 'block';
                 let txtConc = `<b>P. Lib:</b> ${formatarDias(penaConcurso)}`;
-                if (temMulta) {
-                    txtConc += ` <br><span style="color: #f59e0b;">(Multa Total: ${Math.round(multaConcurso)} dias)</span>`;
-                }
+                if (temMulta) txtConc += ` <br><span style="color: #fbbf24;">(Multa Total: ${Math.round(multaConcurso)} dias)</span>`;
                 document.getElementById('resPenaConcurso').innerHTML = txtConc;
             } else {
                 document.getElementById('resConcursoItem').style.display = 'none';
@@ -1271,10 +1292,7 @@
             }
 
             document.getElementById('resPenaDefinitiva').innerText = formatarDias(penaFinalDetraida);
-            
-            if (temMulta) {
-                document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaConcurso)} dias-multa`;
-            }
+            if (temMulta) document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaConcurso)} dias-multa`;
 
             document.getElementById('resRegimeBadge').innerText = `REGIME: ${nomeRegime}`;
             if (nomeRegime === 'FECHADO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--danger)';
