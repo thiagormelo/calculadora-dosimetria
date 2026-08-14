@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Dosimetria - TJ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1e3a8a;       
@@ -47,19 +47,42 @@
             z-index: 10;
         }
 
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .navbar h1 {
             margin: 0;
             font-size: 1.4rem;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .navbar span {
             font-size: 0.9rem;
             color: var(--text-muted);
             font-weight: 500;
+        }
+
+        .btn-manual {
+            background-color: #eff6ff;
+            color: var(--accent);
+            border: 1px solid #bfdbfe;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-manual:hover {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
         }
 
         .tabs-container {
@@ -70,7 +93,7 @@
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             position: sticky;
-            top: 60px;
+            top: 65px;
             z-index: 9;
             align-items: flex-end;
         }
@@ -502,17 +525,110 @@
         .fase2-container::-webkit-scrollbar-track { background: transparent; }
         .fase2-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
 
+        /* MODAL DO MANUAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            margin: 20px auto;
+            padding: 0;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-fechar-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .btn-fechar-modal:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.1);
+        }
+
+        /* ESTILOS INTERNOS DO MANUAL */
+        .m-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        .m-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+        .m-header p { font-size: 1.05rem; color: #cbd5e1; font-weight: 300; }
+        .m-section { padding: 30px 40px; border-bottom: 1px solid var(--border); }
+        .m-section:last-child { border-bottom: none; }
+        .m-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .m-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .m-card { background: var(--bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .m-card h4 { font-size: 1rem; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .m-card p { font-size: 0.9rem; color: var(--text-muted); }
+        .m-timeline { display: flex; flex-direction: column; gap: 15px; }
+        .m-step { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; align-items: center; }
+        .m-step-num { background: var(--accent); color: white; font-size: 1.2rem; font-weight: 700; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; flex-shrink: 0; margin-right: 15px; }
+        .m-step-content h4 { font-size: 1.05rem; color: var(--primary); margin-bottom: 4px; }
+        .m-step-content p { font-size: 0.9rem; color: var(--text-muted); }
+        .m-badge { background: #dbeafe; color: var(--accent); font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; }
+        .m-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); font-size: 0.9rem; }
+        .m-table th, .m-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        .m-table th { background-color: var(--bg); font-weight: 600; color: var(--primary); }
+        .m-table tr:last-child td { border-bottom: none; }
+        .m-tag { background: #dcfce7; color: var(--success); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
+        .m-tag.partial { background: #fef3c7; color: var(--warning); }
+
         @media (max-width: 900px) {
             .dashboard-container { grid-template-columns: 1fr; }
             .results-column { position: static; order: -1; }
+            .m-step { flex-direction: column; text-align: center; }
+            .m-step-num { margin-right: 0; margin-bottom: 10px; }
+            .navbar { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
 <body> 
 
     <div class="navbar">
-        <h1>⚖️ e-Dosimetria</h1>
-        <span>Sistema de Cálculo Penal do Gabinete</span>
+        <div class="navbar-brand">
+            <h1>⚖️ e-Dosimetria</h1>
+            <span>Sistema de Cálculo Penal do Gabinete</span>
+        </div>
+        <button class="btn-manual" onclick="abrirManual()">📖 Manual de Uso</button>
     </div>
 
     <!-- BARRA DE ABAS PARA MÚLTIPLOS RÉUS -->
@@ -636,17 +752,19 @@
                     <h2>2ª Fase: Agravantes e Atenuantes</h2>
                 </div>
 
-                <div id="limiteAgravante" class="limit-warning">O limite de 6 Agravantes foi atingido.</div>
                 <div class="fase2-container" style="margin-bottom: 25px;">
                     <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--danger);">Indique uma ou mais Agravantes:</h3>
                     
                     <div class="checkbox-grid">
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Reincidência <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item" style="background: #fff5f5; border-color: #fecaca;">
+                            <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes()"> 
+                            Reincidência <span class="prep-badge">Prep</span>
+                        </label>
                     </div>
                     
                     <div class="input-box full-width" style="margin-bottom: 15px; margin-top: 10px; display: none;" id="boxMultirreincidencia">
                         <label style="color: #b91c1c;">Qual a natureza da Reincidência?</label>
-                        <select id="selMultirreincidencia" style="background: #fff5f5; border-color: #fecaca;">
+                        <select id="selMultirreincidencia" style="background: #fff5f5; border-color: #fecaca;" onchange="calcularDosimetria()">
                             <option value="nao">Reincidência Genérica Simples</option>
                             <option value="especifica">Reincidência Específica</option>
                             <option value="sim">Multirreincidência</option>
@@ -654,22 +772,22 @@
                     </div>
 
                     <div class="checkbox-grid" style="margin-top: 12px;">
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito contra criança, maior de 60 anos, enfermo ou mulher grávida</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou calamidade pública</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito em estado de embriaguez preordenada</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que promove, organiza a cooperação ou dirige a atividade dos demais agentes</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que coage ou induz outrem à execução material do delito</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que instiga a cometer o delito alguém sujeito à sua autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Circunstância diversa das elencadas</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes()"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes()"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito contra criança, maior de 60 anos, enfermo ou mulher grávida</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou calamidade pública</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito em estado de embriaguez preordenada</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que promove, organiza a cooperação ou dirige a atividade dos demais agentes</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que coage ou induz outrem à execução material do delito</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que instiga a cometer o delito alguém sujeito à sua autoridade</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Circunstância diversa das elencadas</label>
                     </div>
                     
                     <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
@@ -680,19 +798,18 @@
                     </div>
                 </div>
 
-                <div id="limiteAtenuante" class="limit-warning">O limite de 6 Atenuantes foi atingido.</div>
                 <div class="fase2-container">
                     <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--success);">Indique uma ou mais Atenuantes:</h3>
                     <div class="checkbox-grid">
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Agente menor de 21, na data do fato, ou maior de 70 anos, na data da sentença <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Desconhecimento da lei</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter procurado, por espontânea vontade, logo após o delito, evitar ou minorar as consequências, ou reparado o dano</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter cometido o delito sob coação resistível, ou sob influência de violenta emoção provocada por ato injusto da vítima</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Ter cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância relevante, anterior ou posterior ao crime, não prevista expressamente</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes('.atenuante', 'limiteAtenuante', 6)"> Circunstância diversa das elencadas</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes()"> Agente menor de 21, na data do fato, ou maior de 70 anos, na data da sentença <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Desconhecimento da lei</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes()"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Ter procurado, por espontânea vontade, logo após o delito, evitar ou minorar as consequências, ou reparado o dano</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Ter cometido o delito sob coação resistível, ou sob influência de violenta emoção provocada por ato injusto da vítima</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="limitarCheckboxes()"> Ter confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Ter cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Circunstância relevante, anterior ou posterior ao crime, não prevista expressamente</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Circunstância diversa das elencadas</label>
                     </div>
                     
                     <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
@@ -841,7 +958,108 @@
     </div>
 
     <div class="footer-creditos">
-        Desenvolvido por <strong>Thiago Melo</strong> | Assessor Jurídico no TJTO
+        Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
+    </div>
+
+    <!-- MODAL DO MANUAL VISUAL LAW -->
+    <div id="modalManual" class="modal-overlay">
+        <div class="modal-content">
+            <button class="btn-fechar-modal" onclick="fecharManual()">&times;</button>
+            
+            <header class="m-header">
+                <h2>⚖️ e-Dosimetria</h2>
+                <p>Guia Prático e Visual para o uso do sistema automatizado de cálculo penal.</p>
+            </header>
+
+            <section class="m-section">
+                <h3 class="m-title">👥 Gestão de Múltiplos Réus</h3>
+                <p style="margin-bottom: 20px; color: var(--text-muted);">Organize processos complexos e concurso de agentes em uma única tela.</p>
+                <div class="m-grid">
+                    <div class="m-card">
+                        <h4>➕ Criar Novo</h4>
+                        <p>Clique em <strong>"+ Adicionar Réu"</strong> para abrir uma aba em branco, preservando os cálculos anteriores.</p>
+                    </div>
+                    <div class="m-card">
+                        <h4>🏷️ Identificar</h4>
+                        <p>Dê um <strong>Duplo Clique</strong> na aba para renomeá-la com o nome do réu ou o fato.</p>
+                    </div>
+                    <div class="m-card">
+                        <h4>🧹 Limpar</h4>
+                        <p>O botão <strong>"Limpar Aba Atual"</strong> zera exclusivamente os dados da tela que você está visualizando.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="m-section">
+                <h3 class="m-title">⚙️ A Engenharia do Cálculo</h3>
+                <div class="m-timeline">
+                    <div class="m-step">
+                        <div class="m-step-num">1</div>
+                        <div class="m-step-content">
+                            <h4>Pena-Base (Art. 59, CP)</h4>
+                            <p>Selecione os vetores desfavoráveis. O sistema aplica a fração de aumento automaticamente (1/8 ou 1/10) sobre o intervalo da pena.</p>
+                            <span class="m-badge">Lei de Drogas: Habilita vetores do Art. 42</span>
+                        </div>
+                    </div>
+                    <div class="m-step">
+                        <div class="m-step-num">2</div>
+                        <div class="m-step-content">
+                            <h4>Pena Provisória (Agravantes e Atenuantes)</h4>
+                            <p>A calculadora aplica a trava da <strong>Súmula 231 do STJ</strong>, impedindo que a pena ultrapasse o máximo ou baixe do mínimo legal nesta fase.</p>
+                            <span class="m-badge">Fração padrão ideal: 1/6</span>
+                        </div>
+                    </div>
+                    <div class="m-step">
+                        <div class="m-step-num">3</div>
+                        <div class="m-step-content">
+                            <h4>Pena Definitiva (Majorantes e Minorantes)</h4>
+                            <p>A ordem matemática é automática: o sistema calcula <strong>primeiro os aumentos</strong> e <strong>depois as diminuições</strong> sucessivamente.</p>
+                            <span class="m-badge">Frações de 1/6 até o Triplo</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="m-section">
+                <h3 class="m-title">🧠 O "Cérebro" Jurisprudencial</h3>
+                <table class="m-table">
+                    <thead>
+                        <tr>
+                            <th>Concurso de Circunstâncias (2ª Fase)</th>
+                            <th>Ação Automática do Sistema</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reincidência Genérica + Confissão Espontânea</td>
+                            <td><span class="m-tag">Compensação Integral</span> (Tema 585 / STJ)</td>
+                        </tr>
+                        <tr>
+                            <td>Reincidência Específica + Confissão Espontânea</td>
+                            <td><span class="m-tag partial">Compensação Parcial</span> (Súmula 630 / STJ)</td>
+                        </tr>
+                        <tr>
+                            <td>Multirreincidência + Confissão Espontânea</td>
+                            <td><span class="m-tag partial">Prepondera Reincidência</span> (Exceção Tema 585)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="m-section">
+                <h3 class="m-title">🚀 Geração da Minuta</h3>
+                <div class="m-grid">
+                    <div class="m-card" style="border: 1px dashed #cbd5e1;">
+                        <h4>🎓 Modo Didático</h4>
+                        <p>Insere notas explicativas no texto citando Súmulas e Temas Repetitivos. Perfeito para fundamentação exaustiva.</p>
+                    </div>
+                    <div class="m-card" style="border: 1px dashed #cbd5e1;">
+                        <h4>📋 Copiar Dispositivo</h4>
+                        <p>Redige o texto da sentença unindo o cálculo de <strong>todos os réus abertos nas abas</strong> em um único documento padronizado.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
 
     <script>
@@ -858,6 +1076,22 @@
             'dataPrisao', 'dataSoltura', 'detracaoAnos', 'detracaoMeses', 'detracaoDias', 
             'chkDidatico', 'agravantesPrepManual', 'atenuantesPrepManual'
         ];
+
+        // FUNÇÕES DO MANUAL (MODAL)
+        function abrirManual() {
+            document.getElementById('modalManual').style.display = 'block';
+        }
+
+        function fecharManual() {
+            document.getElementById('modalManual').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('modalManual');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
 
         function getValoresAtuais() {
             let state = {};
@@ -904,8 +1138,7 @@
             document.getElementById('sectionDrogas').style.display = moduloDrogasAtivo ? 'block' : 'none';
             document.getElementById('btnDrogas').innerText = moduloDrogasAtivo ? 'Desativar Lei de Drogas' : 'Ativar Lei de Drogas (Art. 42)';
 
-            limitarCheckboxes('.agravante', 'limiteAgravante', 6);
-            limitarCheckboxes('.atenuante', 'limiteAtenuante', 6);
+            limitarCheckboxes();
             toggleMulta();
             calcularDosimetria();
         }
@@ -985,29 +1218,10 @@
             }
         }
 
-        function limitarCheckboxes(seletor, avisoId, limite) {
-            const boxes = document.querySelectorAll(seletor);
-            const selecionados = document.querySelectorAll(`${seletor}:checked`).length;
-            const aviso = document.getElementById(avisoId);
-            
-            if (selecionados >= limite) {
-                aviso.style.display = 'block';
-                boxes.forEach(box => {
-                    if (!box.checked) box.parentNode.classList.add('disabled');
-                });
-            } else {
-                aviso.style.display = 'none';
-                boxes.forEach(box => {
-                    box.parentNode.classList.remove('disabled');
-                });
-            }
-            
-            if (seletor === '.agravante') {
-                const isReincidente = document.getElementById('chkReincidente').checked;
-                document.getElementById('boxMultirreincidencia').style.display = isReincidente ? 'block' : 'none';
-                if (!isReincidente) document.getElementById('selMultirreincidencia').value = 'nao';
-            }
-
+        function limitarCheckboxes() {
+            const isReincidente = document.getElementById('chkReincidente').checked;
+            document.getElementById('boxMultirreincidencia').style.display = isReincidente ? 'block' : 'none';
+            if (!isReincidente) document.getElementById('selMultirreincidencia').value = 'nao';
             calcularDosimetria();
         }
 
@@ -1275,7 +1489,7 @@
                 if (multaProv > maxMulta) multaProv = maxMulta;
             }
 
-            // 3ª FASE - ORDEM: 1º MAJORANTES (AUMENTO), DEPOIS MINORANTES (DIMINUIÇÃO)
+            // 3ª FASE
             const selMinorante = document.getElementById('minorante');
             const selMajorante = document.getElementById('majorante');
             const minorante = parseFloat(selMinorante.value);
@@ -1302,7 +1516,7 @@
             let penaFinalDetraida = penaTerc - totalDetracaoDias;
             if (penaFinalDetraida < 0) penaFinalDetraida = 0; 
 
-            // REGIME INICIAL (ART. 33 CP)
+            // REGIME INICIAL
             let alineaRegime = "";
             let nomeRegime = "";
             let anosRegime = penaFinalDetraida / 360;
