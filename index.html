@@ -42,6 +42,8 @@
             align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
             z-index: 10;
         }
 
@@ -60,7 +62,6 @@
             font-weight: 500;
         }
 
-        /* BARRA DE ABAS (MÚLTIPLOS RÉUS) */
         .tabs-container {
             display: flex;
             gap: 8px;
@@ -69,7 +70,7 @@
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             position: sticky;
-            top: 0;
+            top: 60px;
             z-index: 9;
             align-items: flex-end;
         }
@@ -314,7 +315,7 @@
 
         .results-column {
             position: sticky;
-            top: 90px;
+            top: 130px;
         }
 
         .result-card {
@@ -514,15 +515,14 @@
         <span>Sistema de Cálculo Penal do Gabinete</span>
     </div>
 
-    <!-- NOVA BARRA DE ABAS PARA MÚLTIPLOS RÉUS -->
-    <div class="tabs-container" id="tabsContainer">
-        <!-- Abas injetadas via JS -->
-    </div>
+    <!-- BARRA DE ABAS PARA MÚLTIPLOS RÉUS -->
+    <div class="tabs-container" id="tabsContainer"></div>
 
     <div class="dashboard-container" id="formsArea" oninput="calcularDosimetria()" onchange="calcularDosimetria()">
         
         <div class="forms-column">
             
+            <!-- FASE 1 - PENA EM ABSTRATO -->
             <div class="card">
                 <div class="card-header">
                     <h2>Pena em Abstrato</h2>
@@ -606,6 +606,7 @@
                 </div>
             </div>
 
+            <!-- FASE 1 - CIRCUNSTÂNCIAS JUDICIAIS -->
             <div class="card">
                 <div class="card-header">
                     <h2>1ª Fase: Circunstâncias Judiciais</h2>
@@ -629,16 +630,10 @@
                 </div>
             </div>
 
-            <!-- FASE 2 -->
+            <!-- FASE 2 - AGRAVANTES E ATENUANTES -->
             <div class="card">
                 <div class="card-header">
                     <h2>2ª Fase: Agravantes e Atenuantes</h2>
-                </div>
-                
-                <div style="background: #fef2f2; border: 1px dashed #fca5a5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <label class="checkbox-item" style="background: transparent; border: none; color: #b91c1c; font-weight: 600; margin: 0; padding: 0;">
-                        <input type="checkbox" id="chkReincidente" onchange="calcularDosimetria()"> O Réu é Reincidente (Impacta o Regime Inicial)
-                    </label>
                 </div>
 
                 <div id="limiteAgravante" class="limit-warning">O limite de 6 Agravantes foi atingido.</div>
@@ -646,7 +641,7 @@
                     <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--danger);">Indique uma ou mais Agravantes:</h3>
                     
                     <label class="checkbox-item" style="background: #fff5f5; border-color: #fecaca; margin-bottom: 12px;">
-                        <input type="checkbox" class="agravante prep" id="chkReincidenteAux" onchange="sincronizarReincidencia('chkReincidenteAux', 'chkReincidente'); limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> 
+                        <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> 
                         Reincidência <span class="prep-badge">Preponderante</span>
                     </label>
                     
@@ -709,99 +704,64 @@
                 </div>
             </div>
 
+            <!-- FASE 3 - MAJORANTES E MINORANTES (ORDEM CORRETA: 1º AUMENTOS, DEPOIS DIMINUIÇÕES) -->
             <div class="card">
                 <div class="card-header">
-                    <h2>3ª Fase: Majorantes e Minorantes</h2>
+                    <h2>3ª Fase: Causas de Aumento e Diminuição</h2>
                 </div>
                 <div class="input-group">
                     <div class="input-box">
-                        <label>Fração de Diminuição (-)</label>
-                        <select id="minorante">
-                            <option value="0">Nenhuma</option>
-                            <option value="0.166666">1/6</option>
-                            <option value="0.333333">1/3</option>
-                            <option value="0.5">1/2</option>
-                            <option value="0.666666">2/3</option>
-                        </select>
-                    </div>
-                    <div class="input-box">
-                        <label>Fração de Aumento (+)</label>
+                        <label style="color: var(--danger);">Causas de Aumento (+ Majorantes)</label>
                         <select id="majorante">
                             <option value="0">Nenhuma</option>
                             <option value="0.166666">1/6</option>
+                            <option value="0.2">1/5</option>
+                            <option value="0.25">1/4</option>
                             <option value="0.333333">1/3</option>
-                            <option value="0.5">1/2</option>
+                            <option value="0.375">3/8</option>
+                            <option value="0.4">2/5</option>
+                            <option value="0.5">1/2 (Metade)</option>
                             <option value="0.666666">2/3</option>
+                            <option value="0.75">3/4</option>
+                            <option value="1.0">Até o Dobro (100%)</option>
+                            <option value="2.0">Até o Triplo (200%)</option>
+                        </select>
+                    </div>
+                    <div class="input-box">
+                        <label style="color: var(--success);">Causas de Diminuição (- Minorantes)</label>
+                        <select id="minorante">
+                            <option value="0">Nenhuma</option>
+                            <option value="0.166666">1/6</option>
+                            <option value="0.2">1/5</option>
+                            <option value="0.25">1/4</option>
+                            <option value="0.333333">1/3</option>
+                            <option value="0.375">3/8</option>
+                            <option value="0.4">2/5</option>
+                            <option value="0.5">1/2 (Metade)</option>
+                            <option value="0.666666">2/3</option>
+                            <option value="0.75">3/4</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="card" style="border-left: 4px solid var(--warning);">
+            <!-- OPÇÃO DE DEFINIÇÃO DO REGIME -->
+            <div class="card" style="border-left: 4px solid var(--primary);">
                 <div class="card-header">
-                    <h2>Concurso de Crimes (Arts. 69 a 71, CP)</h2>
+                    <h2>Critério de Fixação do Regime Inicial (Art. 33, CP)</h2>
                 </div>
                 <div class="input-group">
                     <div class="input-box full-width">
-                        <label>Tipo de Concurso</label>
-                        <select id="tipoConcurso" onchange="mudarConcurso()">
-                            <option value="nenhum">Não há (Crime Único)</option>
-                            <option value="material">Concurso Material / Formal Imperfeito (Soma de Penas)</option>
-                            <option value="formal_continuado">Concurso Formal Próprio / Crime Continuado (Fração)</option>
-                            <option value="continuado_esp">Crime Continuado Específico (Multiplicador)</option>
+                        <label>Modo de Avaliação do Regime</label>
+                        <select id="modoRegime" onchange="calcularDosimetria()">
+                            <option value="automatico">Automático (Padrão Legal: Reincidente = Fechado para Reclusão &le; 4 anos)</option>
+                            <option value="fundamentado_aberto">Fundamentado: Fixar em Regime Mais Favorável (ex: Aberto/Semiaberto mediante análise do art. 59)</option>
                         </select>
-                    </div>
-                </div>
-
-                <div id="boxConcursoSoma" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Insira a pena dos <b>outros crimes</b> já calculados para somar ao atual:</p>
-                    <div class="input-group">
-                        <div class="input-box"><label>Anos</label><input type="number" id="concAnos" value="0" min="0"></div>
-                        <div class="input-box"><label>Meses</label><input type="number" id="concMeses" value="0" min="0"></div>
-                        <div class="input-box"><label>Dias</label><input type="number" id="concDias" value="0" min="0"></div>
-                        <div class="input-box" id="boxConcMultaSoma"><label>Multa (Dias)</label><input type="number" id="concMulta" value="0" min="0"></div>
-                    </div>
-                </div>
-
-                <div id="boxConcursoFracao" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Aumento da Pena Privativa de Liberdade:</p>
-                    <div class="input-group">
-                        <div class="input-box">
-                            <label>Fração de Aumento</label>
-                            <select id="concFracao">
-                                <option value="0.166666">1/6 (2 crimes)</option>
-                                <option value="0.2">1/5 (3 crimes)</option>
-                                <option value="0.25">1/4 (4 crimes)</option>
-                                <option value="0.333333">1/3 (5 crimes)</option>
-                                <option value="0.5">1/2 (6 crimes)</option>
-                                <option value="0.666666">2/3 (7 ou mais crimes)</option>
-                            </select>
-                        </div>
-                        <div class="input-box" id="boxConcMultaQtd">
-                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes (Art. 72, CP)</label>
-                            <input type="number" id="concQtdCrimes" value="2" min="2">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="boxConcursoMult" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Crime Continuado Específico:</p>
-                    <div class="input-group">
-                        <div class="input-box">
-                            <label>Multiplicador</label>
-                            <select id="concMultiplicador">
-                                <option value="2">Até o Dobro (x2)</option>
-                                <option value="3">Até o Triplo (x3)</option>
-                            </select>
-                        </div>
-                        <div class="input-box" id="boxConcMultaQtdEsp">
-                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes (Art. 72, CP)</label>
-                            <input type="number" id="concQtdCrimesEsp" value="2" min="2">
-                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- DETRAÇÃO -->
             <div class="card" style="border-left: 4px solid var(--accent);">
                 <div class="card-header">
                     <h2>Detração Penal (Art. 42, CP)</h2>
@@ -831,6 +791,7 @@
 
         </div>
 
+        <!-- COLUNA DIREITA: RESULTADOS -->
         <div class="results-column">
             <div class="result-card">
                 <h2>Resumo da Sentença</h2>
@@ -860,12 +821,8 @@
                         <div id="avisoSumulaAgravante" class="alerta-sumula maximo">⚠️ Súmula 231 STJ: Travado no Máximo</div>
                     </div>
                     <div class="timeline-item">
-                        <div class="result-title">Total da 3ª Fase</div>
+                        <div class="result-title">Total da 3ª Fase (Majorantes / Minorantes)</div>
                         <div class="timeline-text" id="resPenaTerc">-</div>
-                    </div>
-                    <div class="timeline-item" id="resConcursoItem" style="display: none;">
-                        <div class="result-title" style="color: #fbbf24;">Concurso de Crimes</div>
-                        <div class="timeline-text" id="resPenaConcurso">-</div>
                     </div>
                     <div class="timeline-item" style="border-left: none;">
                         <div class="result-title" style="color: #fca5a5;">Detração Aplicada</div>
@@ -884,11 +841,10 @@
     </div>
 
     <div class="footer-creditos">
-        Desenvolvido por <strong>Thiago Melo</strong> | Assessor Jurídico no TJTO
+        Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
     </div>
 
     <script>
-        // GERENCIAMENTO DE ESTADO E ABAS
         let moduloDrogasAtivo = false;
         let reus = [];
         let reuAtualId = 1;
@@ -897,9 +853,8 @@
 
         const inputIds = [
             'seletorCrime', 'temMulta', 'tipoPrisao', 'unidadePena', 'minPena', 'maxPena', 
-            'minMulta', 'maxMulta', 'chkReincidente', 'chkReincidenteAux', 'selMultirreincidencia', 
-            'minorante', 'majorante', 'tipoConcurso', 'concAnos', 'concMeses', 'concDias', 
-            'concMulta', 'concFracao', 'concQtdCrimes', 'concMultiplicador', 'concQtdCrimesEsp', 
+            'minMulta', 'maxMulta', 'chkReincidente', 'selMultirreincidencia', 
+            'minorante', 'majorante', 'modoRegime', 
             'dataPrisao', 'dataSoltura', 'detracaoAnos', 'detracaoMeses', 'detracaoDias', 
             'chkDidatico', 'agravantesPrepManual', 'atenuantesPrepManual'
         ];
@@ -952,7 +907,6 @@
             limitarCheckboxes('.agravante', 'limiteAgravante', 6);
             limitarCheckboxes('.atenuante', 'limiteAtenuante', 6);
             toggleMulta();
-            mudarConcurso();
             calcularDosimetria();
         }
 
@@ -1031,12 +985,6 @@
             }
         }
 
-        // FUNÇÕES DO SISTEMA (CÁLCULO E LÓGICA)
-        function sincronizarReincidencia(fonteId, destinoId) {
-            document.getElementById(destinoId).checked = document.getElementById(fonteId).checked;
-            calcularDosimetria();
-        }
-
         function limitarCheckboxes(seletor, avisoId, limite) {
             const boxes = document.querySelectorAll(seletor);
             const selecionados = document.querySelectorAll(`${seletor}:checked`).length;
@@ -1055,10 +1003,7 @@
             }
             
             if (seletor === '.agravante') {
-                const isReincidente = document.getElementById('chkReincidenteAux').checked || document.getElementById('chkReincidente').checked;
-                document.getElementById('chkReincidente').checked = isReincidente;
-                document.getElementById('chkReincidenteAux').checked = isReincidente;
-                
+                const isReincidente = document.getElementById('chkReincidente').checked;
                 document.getElementById('boxMultirreincidencia').style.display = isReincidente ? 'block' : 'none';
                 if (!isReincidente) document.getElementById('selMultirreincidencia').value = 'nao';
             }
@@ -1069,7 +1014,6 @@
         function copiarDispositivo() {
             salvarEstadoAtual();
             calcularDosimetria(); 
-            
             let textoFinal = reus.map(r => r.textoGerado).join("\n\n=======================================================\n\n");
             
             navigator.clipboard.writeText(textoFinal).then(() => {
@@ -1098,19 +1042,6 @@
             document.getElementById('boxMinMulta').style.display = temMulta ? 'flex' : 'none';
             document.getElementById('boxMaxMulta').style.display = temMulta ? 'flex' : 'none';
             document.getElementById('resMultaDefinitiva').style.display = temMulta ? 'block' : 'none';
-            
-            document.getElementById('boxConcMultaSoma').style.display = temMulta ? 'flex' : 'none';
-            document.getElementById('boxConcMultaQtd').style.display = temMulta ? 'flex' : 'none';
-            document.getElementById('boxConcMultaQtdEsp').style.display = temMulta ? 'flex' : 'none';
-            
-            calcularDosimetria();
-        }
-
-        function mudarConcurso() {
-            const tipo = document.getElementById('tipoConcurso').value;
-            document.getElementById('boxConcursoSoma').style.display = tipo === 'material' ? 'block' : 'none';
-            document.getElementById('boxConcursoFracao').style.display = tipo === 'formal_continuado' ? 'block' : 'none';
-            document.getElementById('boxConcursoMult').style.display = tipo === 'continuado_esp' ? 'block' : 'none';
             calcularDosimetria();
         }
 
@@ -1134,7 +1065,6 @@
                 document.getElementById('maxPena').value = 4;
                 document.getElementById('unidadePena').value = 'anos';
                 document.getElementById('tipoPrisao').value = 'reclusao';
-                
                 document.getElementById('temMulta').checked = true;
                 toggleMulta();
             }
@@ -1152,7 +1082,6 @@
                 document.getElementById('minPena').value = 5;
                 document.getElementById('maxPena').value = 15;
                 document.getElementById('tipoPrisao').value = 'reclusao';
-                
                 document.getElementById('temMulta').checked = true;
                 document.getElementById('minMulta').value = 500;
                 document.getElementById('maxMulta').value = 1500;
@@ -1203,11 +1132,11 @@
         }
 
         function calcularDosimetria() {
-            // Se o DOM não carregou o estado padrão, aborta para não quebrar
             if(!document.getElementById('minPena')) return;
 
             const temMulta = document.getElementById('temMulta').checked;
             const modoDidatico = document.getElementById('chkDidatico').checked;
+            const modoRegime = document.getElementById('modoRegime').value;
             const unidade = document.getElementById('unidadePena').value;
             const minInput = parseFloat(document.getElementById('minPena').value) || 0;
             const maxInput = parseFloat(document.getElementById('maxPena').value) || 0;
@@ -1244,17 +1173,16 @@
             let atePrep = parseInt(document.getElementById('atenuantesPrepManual').value) || 0;
             let ateComum = 0;
 
-            let isReincidente = document.getElementById('chkReincidente').checked || document.getElementById('chkReincidenteAux').checked;
+            let isReincidente = document.getElementById('chkReincidente').checked;
             let isMultirreincidente = document.getElementById('selMultirreincidencia').value === 'sim';
             let temConfissao = document.querySelector('.atenuante.confissao').checked;
 
             document.querySelectorAll('.agravante:checked').forEach(cb => {
                 let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
-                if (textoCb !== "Reincidência") listaAgravantes.push(textoCb);
+                listaAgravantes.push(textoCb);
                 if (cb.classList.contains('prep')) agrPrep++;
                 else agrComum++;
             });
-            if (isReincidente) listaAgravantes.unshift(isMultirreincidente ? "Multirreincidência" : "Reincidência");
 
             document.querySelectorAll('.atenuante:checked').forEach(cb => {
                 let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
@@ -1325,7 +1253,7 @@
                 if (multaProv > maxMulta) multaProv = maxMulta;
             }
 
-            // 3ª FASE
+            // 3ª FASE - ORDEM CORRETA: 1º MAJORANTES (AUMENTO), DEPOIS MINORANTES (DIMINUIÇÃO)
             const selMinorante = document.getElementById('minorante');
             const selMajorante = document.getElementById('majorante');
             const minorante = parseFloat(selMinorante.value);
@@ -1334,45 +1262,13 @@
             let penaTerc = penaProv;
             let multaTerc = multaProv;
             
-            if (minorante > 0) {
-                penaTerc -= (penaTerc * minorante);
-                if(temMulta) multaTerc -= (multaTerc * minorante);
-            }
             if (majorante > 0) {
                 penaTerc += (penaTerc * majorante);
                 if(temMulta) multaTerc += (multaTerc * majorante);
             }
-
-            // 4ª FASE: CONCURSO
-            let penaConcurso = penaTerc;
-            let multaConcurso = multaTerc;
-            const tipoConcSelect = document.getElementById('tipoConcurso');
-            const tipoConc = tipoConcSelect.value;
-            let aplicouConcurso = false;
-
-            if (tipoConc === 'material') {
-                const cAnos = parseInt(document.getElementById('concAnos').value) || 0;
-                const cMeses = parseInt(document.getElementById('concMeses').value) || 0;
-                const cDias = parseInt(document.getElementById('concDias').value) || 0;
-                const cMulta = parseFloat(document.getElementById('concMulta').value) || 0;
-                
-                penaConcurso += (cAnos * 360) + (cMeses * 30) + cDias;
-                if(temMulta) multaConcurso += cMulta;
-                aplicouConcurso = true;
-            
-            } else if (tipoConc === 'formal_continuado') {
-                const frac = parseFloat(document.getElementById('concFracao').value);
-                const qtd = parseInt(document.getElementById('concQtdCrimes').value) || 1;
-                penaConcurso += (penaTerc * frac);
-                if(temMulta) multaConcurso = (multaTerc * qtd);
-                aplicouConcurso = true;
-            
-            } else if (tipoConc === 'continuado_esp') {
-                const mult = parseFloat(document.getElementById('concMultiplicador').value);
-                const qtd = parseInt(document.getElementById('concQtdCrimesEsp').value) || 1;
-                penaConcurso = penaTerc * mult;
-                if(temMulta) multaConcurso = (multaTerc * qtd);
-                aplicouConcurso = true;
+            if (minorante > 0) {
+                penaTerc -= (penaTerc * minorante);
+                if(temMulta) multaTerc -= (multaTerc * minorante);
             }
 
             // DETRAÇÃO 
@@ -1381,15 +1277,14 @@
             const detDias = parseInt(document.getElementById('detracaoDias').value) || 0;
             const totalDetracaoDias = (detAnos * 360) + (detMeses * 30) + detDias;
 
-            let penaFinalDetraida = penaConcurso - totalDetracaoDias;
+            let penaFinalDetraida = penaTerc - totalDetracaoDias;
             if (penaFinalDetraida < 0) penaFinalDetraida = 0; 
 
-            // REGIME INICIAL
+            // REGIME INICIAL (ART. 33 CP)
             let alineaRegime = "";
             let nomeRegime = "";
             let anosRegime = penaFinalDetraida / 360;
             let isReclusao = document.getElementById('tipoPrisao').value === 'reclusao';
-            let sumula269Ativada = false;
 
             if (isReclusao) {
                 if (anosRegime > 8) {
@@ -1399,9 +1294,13 @@
                     else { nomeRegime = "SEMIABERTO"; alineaRegime = "alínea 'b'"; }
                 } else {
                     if (isReincidente) { 
-                        nomeRegime = "SEMIABERTO"; 
-                        alineaRegime = "alíneas 'b' e 'c' c/c Súmula 269 STJ"; 
-                        sumula269Ativada = true;
+                        if (modoRegime === 'fundamentado_aberto') {
+                            nomeRegime = totalDesfavoraveis > 0 ? "SEMIABERTO" : "ABERTO";
+                            alineaRegime = "alíneas 'b' e 'c' c/c art. 33, § 3º, CP";
+                        } else {
+                            nomeRegime = "FECHADO"; 
+                            alineaRegime = "art. 33, § 2º, 'b', c/c art. 59, CP"; 
+                        }
                     } 
                     else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
                 }
@@ -1409,7 +1308,15 @@
                 if (anosRegime > 4) {
                     nomeRegime = "SEMIABERTO"; alineaRegime = isReincidente ? "alínea 'b' (a contrario sensu)" : "alínea 'b'";
                 } else {
-                    if (isReincidente) { nomeRegime = "SEMIABERTO"; alineaRegime = "alíneas 'b' e 'c' (a contrario sensu)"; } 
+                    if (isReincidente) { 
+                        if (modoRegime === 'fundamentado_aberto') {
+                            nomeRegime = "ABERTO";
+                            alineaRegime = "alínea 'c' c/c art. 33, § 3º, CP";
+                        } else {
+                            nomeRegime = "SEMIABERTO"; 
+                            alineaRegime = "art. 33, § 2º, 'c'"; 
+                        }
+                    } 
                     else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
                 }
             }
@@ -1433,12 +1340,7 @@
                 texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico que as circunstâncias judiciais são, em sua maioria, favoráveis ou neutras. `;
             }
             texto += `Dessa forma, fixo a pena-base em ${formatarDias(penaBase)}`;
-            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n`; else texto += ".\n";
-            
-            if (modoDidatico && totalDesfavoraveis > 0) {
-                texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Segundo entendimento do STJ, o aumento na primeira fase obedece, como regra geral, à fração de 1/6 (ou 1/8 no caso do art. 59) sobre o intervalo entre as penas mínima e máxima para cada circunstância desfavorável.]\n`;
-            }
-            texto += "\n";
+            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
 
             texto += "2ª FASE (PENA PROVISÓRIA): ";
             if (listaAgravantes.length > 0 || listaAtenuantes.length > 0) {
@@ -1453,39 +1355,17 @@
             if (aplicouAgravanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
             
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
-            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n`; else texto += ".\n";
+            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
 
-            if (modoDidatico) {
-                if (teveAgravoAtenuante) {
-                    texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: O Código Penal não estabelece frações fixas para a segunda fase, mas a jurisprudência consolidada do STJ preconiza o uso da fração ideal de 1/6 para cada agravante ou atenuante genérica.`;
-                }
-                if (aplicouCompensacaoEspecial && teveAgravoAtenuante) {
-                    texto += ` Ademais, segundo o STJ (Tema 585), a atenuante da confissão diz respeito à personalidade do agente, devendo ser compensada com a agravante da reincidência, exceto nos casos de multirreincidência, que exige maior reprovação.]\n`;
-                } else if (teveAgravoAtenuante) {
-                    texto += `]\n`;
-                }
-            }
-            texto += "\n";
-
-            texto += "3ª FASE (PENA DEFINITIVA): ";
+            texto += "3ª FASE (CAUSAS DE AUMENTO E DIMINUIÇÃO): ";
             if (minorante === 0 && majorante === 0) {
                 texto += "Na terceira fase, não constato a presença de causas de aumento ou de diminuição de pena. ";
             } else {
-                if (minorante > 0) texto += `Verifico a presença de causa de diminuição de pena, razão pela qual reduzo a reprimenda na fração de ${selMinorante.options[selMinorante.selectedIndex].text}. `;
                 if (majorante > 0) texto += `Verifico a presença de causa de aumento de pena, razão pela qual exaspero a reprimenda na fração de ${selMajorante.options[selMajorante.selectedIndex].text}. `;
+                if (minorante > 0) texto += `Verifico a presença de causa de diminuição de pena, razão pela qual reduzo a reprimenda na fração de ${selMinorante.options[selMinorante.selectedIndex].text}. `;
             }
             texto += `Sendo assim, torno a pena definitiva em ${formatarDias(penaTerc)}`;
             if(temMulta) texto += ` e ${Math.round(multaTerc)} dias-multa.\n\n`; else texto += ".\n\n";
-
-            if (aplicouConcurso) {
-                texto += "CONCURSO DE CRIMES: ";
-                texto += `Em virtude do reconhecimento de ${tipoConcSelect.options[tipoConcSelect.selectedIndex].text}, a reprimenda unificada perfaz o total de ${formatarDias(penaConcurso)}`;
-                if(temMulta) texto += ` e ${Math.round(multaConcurso)} dias-multa, cumulados nos termos do art. 72 do CP.\n`; else texto += ".\n";
-                if (modoDidatico && temMulta) {
-                     texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Conforme o Art. 72 do CP, no concurso de crimes as penas de multa são aplicadas distinta e integralmente, por isso o valor da multa sofreu acréscimo proporcional ao número de delitos.]\n`;
-                }
-                texto += "\n";
-            }
 
             if (totalDetracaoDias > 0) {
                 texto += "DETRAÇÃO (ART. 42, CP): ";
@@ -1494,16 +1374,12 @@
 
             if (penaFinalDetraida > 0) {
                 texto += "REGIME INICIAL DE CUMPRIMENTO:\n";
-                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, e considerando o quantum de pena a ser cumprido (${formatarDias(penaFinalDetraida)}) bem como a condição do sentenciado (${isReincidente ? 'reincidente' : 'primário'}), fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n`;
-                if (modoDidatico && sumula269Ativada) {
-                     texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Súmula 269, STJ - "É admissível a adoção do regime prisional semi-aberto aos reincidentes condenados a pena igual ou inferior a quatro anos se favoráveis as circunstâncias judiciais."]\n`;
-                }
-                texto += "\n";
+                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, e considerando o quantum de pena a ser cumprido (${formatarDias(penaFinalDetraida)}) bem como a condição do sentenciado (${isReincidente ? 'reincidente' : 'primário'}), fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n\n`;
             }
 
             texto += "--- RESULTADO FINAL ---\n";
             texto += `PENA PRIVATIVA DE LIBERDADE: ${formatarDias(penaFinalDetraida)} (${nomeRegime}).\n`;
-            if (temMulta) texto += `PENA DE MULTA: ${Math.round(multaConcurso)} dias-multa.`;
+            if (temMulta) texto += `PENA DE MULTA: ${Math.round(multaTerc)} dias-multa.`;
 
             // Salva o texto no Réu
             if (reus.length > 0) {
@@ -1530,15 +1406,6 @@
             document.getElementById('avisoSumulaAtenuante').style.display = aplicouAtenuanteSumula ? 'block' : 'none';
             document.getElementById('avisoSumulaAgravante').style.display = aplicouAgravanteSumula ? 'block' : 'none';
 
-            if (aplicouConcurso) {
-                document.getElementById('resConcursoItem').style.display = 'block';
-                let txtConc = `<b>P. Lib:</b> ${formatarDias(penaConcurso)}`;
-                if (temMulta) txtConc += ` <br><span style="color: #fbbf24;">(Multa Total: ${Math.round(multaConcurso)} dias)</span>`;
-                document.getElementById('resPenaConcurso').innerHTML = txtConc;
-            } else {
-                document.getElementById('resConcursoItem').style.display = 'none';
-            }
-
             if (totalDetracaoDias > 0) {
                 document.getElementById('resDetracao').innerText = `- ${formatarDias(totalDetracaoDias)}`;
             } else {
@@ -1546,7 +1413,7 @@
             }
 
             document.getElementById('resPenaDefinitiva').innerText = formatarDias(penaFinalDetraida);
-            if (temMulta) document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaConcurso)} dias-multa`;
+            if (temMulta) document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaTerc)} dias-multa`;
 
             document.getElementById('resRegimeBadge').innerText = `REGIME: ${nomeRegime}`;
             if (nomeRegime === 'FECHADO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--danger)';
