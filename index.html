@@ -31,6 +31,8 @@
             flex-direction: column;
             min-height: 100vh;
             line-height: 1.5;
+            padding-bottom: 0px; /* Alterado dinamicamente via JS */
+            transition: padding-bottom 0.3s;
         }
 
         .navbar {
@@ -287,13 +289,6 @@
             color: #1e3a8a;
         }
 
-        .checkbox-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-            background: #f1f5f9;
-        }
-        
         .prep-badge {
             background-color: var(--warning);
             color: white;
@@ -306,18 +301,6 @@
         }
 
         .prep-badge.success { background-color: var(--success); }
-
-        .limit-warning {
-            background-color: #fef2f2;
-            color: var(--danger);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            border: 1px solid #fca5a5;
-            display: none;
-        }
 
         .toggle-btn {
             background: var(--surface);
@@ -502,16 +485,6 @@
         .btn-limpar { background-color: transparent; color: #cbd5e1; text-decoration: underline; padding: 5px; font-size: 0.9rem;}
         .btn-limpar:hover { color: white; }
 
-        .footer-creditos {
-            text-align: center;
-            padding: 25px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            background-color: var(--surface);
-            border-top: 1px solid var(--border);
-            margin-top: auto;
-        }
-
         .fase2-container {
             max-height: 450px;
             overflow-y: auto;
@@ -524,6 +497,48 @@
         .fase2-container::-webkit-scrollbar { width: 8px; }
         .fase2-container::-webkit-scrollbar-track { background: transparent; }
         .fase2-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+
+        /* RODAPÉ FIXO DE CONCURSO MATERIAL GLOBAL (INVISÍVEL POR PADRÃO) */
+        .global-footer {
+            display: none; /* Inicia oculto */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 12px 40px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .gf-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #93c5fd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gf-data {
+            display: flex;
+            gap: 30px;
+            background: rgba(0,0,0,0.2);
+            padding: 8px 20px;
+            border-radius: 8px;
+        }
+
+        .gf-item { font-size: 1.1rem; font-weight: bold; }
+        .gf-label { color: #93c5fd; font-weight: normal; font-size: 0.85rem; margin-right: 5px; text-transform: uppercase; }
 
         /* MODAL DO MANUAL */
         .modal-overlay {
@@ -593,7 +608,6 @@
         .m-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
         .m-header p { font-size: 1.05rem; color: #cbd5e1; font-weight: 300; }
         .m-section { padding: 30px 40px; border-bottom: 1px solid var(--border); }
-        .m-section:last-child { border-bottom: none; }
         .m-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
         .m-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
         .m-card { background: var(--bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
@@ -618,6 +632,8 @@
             .m-step { flex-direction: column; text-align: center; }
             .m-step-num { margin-right: 0; margin-bottom: 10px; }
             .navbar { flex-direction: column; gap: 15px; }
+            .global-footer { flex-direction: column; gap: 10px; padding: 15px; }
+            .gf-data { flex-direction: column; gap: 10px; text-align: center; }
         }
     </style>
 </head>
@@ -757,7 +773,7 @@
                     
                     <div class="checkbox-grid">
                         <label class="checkbox-item" style="background: #fff5f5; border-color: #fecaca;">
-                            <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes()"> 
+                            <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="verificarReincidencia()"> 
                             Reincidência <span class="prep-badge">Prep</span>
                         </label>
                     </div>
@@ -772,22 +788,22 @@
                     </div>
 
                     <div class="checkbox-grid" style="margin-top: 12px;">
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes()"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes()"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito contra criança, maior de 60 anos, enfermo ou mulher grávida</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou calamidade pública</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que comete o delito em estado de embriaguez preordenada</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que promove, organiza a cooperação ou dirige a atividade dos demais agentes</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que coage ou induz outrem à execução material do delito</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que instiga a cometer o delito alguém sujeito à sua autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes()"> Circunstância diversa das elencadas</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="calcularDosimetria()"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="calcularDosimetria()"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito contra criança, maior de 60 anos, enfermo ou mulher grávida</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou calamidade pública</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito em estado de embriaguez preordenada</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que promove, organiza a cooperação ou dirige a atividade dos demais agentes</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que coage ou induz outrem à execução material do delito</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que instiga a cometer o delito alguém sujeito à sua autoridade</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
+                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Circunstância diversa das elencadas</label>
                     </div>
                     
                     <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
@@ -801,15 +817,15 @@
                 <div class="fase2-container">
                     <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--success);">Indique uma ou mais Atenuantes:</h3>
                     <div class="checkbox-grid">
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes()"> Agente menor de 21, na data do fato, ou maior de 70 anos, na data da sentença <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Desconhecimento da lei</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="limitarCheckboxes()"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Ter procurado, por espontânea vontade, logo após o delito, evitar ou minorar as consequências, ou reparado o dano</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Ter cometido o delito sob coação resistível, ou sob influência de violenta emoção provocada por ato injusto da vítima</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="limitarCheckboxes()"> Ter confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Ter cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Circunstância relevante, anterior ou posterior ao crime, não prevista expressamente</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="limitarCheckboxes()"> Circunstância diversa das elencadas</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="calcularDosimetria()"> Agente menor de 21, na data do fato, ou maior de 70 anos, na data da sentença <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Desconhecimento da lei</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="calcularDosimetria()"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Ter procurado, por espontânea vontade, logo após o delito, evitar ou minorar as consequências, ou reparado o dano</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Ter cometido o delito sob coação resistível, ou sob influência de violenta emoção provocada por ato injusto da vítima</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="calcularDosimetria()"> Ter confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge success">Prep</span></label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Ter cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Circunstância relevante, anterior ou posterior ao crime, não prevista expressamente</label>
+                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Circunstância diversa das elencadas</label>
                     </div>
                     
                     <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
@@ -862,6 +878,59 @@
                 </div>
             </div>
 
+            <div class="card" style="border-left: 4px solid var(--warning);">
+                <div class="card-header">
+                    <h2>Concurso de Crimes da Própria Aba (Ex: Art. 70 e 71)</h2>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0;">*Para <b>Concurso Material (Art. 69)</b>, adicione uma Aba para cada crime. O sistema somará tudo no rodapé automaticamente.</p>
+                <div class="input-group">
+                    <div class="input-box full-width">
+                        <label>Fração sobre a pena atual</label>
+                        <select id="tipoConcurso" onchange="mudarConcurso()">
+                            <option value="nenhum">Não há (Crime Único nesta aba)</option>
+                            <option value="formal_continuado">Concurso Formal / Crime Continuado (Fração)</option>
+                            <option value="continuado_esp">Crime Continuado Específico (Multiplicador)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="boxConcursoFracao" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
+                    <div class="input-group">
+                        <div class="input-box">
+                            <label>Fração de Aumento</label>
+                            <select id="concFracao">
+                                <option value="0.166666">1/6 (2 crimes)</option>
+                                <option value="0.2">1/5 (3 crimes)</option>
+                                <option value="0.25">1/4 (4 crimes)</option>
+                                <option value="0.333333">1/3 (5 crimes)</option>
+                                <option value="0.5">1/2 (6 crimes)</option>
+                                <option value="0.666666">2/3 (7 ou mais crimes)</option>
+                            </select>
+                        </div>
+                        <div class="input-box" id="boxConcMultaQtd">
+                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes (Art. 72, CP)</label>
+                            <input type="number" id="concQtdCrimes" value="2" min="2">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="boxConcursoMult" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
+                    <div class="input-group">
+                        <div class="input-box">
+                            <label>Multiplicador</label>
+                            <select id="concMultiplicador">
+                                <option value="2">Até o Dobro (x2)</option>
+                                <option value="3">Até o Triplo (x3)</option>
+                            </select>
+                        </div>
+                        <div class="input-box" id="boxConcMultaQtdEsp">
+                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes (Art. 72, CP)</label>
+                            <input type="number" id="concQtdCrimesEsp" value="2" min="2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- OPÇÃO DE DEFINIÇÃO DO REGIME -->
             <div class="card" style="border-left: 4px solid var(--primary);">
                 <div class="card-header">
@@ -908,7 +977,6 @@
 
         </div>
 
-        <!-- COLUNA DIREITA: RESULTADOS -->
         <div class="results-column">
             <div class="result-card">
                 <h2>Resumo da Sentença</h2>
@@ -941,6 +1009,10 @@
                         <div class="result-title">Total da 3ª Fase (Majorantes / Minorantes)</div>
                         <div class="timeline-text" id="resPenaTerc">-</div>
                     </div>
+                    <div class="timeline-item" id="resConcursoItem" style="display: none;">
+                        <div class="result-title" style="color: #fbbf24;">Acréscimo Concurso de Crimes (Art. 70/71)</div>
+                        <div class="timeline-text" id="resPenaConcurso">-</div>
+                    </div>
                     <div class="timeline-item" style="border-left: none;">
                         <div class="result-title" style="color: #fca5a5;">Detração Aplicada</div>
                         <div class="timeline-text" style="color: #fca5a5;" id="resDetracao">-</div>
@@ -948,7 +1020,7 @@
                 </div>
 
                 <div class="botoes-container">
-                    <button class="btn btn-copiar" id="btnCopiarTexto" onclick="copiarDispositivo()" type="button">📋 Copiar Dispositivo de Todos os Réus</button>
+                    <button class="btn btn-copiar" id="btnCopiarTexto" onclick="copiarDispositivo()" type="button">📋 Copiar Dispositivo Completo (Todas as Abas)</button>
                     <button class="btn btn-calcular" onclick="window.print()" type="button">🖨️ Imprimir Resumo Atual</button>
                     <button class="btn btn-limpar" onclick="limparDados()" type="button">Limpar Aba Atual e Recomeçar</button>
                 </div>
@@ -957,8 +1029,14 @@
 
     </div>
 
-    <div class="footer-creditos">
-        Desenvolvido por <strong>[Seu Nome Aqui]</strong> | Assessor Jurídico no TJTO e Professor de Direito Penal
+    <!-- RODAPÉ FIXO DE CONCURSO MATERIAL GLOBAL -->
+    <div id="globalFooter" class="global-footer">
+        <div class="gf-title">🔗 CONCURSO MATERIAL (SOMA DAS ABAS - ART. 69 CP)</div>
+        <div class="gf-data">
+            <div class="gf-item"><span class="gf-label">Reclusão:</span> <span id="gfRec">0 dias</span></div>
+            <div class="gf-item"><span class="gf-label">Detenção:</span> <span id="gfDet">0 dias</span></div>
+            <div class="gf-item"><span class="gf-label">Multa Total:</span> <span id="gfMulta">0</span> dias</div>
+        </div>
     </div>
 
     <!-- MODAL DO MANUAL VISUAL LAW -->
@@ -972,16 +1050,16 @@
             </header>
 
             <section class="m-section">
-                <h3 class="m-title">👥 Gestão de Múltiplos Réus</h3>
-                <p style="margin-bottom: 20px; color: var(--text-muted);">Organize processos complexos e concurso de agentes em uma única tela.</p>
+                <h3 class="m-title">👥 Gestão de Múltiplos Réus e Fatos</h3>
+                <p style="margin-bottom: 20px; color: var(--text-muted);">Organize processos complexos e concursos materiais de crimes.</p>
                 <div class="m-grid">
                     <div class="m-card">
                         <h4>➕ Criar Novo</h4>
-                        <p>Clique em <strong>"+ Adicionar Réu"</strong> para abrir uma aba em branco, preservando os cálculos anteriores.</p>
+                        <p>Clique em <strong>"+ Adicionar Fato/Crime"</strong> para abrir uma aba em branco, preservando os cálculos anteriores.</p>
                     </div>
                     <div class="m-card">
-                        <h4>🏷️ Identificar</h4>
-                        <p>Dê um <strong>Duplo Clique</strong> na aba para renomeá-la com o nome do réu ou o fato.</p>
+                        <h4>🔗 Concurso Material</h4>
+                        <p>Crie uma aba para CADA crime. O sistema detectará as abas extras e mostrará uma barra inferior somando as penas automaticamente (separando reclusão e detenção).</p>
                     </div>
                     <div class="m-card">
                         <h4>🧹 Limpar</h4>
@@ -998,7 +1076,6 @@
                         <div class="m-step-content">
                             <h4>Pena-Base (Art. 59, CP)</h4>
                             <p>Selecione os vetores desfavoráveis. O sistema aplica a fração de aumento automaticamente (1/8 ou 1/10) sobre o intervalo da pena.</p>
-                            <span class="m-badge">Lei de Drogas: Habilita vetores do Art. 42</span>
                         </div>
                     </div>
                     <div class="m-step">
@@ -1006,7 +1083,6 @@
                         <div class="m-step-content">
                             <h4>Pena Provisória (Agravantes e Atenuantes)</h4>
                             <p>A calculadora aplica a trava da <strong>Súmula 231 do STJ</strong>, impedindo que a pena ultrapasse o máximo ou baixe do mínimo legal nesta fase.</p>
-                            <span class="m-badge">Fração padrão ideal: 1/6</span>
                         </div>
                     </div>
                     <div class="m-step">
@@ -1014,7 +1090,6 @@
                         <div class="m-step-content">
                             <h4>Pena Definitiva (Majorantes e Minorantes)</h4>
                             <p>A ordem matemática é automática: o sistema calcula <strong>primeiro os aumentos</strong> e <strong>depois as diminuições</strong> sucessivamente.</p>
-                            <span class="m-badge">Frações de 1/6 até o Triplo</span>
                         </div>
                     </div>
                 </div>
@@ -1055,7 +1130,7 @@
                     </div>
                     <div class="m-card" style="border: 1px dashed #cbd5e1;">
                         <h4>📋 Copiar Dispositivo</h4>
-                        <p>Redige o texto da sentença unindo o cálculo de <strong>todos os réus abertos nas abas</strong> em um único documento padronizado.</p>
+                        <p>Redige o texto da sentença unindo o cálculo de <strong>todas as abas abertas</strong> e gerando o cúmulo material automático no fim.</p>
                     </div>
                 </div>
             </section>
@@ -1072,25 +1147,18 @@
         const inputIds = [
             'seletorCrime', 'temMulta', 'tipoPrisao', 'unidadePena', 'minPena', 'maxPena', 
             'minMulta', 'maxMulta', 'chkReincidente', 'selMultirreincidencia', 
-            'minorante', 'majorante', 'modoRegime', 
+            'minorante', 'majorante', 'modoRegime', 'tipoConcurso',
+            'concFracao', 'concQtdCrimes', 'concMultiplicador', 'concQtdCrimesEsp',
             'dataPrisao', 'dataSoltura', 'detracaoAnos', 'detracaoMeses', 'detracaoDias', 
             'chkDidatico', 'agravantesPrepManual', 'atenuantesPrepManual'
         ];
 
         // FUNÇÕES DO MANUAL (MODAL)
-        function abrirManual() {
-            document.getElementById('modalManual').style.display = 'block';
-        }
-
-        function fecharManual() {
-            document.getElementById('modalManual').style.display = 'none';
-        }
-
+        function abrirManual() { document.getElementById('modalManual').style.display = 'block'; }
+        function fecharManual() { document.getElementById('modalManual').style.display = 'none'; }
         window.onclick = function(event) {
             let modal = document.getElementById('modalManual');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+            if (event.target == modal) modal.style.display = "none";
         }
 
         function getValoresAtuais() {
@@ -1138,8 +1206,9 @@
             document.getElementById('sectionDrogas').style.display = moduloDrogasAtivo ? 'block' : 'none';
             document.getElementById('btnDrogas').innerText = moduloDrogasAtivo ? 'Desativar Lei de Drogas' : 'Ativar Lei de Drogas (Art. 42)';
 
-            limitarCheckboxes();
+            verificarReincidencia();
             toggleMulta();
+            mudarConcurso();
             calcularDosimetria();
         }
 
@@ -1170,9 +1239,11 @@
 
             const addBtn = document.createElement('button');
             addBtn.className = 'tab-add';
-            addBtn.innerHTML = '+ Adicionar Réu';
+            addBtn.innerHTML = '+ Adicionar Fato/Crime';
             addBtn.onclick = adicionarReu;
             container.appendChild(addBtn);
+            
+            atualizarRodapeGlobal();
         }
 
         function alternarReu(id) {
@@ -1186,7 +1257,7 @@
 
         function adicionarReu() {
             salvarEstadoAtual();
-            const novoReu = { id: nextId, nome: `Réu ${nextId}`, state: JSON.parse(JSON.stringify(estadoPadrao)), textoGerado: '' };
+            const novoReu = { id: nextId, nome: `Fato/Crime ${nextId}`, state: JSON.parse(JSON.stringify(estadoPadrao)), textoGerado: '', resultado: null };
             reus.push(novoReu);
             reuAtualId = nextId;
             nextId++;
@@ -1197,7 +1268,7 @@
         function removerReu(e, id) {
             e.stopPropagation();
             if(reus.length === 1) {
-                alert("Você precisa ter pelo menos um réu no processo.");
+                alert("Você precisa ter pelo menos um crime/fato.");
                 return;
             }
             reus = reus.filter(r => r.id !== id);
@@ -1206,11 +1277,12 @@
                 carregarEstado(reus[0].state);
             }
             renderTabs();
+            atualizarRodapeGlobal();
         }
 
         function renomearReu(id) {
             const reu = reus.find(r => r.id === id);
-            const novoNome = prompt("Nome do Réu (ou apelido):", reu.nome);
+            const novoNome = prompt("Identificação do Crime/Fato:", reu.nome);
             if (novoNome && novoNome.trim() !== "") {
                 reu.nome = novoNome.trim();
                 if(reu.id === reuAtualId) calcularDosimetria(); 
@@ -1218,33 +1290,11 @@
             }
         }
 
-        function limitarCheckboxes() {
+        function verificarReincidencia() {
             const isReincidente = document.getElementById('chkReincidente').checked;
             document.getElementById('boxMultirreincidencia').style.display = isReincidente ? 'block' : 'none';
             if (!isReincidente) document.getElementById('selMultirreincidencia').value = 'nao';
             calcularDosimetria();
-        }
-
-        function copiarDispositivo() {
-            salvarEstadoAtual();
-            calcularDosimetria(); 
-            let textoFinal = reus.map(r => r.textoGerado).join("\n\n=======================================================\n\n");
-            
-            navigator.clipboard.writeText(textoFinal).then(() => {
-                const btn = document.getElementById('btnCopiarTexto');
-                const originalText = btn.innerText;
-                btn.innerText = "✅ Texto Copiado com Sucesso!";
-                btn.style.backgroundColor = "var(--success)"; 
-                btn.style.color = "white";
-                
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.backgroundColor = "var(--surface)";
-                    btn.style.color = "var(--primary)";
-                }, 3000);
-            }).catch(err => {
-                alert('Erro ao copiar o texto. Tente novamente.');
-            });
         }
 
         function limparDados() {
@@ -1252,6 +1302,7 @@
             document.getElementById('selMultirreincidencia').value = 'nao';
             document.getElementById('boxMultirreincidencia').style.display = 'none';
             document.getElementById('chkDidatico').checked = false;
+            document.getElementById('tipoConcurso').value = 'nenhum';
             
             carregarEstado(JSON.parse(JSON.stringify(estadoPadrao)));
         }
@@ -1261,7 +1312,16 @@
             document.getElementById('boxMinMulta').style.display = temMulta ? 'flex' : 'none';
             document.getElementById('boxMaxMulta').style.display = temMulta ? 'flex' : 'none';
             document.getElementById('resMultaDefinitiva').style.display = temMulta ? 'block' : 'none';
+            document.getElementById('boxConcMultaQtd').style.display = temMulta && document.getElementById('tipoConcurso').value === 'formal_continuado' ? 'flex' : 'none';
+            document.getElementById('boxConcMultaQtdEsp').style.display = temMulta && document.getElementById('tipoConcurso').value === 'continuado_esp' ? 'flex' : 'none';
             calcularDosimetria();
+        }
+
+        function mudarConcurso() {
+            const tipo = document.getElementById('tipoConcurso').value;
+            document.getElementById('boxConcursoFracao').style.display = tipo === 'formal_continuado' ? 'block' : 'none';
+            document.getElementById('boxConcursoMult').style.display = tipo === 'continuado_esp' ? 'block' : 'none';
+            toggleMulta();
         }
 
         function carregarCrime() {
@@ -1337,7 +1397,7 @@
         }
 
         function formatarDias(totalDias) {
-            if (totalDias <= 0) return '0 dias (Pena cumprida integralmente)';
+            if (totalDias <= 0) return '0 dias';
             totalDias = Math.round(totalDias);
             const anos = Math.floor(totalDias / 360);
             const resto = totalDias % 360;
@@ -1351,6 +1411,48 @@
             return txt.length > 0 ? txt.join(', ') : '0 dias';
         }
 
+        function helperRegime(tipo, penaDias, isReincidente, modoRegime, temDesfavoraveis) {
+            if (penaDias <= 0) return {nome: "EXTINTO", alinea: ""};
+            let anos = penaDias / 360;
+            let nome = "", alinea = "";
+            
+            if (tipo === 'reclusao') {
+                if (anos > 8) {
+                    nome = "FECHADO"; alinea = "alínea 'a'";
+                } else if (anos > 4 && anos <= 8) {
+                    if (isReincidente) { nome = "FECHADO"; alinea = "alíneas 'a' e 'b' (a contrario sensu)"; } 
+                    else { nome = "SEMIABERTO"; alinea = "alínea 'b'"; }
+                } else {
+                    if (isReincidente) { 
+                        if (modoRegime === 'fundamentado_aberto') {
+                            nome = temDesfavoraveis ? "SEMIABERTO" : "ABERTO";
+                            alinea = "alíneas 'b' e 'c' c/c art. 33, § 3º, CP";
+                        } else {
+                            nome = "FECHADO"; 
+                            alinea = "art. 33, § 2º, 'b', c/c art. 59, CP"; 
+                        }
+                    } 
+                    else { nome = "ABERTO"; alinea = "alínea 'c'"; }
+                }
+            } else { 
+                if (anos > 4) {
+                    nome = "SEMIABERTO"; alinea = isReincidente ? "alínea 'b' (a contrario sensu)" : "alínea 'b'";
+                } else {
+                    if (isReincidente) { 
+                        if (modoRegime === 'fundamentado_aberto') {
+                            nome = "ABERTO";
+                            alinea = "alínea 'c' c/c art. 33, § 3º, CP";
+                        } else {
+                            nome = "SEMIABERTO"; 
+                            alinea = "art. 33, § 2º, 'c'"; 
+                        }
+                    } 
+                    else { nome = "ABERTO"; alinea = "alínea 'c'"; }
+                }
+            }
+            return { nome, alinea };
+        }
+
         function calcularDosimetria() {
             if(!document.getElementById('minPena')) return;
 
@@ -1360,6 +1462,7 @@
             const unidade = document.getElementById('unidadePena').value;
             const minInput = parseFloat(document.getElementById('minPena').value) || 0;
             const maxInput = parseFloat(document.getElementById('maxPena').value) || 0;
+            const isReclusao = document.getElementById('tipoPrisao').value === 'reclusao';
             
             let minMulta = 0, maxMulta = 0;
             if (temMulta) {
@@ -1408,7 +1511,7 @@
                 else agrComum++;
             });
             if (isReincidente) {
-                let strReinc = "Reincidência Genérica Simples";
+                let strReinc = "Reincidência Genérica";
                 if (isMultirreincidente) strReinc = "Multirreincidência";
                 else if (isReincidenciaEspecifica) strReinc = "Reincidência Específica";
                 listaAgravantes.unshift(strReinc);
@@ -1429,14 +1532,14 @@
 
             if (isReincidente && temConfissao) {
                 if (isMultirreincidente) {
-                    textoAnalise = "Conforme STJ (Tema 585 e afins), a multirreincidência prepondera sobre a confissão espontânea. ";
+                    textoAnalise = "Conforme STJ (Tema 585), a multirreincidência prepondera sobre a confissão espontânea. ";
                 } else if (isReincidenciaEspecifica) {
-                    textoAnalise = "Conforme STJ (Súmula 630 e afins), a reincidência específica prepondera sobre a confissão espontânea, operando-se a compensação parcial. ";
+                    textoAnalise = "Conforme STJ (Súmula 630), a reincidência específica prepondera sobre a confissão espontânea, operando-se a compensação parcial. ";
                     agrEfetivaPrep -= 0.5; 
                     ateEfetivaPrep -= 1;
                     compensacaoParcialEspecifica = true;
                 } else {
-                    textoAnalise = "Conforme Tema 585/STJ, a agravante da reincidência genérica e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
+                    textoAnalise = "Conforme STJ (Tema 585), a agravante da reincidência genérica e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
                     agrEfetivaPrep--; 
                     ateEfetivaPrep--;
                     aplicouCompensacaoEspecial = true;
@@ -1507,79 +1610,59 @@
                 if(temMulta) multaTerc -= (multaTerc * minorante);
             }
 
+            // 4ª FASE: CONCURSO DA ABA (Formal/Continuado)
+            let penaConcurso = penaTerc;
+            let multaConcurso = multaTerc;
+            const tipoConcSelect = document.getElementById('tipoConcurso');
+            const tipoConc = tipoConcSelect.value;
+            let aplicouConcurso = false;
+
+            if (tipoConc === 'formal_continuado') {
+                const frac = parseFloat(document.getElementById('concFracao').value);
+                const qtd = parseInt(document.getElementById('concQtdCrimes').value) || 1;
+                penaConcurso += (penaTerc * frac);
+                if(temMulta) multaConcurso = (multaTerc * qtd);
+                aplicouConcurso = true;
+            } else if (tipoConc === 'continuado_esp') {
+                const mult = parseFloat(document.getElementById('concMultiplicador').value);
+                const qtd = parseInt(document.getElementById('concQtdCrimesEsp').value) || 1;
+                penaConcurso = penaTerc * mult;
+                if(temMulta) multaConcurso = (multaTerc * qtd);
+                aplicouConcurso = true;
+            }
+
             // DETRAÇÃO 
             const detAnos = parseInt(document.getElementById('detracaoAnos').value) || 0;
             const detMeses = parseInt(document.getElementById('detracaoMeses').value) || 0;
             const detDias = parseInt(document.getElementById('detracaoDias').value) || 0;
             const totalDetracaoDias = (detAnos * 360) + (detMeses * 30) + detDias;
 
-            let penaFinalDetraida = penaTerc - totalDetracaoDias;
+            let penaFinalDetraida = penaConcurso - totalDetracaoDias;
             if (penaFinalDetraida < 0) penaFinalDetraida = 0; 
 
-            // REGIME INICIAL
-            let alineaRegime = "";
-            let nomeRegime = "";
-            let anosRegime = penaFinalDetraida / 360;
-            let isReclusao = document.getElementById('tipoPrisao').value === 'reclusao';
+            // REGIME INICIAL ABA
+            let regimeInfo = helperRegime(isReclusao ? 'reclusao' : 'detencao', penaFinalDetraida, isReincidente, modoRegime, totalDesfavoraveis > 0);
+            let nomeRegime = regimeInfo.nome;
 
-            if (isReclusao) {
-                if (anosRegime > 8) {
-                    nomeRegime = "FECHADO"; alineaRegime = "alínea 'a'";
-                } else if (anosRegime > 4 && anosRegime <= 8) {
-                    if (isReincidente) { nomeRegime = "FECHADO"; alineaRegime = "alíneas 'a' e 'b' (a contrario sensu)"; } 
-                    else { nomeRegime = "SEMIABERTO"; alineaRegime = "alínea 'b'"; }
-                } else {
-                    if (isReincidente) { 
-                        if (modoRegime === 'fundamentado_aberto') {
-                            nomeRegime = totalDesfavoraveis > 0 ? "SEMIABERTO" : "ABERTO";
-                            alineaRegime = "alíneas 'b' e 'c' c/c art. 33, § 3º, CP";
-                        } else {
-                            nomeRegime = "FECHADO"; 
-                            alineaRegime = "art. 33, § 2º, 'b', c/c art. 59, CP"; 
-                        }
-                    } 
-                    else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
-                }
-            } else { 
-                if (anosRegime > 4) {
-                    nomeRegime = "SEMIABERTO"; alineaRegime = isReincidente ? "alínea 'b' (a contrario sensu)" : "alínea 'b'";
-                } else {
-                    if (isReincidente) { 
-                        if (modoRegime === 'fundamentado_aberto') {
-                            nomeRegime = "ABERTO";
-                            alineaRegime = "alínea 'c' c/c art. 33, § 3º, CP";
-                        } else {
-                            nomeRegime = "SEMIABERTO"; 
-                            alineaRegime = "art. 33, § 2º, 'c'"; 
-                        }
-                    } 
-                    else { nomeRegime = "ABERTO"; alineaRegime = "alínea 'c'"; }
-                }
-            }
-            if (penaFinalDetraida <= 0) nomeRegime = "EXTINTO PELO CUMPRIMENTO";
-
-
-            // RECUPERA O NOME DO RÉU ATUAL
-            let nomeReu = "RÉU";
-            if (reus.length > 0) {
-                let reuObj = reus.find(r => r.id === reuAtualId);
-                if (reuObj) nomeReu = reuObj.nome;
-            }
+            // RECUPERA O NOME DO RÉU/FATO ATUAL
+            let nomeReu = "FATO/RÉU";
+            let reuObj = reus.find(r => r.id === reuAtualId);
+            if (reuObj) nomeReu = reuObj.nome;
 
             // GERADOR DE TEXTO 
-            let texto = `--- DOSIMETRIA DA PENA: ${nomeReu.toUpperCase()} ---\n\n`;
+            let texto = `--- DOSIMETRIA: ${nomeReu.toUpperCase()} ---\n\n`;
 
             texto += "1ª FASE (PENA-BASE): ";
             if(listaDesfavoraveis.length > 0) {
-                texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico a existência de circunstâncias judiciais desfavoráveis, consistentes em: ${listaDesfavoraveis.join('; ')}. `;
+                texto += `Analisando as diretrizes do art. 59 do CP, verifico a existência de circunstâncias desfavoráveis, consistentes em: ${listaDesfavoraveis.join('; ')}. `;
             } else {
-                texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico que as circunstâncias judiciais são, em sua maioria, favoráveis ou neutras. `;
+                texto += `As circunstâncias judiciais do art. 59 do CP são favoráveis ou neutras. `;
             }
             texto += `Dessa forma, fixo a pena-base em ${formatarDias(penaBase)}`;
             if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n`; else texto += ".\n";
             
             if (modoDidatico && totalDesfavoraveis > 0) {
-                texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Segundo entendimento do STJ, o aumento na primeira fase obedece, como regra geral, à fração de 1/6 (ou 1/8 no caso do art. 59) sobre o intervalo entre as penas mínima e máxima para cada circunstância desfavorável.]\n`;
+                texto += `[🎓 FUNDAMENTAÇÃO: Segundo entendimento do STJ, o aumento na primeira fase obedece, como regra geral, à fração de 1/6 (ou 1/8 no caso do art. 59) sobre o intervalo da pena.]\n`;
             }
             texto += "\n";
 
@@ -1589,65 +1672,54 @@
                 if (listaAtenuantes.length > 0) texto += `Reconheço a(s) atenuante(s) de: ${listaAtenuantes.join('; ')}. `;
                 if (textoAnalise) texto += textoAnalise;
             } else {
-                texto += `Inexistem circunstâncias agravantes ou atenuantes genéricas a serem valoradas. `;
+                texto += `Inexistem agravantes ou atenuantes genéricas. `;
             }
 
-            if (aplicouAtenuanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância atenuante não pode conduzir à redução da pena abaixo do mínimo legal. `;
-            if (aplicouAgravanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
+            if (aplicouAtenuanteSumula) texto += ` Em observância à Súmula 231 do STJ, a atenuante não pode reduzir a pena aquém do mínimo. `;
+            if (aplicouAgravanteSumula) texto += ` Em observância à Súmula 231 do STJ, a agravante não pode exceder o máximo legal. `;
             
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
             if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n`; else texto += ".\n";
-
-            if (modoDidatico) {
-                if (teveAgravoAtenuante) {
-                    texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: O Código Penal não estabelece frações fixas para a segunda fase, mas a jurisprudência consolidada do STJ preconiza o uso da fração ideal de 1/6 para cada agravante ou atenuante genérica.`;
-                }
-                if (aplicouCompensacaoEspecial && teveAgravoAtenuante) {
-                    texto += ` Ademais, segundo o STJ (Tema 585), a atenuante da confissão diz respeito à personalidade do agente, devendo ser compensada com a agravante da reincidência genérica, exceto nos casos de multirreincidência, que exige maior reprovação.]\n`;
-                } else if (compensacaoParcialEspecifica && teveAgravoAtenuante) {
-                    texto += ` Ademais, segundo o STJ (Súmula 630), a agravante da reincidência específica prepondera sobre a atenuante da confissão espontânea, ensejando a compensação parcial em desfavor do réu.]\n`;
-                } else if (teveAgravoAtenuante) {
-                    texto += `]\n`;
-                }
-            }
             texto += "\n";
 
             texto += "3ª FASE (CAUSAS DE AUMENTO E DIMINUIÇÃO): ";
             if (minorante === 0 && majorante === 0) {
-                texto += "Na terceira fase, não constato a presença de causas de aumento ou de diminuição de pena. ";
+                texto += "Não constato causas de aumento ou de diminuição de pena. ";
             } else {
-                if (majorante > 0) texto += `Verifico a presença de causa de aumento de pena, razão pela qual exaspero a reprimenda na fração de ${selMajorante.options[selMajorante.selectedIndex].text}. `;
-                if (minorante > 0) texto += `Verifico a presença de causa de diminuição de pena, razão pela qual reduzo a reprimenda na fração de ${selMinorante.options[selMinorante.selectedIndex].text}. `;
+                if (majorante > 0) texto += `Pela presença de causa de aumento de pena, exaspero a reprimenda na fração de ${selMajorante.options[selMajorante.selectedIndex].text}. `;
+                if (minorante > 0) texto += `Pela presença de causa de diminuição de pena, reduzo a reprimenda na fração de ${selMinorante.options[selMinorante.selectedIndex].text}. `;
             }
             texto += `Sendo assim, torno a pena definitiva em ${formatarDias(penaTerc)}`;
             if(temMulta) texto += ` e ${Math.round(multaTerc)} dias-multa.\n\n`; else texto += ".\n\n";
 
-            if (temMulta) {
-                texto += "PENA DE MULTA:\n";
-                texto += `Considerando as previsões do art. 49 do Código Penal e em juízo de proporcionalidade com a pena acima aplicada, fixo a pena de multa em ${Math.round(penaTerc > 0 ? multaTerc : multaBase)} dias-multa, à razão de 1/30 (um trigésimo) do salário mínimo vigente ao tempo do fato, ante a ausência de maiores informações sobre a capacidade econômica do réu.\n\n`;
+            if (aplicouConcurso) {
+                texto += "CONCURSO DE CRIMES: ";
+                texto += `Em virtude do reconhecimento de ${tipoConcSelect.options[tipoConcSelect.selectedIndex].text}, a reprimenda deste crime perfaz ${formatarDias(penaConcurso)}`;
+                if(temMulta) texto += ` e ${Math.round(multaConcurso)} dias-multa (Art. 72, CP).\n\n`; else texto += ".\n\n";
             }
 
             if (totalDetracaoDias > 0) {
                 texto += "DETRAÇÃO (ART. 42, CP): \n";
-                texto += `Considerando o período de ${formatarDias(totalDetracaoDias)} em que o sentenciado permaneceu preso provisoriamente, procedo ao abatimento do quantum determinado pelo art. 387, § 2º, do CPP. A pena restante a cumprir passa a ser de ${formatarDias(penaFinalDetraida)}.\n\n`;
+                texto += `Considerando ${formatarDias(totalDetracaoDias)} de prisão provisória, abato o quantum determinado pelo art. 387, § 2º, CPP. O saldo de pena passa a ser de ${formatarDias(penaFinalDetraida)}.\n\n`;
             }
 
-            if (penaFinalDetraida > 0) {
-                texto += "REGIME INICIAL DE CUMPRIMENTO:\n";
-                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n\n`;
+            texto += `SUBTOTAL DESTE FATO: ${formatarDias(penaFinalDetraida)} de ${isReclusao?'Reclusão':'Detenção'}.`;
+
+            // SALVA RESULTADO NA ABA E ATUALIZA GLOBAL
+            if (reuObj) {
+                reuObj.textoGerado = texto;
+                reuObj.resultado = {
+                    rec: isReclusao ? penaFinalDetraida : 0,
+                    det: !isReclusao ? penaFinalDetraida : 0,
+                    multa: temMulta ? multaConcurso : 0,
+                    isReincidente: isReincidente,
+                    modoRegime: modoRegime,
+                    temDesfav: totalDesfavoraveis > 0
+                };
             }
+            atualizarRodapeGlobal();
 
-            texto += "--- RESULTADO FINAL ---\n";
-            texto += `PENA PRIVATIVA DE LIBERDADE: ${formatarDias(penaFinalDetraida)} (${nomeRegime}).\n`;
-            if (temMulta) texto += `PENA DE MULTA: ${Math.round(temMulta ? multaTerc : 0)} dias-multa.`;
-
-            // Salva o texto no Réu
-            if (reus.length > 0) {
-                let reuObj = reus.find(r => r.id === reuAtualId);
-                if (reuObj) reuObj.textoGerado = texto;
-            }
-
-            // ATUALIZAR INTERFACE
+            // ATUALIZAR INTERFACE DA TELA
             let txtBase = `<b>P. Lib:</b> ${formatarDias(penaBase)}`;
             let txtProv = `<b>P. Lib:</b> ${formatarDias(penaProv)}`;
             let txtTerc = `<b>P. Lib:</b> ${formatarDias(penaTerc)}`;
@@ -1666,6 +1738,15 @@
             document.getElementById('avisoSumulaAtenuante').style.display = aplicouAtenuanteSumula ? 'block' : 'none';
             document.getElementById('avisoSumulaAgravante').style.display = aplicouAgravanteSumula ? 'block' : 'none';
 
+            if (aplicouConcurso) {
+                document.getElementById('resConcursoItem').style.display = 'block';
+                let txtConc = `<b>P. Lib:</b> ${formatarDias(penaConcurso)}`;
+                if (temMulta) txtConc += ` <br><span style="color: #fbbf24;">(Multa Total: ${Math.round(multaConcurso)} dias)</span>`;
+                document.getElementById('resPenaConcurso').innerHTML = txtConc;
+            } else {
+                document.getElementById('resConcursoItem').style.display = 'none';
+            }
+
             if (totalDetracaoDias > 0) {
                 document.getElementById('resDetracao').innerText = `- ${formatarDias(totalDetracaoDias)}`;
             } else {
@@ -1673,19 +1754,106 @@
             }
 
             document.getElementById('resPenaDefinitiva').innerText = formatarDias(penaFinalDetraida);
-            if (temMulta) document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaTerc)} dias-multa`;
+            if (temMulta) document.getElementById('resMultaDefinitiva').innerText = `${Math.round(multaConcurso)} dias-multa`;
 
-            document.getElementById('resRegimeBadge').innerText = `REGIME: ${nomeRegime}`;
+            document.getElementById('resRegimeBadge').innerText = `REGIME SIMULADO: ${nomeRegime}`;
             if (nomeRegime === 'FECHADO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--danger)';
             else if (nomeRegime === 'SEMIABERTO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--warning)';
             else if (nomeRegime === 'ABERTO') document.getElementById('resRegimeBadge').style.backgroundColor = 'var(--success)';
             else document.getElementById('resRegimeBadge').style.backgroundColor = '#64748b'; 
         }
 
+        function atualizarRodapeGlobal() {
+            let totalRec = 0;
+            let totalDet = 0;
+            let totalMulta = 0;
+            
+            reus.forEach(r => {
+                if(r.resultado) {
+                    totalRec += r.resultado.rec || 0;
+                    totalDet += r.resultado.det || 0;
+                    totalMulta += r.resultado.multa || 0;
+                }
+            });
+
+            document.getElementById('gfRec').innerText = formatarDias(totalRec);
+            document.getElementById('gfDet').innerText = formatarDias(totalDet);
+            document.getElementById('gfMulta').innerText = Math.round(totalMulta);
+
+            // Dinâmica do rodapé (oculto se <= 1 aba)
+            const rodape = document.getElementById('globalFooter');
+            if (reus.length > 1) {
+                rodape.style.display = 'flex';
+                document.body.style.paddingBottom = '80px';
+            } else {
+                rodape.style.display = 'none';
+                document.body.style.paddingBottom = '0px';
+            }
+        }
+
+        function copiarDispositivo() {
+            salvarEstadoAtual();
+            calcularDosimetria(); 
+            
+            let textoFinal = reus.map(r => r.textoGerado).join("\n\n=======================================================\n\n");
+            
+            // CÁLCULO DO CONCURSO MATERIAL GLOBAL PARA O TEXTO (APENAS SE HOUVER MAIS DE 1 ABA)
+            if (reus.length > 1) {
+                let totalRec = 0, totalDet = 0, totalMulta = 0;
+                let hasReincidenteGlobal = false;
+                let modoRegimeGlobal = 'automatico';
+                let temDesfavGlobal = false;
+
+                reus.forEach(r => {
+                    if(r.resultado) {
+                        totalRec += r.resultado.rec || 0;
+                        totalDet += r.resultado.det || 0;
+                        totalMulta += r.resultado.multa || 0;
+                        if (r.resultado.isReincidente) hasReincidenteGlobal = true;
+                        if (r.resultado.temDesfav) temDesfavGlobal = true;
+                        if (r.resultado.modoRegime === 'fundamentado_aberto') modoRegimeGlobal = 'fundamentado_aberto';
+                    }
+                });
+
+                let globalText = "\n\n=======================================================\n";
+                globalText += "--- CONCURSO MATERIAL (SOMA GLOBAL) ---\n\n";
+                globalText += "Reconheço o concurso material entre os delitos apurados (art. 69 do Código Penal). Procedendo à soma das penas de mesma espécie e respeitando a independência entre reclusão e detenção, fixo a reprimenda total e definitiva em:\n\n";
+                
+                if (totalRec > 0) {
+                    let rRec = helperRegime('reclusao', totalRec, hasReincidenteGlobal, modoRegimeGlobal, temDesfavGlobal);
+                    globalText += `- ${formatarDias(totalRec)} de RECLUSÃO (Regime Inicial: ${rRec.nome}).\n`;
+                }
+                if (totalDet > 0) {
+                    let rDet = helperRegime('detencao', totalDet, hasReincidenteGlobal, modoRegimeGlobal, temDesfavGlobal);
+                    globalText += `- ${formatarDias(totalDet)} de DETENÇÃO (Regime Inicial: ${rDet.nome}).\n`;
+                }
+                if (totalMulta > 0) {
+                    globalText += `- ${Math.round(totalMulta)} dias-multa.\n`;
+                }
+
+                textoFinal += globalText;
+            }
+            
+            navigator.clipboard.writeText(textoFinal).then(() => {
+                const btn = document.getElementById('btnCopiarTexto');
+                const originalText = btn.innerText;
+                btn.innerText = "✅ Texto Copiado com Sucesso!";
+                btn.style.backgroundColor = "var(--success)"; 
+                btn.style.color = "white";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = "var(--surface)";
+                    btn.style.color = "var(--primary)";
+                }, 3000);
+            }).catch(err => {
+                alert('Erro ao copiar o texto. Tente novamente.');
+            });
+        }
+
         window.onload = function() {
             carregarCrime(); 
             estadoPadrao = getValoresAtuais();
-            reus.push({ id: 1, nome: "Réu 1", state: JSON.parse(JSON.stringify(estadoPadrao)), textoGerado: "" });
+            reus.push({ id: 1, nome: "Fato 1", state: JSON.parse(JSON.stringify(estadoPadrao)), textoGerado: "", resultado: null });
             renderTabs();
             calcularDosimetria();
         };
