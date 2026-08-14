@@ -640,20 +640,20 @@
                 <div class="fase2-container" style="margin-bottom: 25px;">
                     <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--danger);">Indique uma ou mais Agravantes:</h3>
                     
-                    <label class="checkbox-item" style="background: #fff5f5; border-color: #fecaca; margin-bottom: 12px;">
-                        <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> 
-                        Reincidência <span class="prep-badge">Preponderante</span>
-                    </label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" id="chkReincidente" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Reincidência <span class="prep-badge">Prep</span></label>
+                    </div>
                     
-                    <div class="input-box full-width" style="margin-bottom: 15px; display: none;" id="boxMultirreincidencia">
-                        <label style="color: #b91c1c;">É caso de Multirreincidência?</label>
+                    <div class="input-box full-width" style="margin-bottom: 15px; margin-top: 10px; display: none;" id="boxMultirreincidencia">
+                        <label style="color: #b91c1c;">Qual a natureza da Reincidência?</label>
                         <select id="selMultirreincidencia" style="background: #fff5f5; border-color: #fecaca;">
-                            <option value="nao">Não (Reincidência Simples)</option>
-                            <option value="sim">Sim (Multirreincidência)</option>
+                            <option value="nao">Reincidência Genérica Simples</option>
+                            <option value="especifica">Reincidência Específica</option>
+                            <option value="sim">Multirreincidência</option>
                         </select>
                     </div>
 
-                    <div class="checkbox-grid">
+                    <div class="checkbox-grid" style="margin-top: 12px;">
                         <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
                         <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="limitarCheckboxes('.agravante', 'limiteAgravante', 6)"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
@@ -704,7 +704,7 @@
                 </div>
             </div>
 
-            <!-- FASE 3 - MAJORANTES E MINORANTES (ORDEM CORRETA: 1º AUMENTOS, DEPOIS DIMINUIÇÕES) -->
+            <!-- FASE 3 - MAJORANTES E MINORANTES -->
             <div class="card">
                 <div class="card-header">
                     <h2>3ª Fase: Causas de Aumento e Diminuição</h2>
@@ -1034,6 +1034,11 @@
         }
 
         function limparDados() {
+            document.getElementById('chkReincidente').checked = false;
+            document.getElementById('selMultirreincidencia').value = 'nao';
+            document.getElementById('boxMultirreincidencia').style.display = 'none';
+            document.getElementById('chkDidatico').checked = false;
+            
             carregarEstado(JSON.parse(JSON.stringify(estadoPadrao)));
         }
 
@@ -1065,6 +1070,7 @@
                 document.getElementById('maxPena').value = 4;
                 document.getElementById('unidadePena').value = 'anos';
                 document.getElementById('tipoPrisao').value = 'reclusao';
+                
                 document.getElementById('temMulta').checked = true;
                 toggleMulta();
             }
@@ -1174,15 +1180,25 @@
             let ateComum = 0;
 
             let isReincidente = document.getElementById('chkReincidente').checked;
-            let isMultirreincidente = document.getElementById('selMultirreincidencia').value === 'sim';
+            let naturezaReincidencia = document.getElementById('selMultirreincidencia').value;
+            let isMultirreincidente = naturezaReincidencia === 'sim';
+            let isReincidenciaEspecifica = naturezaReincidencia === 'especifica';
             let temConfissao = document.querySelector('.atenuante.confissao').checked;
 
             document.querySelectorAll('.agravante:checked').forEach(cb => {
                 let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
-                listaAgravantes.push(textoCb);
+                if (cb.id !== 'chkReincidente') {
+                    listaAgravantes.push(textoCb);
+                }
                 if (cb.classList.contains('prep')) agrPrep++;
                 else agrComum++;
             });
+            if (isReincidente) {
+                let strReinc = "Reincidência Genérica Simples";
+                if (isMultirreincidente) strReinc = "Multirreincidência";
+                else if (isReincidenciaEspecifica) strReinc = "Reincidência Específica";
+                listaAgravantes.unshift(strReinc);
+            }
 
             document.querySelectorAll('.atenuante:checked').forEach(cb => {
                 let textoCb = cb.parentNode.textContent.trim().replace(' Prep', '');
@@ -1195,18 +1211,24 @@
             let agrEfetivaPrep = agrPrep;
             let ateEfetivaPrep = atePrep;
             let aplicouCompensacaoEspecial = false;
+            let compensacaoParcialEspecifica = false;
 
             if (isReincidente && temConfissao) {
                 if (isMultirreincidente) {
                     textoAnalise = "Conforme STJ (Tema 585 e afins), a multirreincidência prepondera sobre a confissão espontânea. ";
+                } else if (isReincidenciaEspecifica) {
+                    textoAnalise = "Conforme STJ (Súmula 630 e afins), a reincidência específica prepondera sobre a confissão espontânea, operando-se a compensação parcial. ";
+                    agrEfetivaPrep -= 0.5; 
+                    ateEfetivaPrep -= 1;
+                    compensacaoParcialEspecifica = true;
                 } else {
-                    textoAnalise = "Conforme Tema 585/STJ, a agravante da reincidência e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
+                    textoAnalise = "Conforme Tema 585/STJ, a agravante da reincidência genérica e a atenuante da confissão espontânea são igualmente preponderantes e foram compensadas. ";
                     agrEfetivaPrep--; 
                     ateEfetivaPrep--;
                     aplicouCompensacaoEspecial = true;
                 }
             } else if (agrEfetivaPrep > 0 && ateEfetivaPrep > 0) {
-                 let compensar = Math.min(agrEfetivaPrep, ateEfetivaPrep);
+                 let compensar = Math.min(Math.floor(agrEfetivaPrep), Math.floor(ateEfetivaPrep));
                  agrEfetivaPrep -= compensar;
                  ateEfetivaPrep -= compensar;
                  if(!textoAnalise) textoAnalise = "Houve compensação entre circunstâncias preponderantes antagônicas. ";
@@ -1222,7 +1244,7 @@
             let penaProv = penaBase;
             let multaProv = multaBase;
 
-            let teveAgravoAtenuante = (agrComum > 0 || agrEfetivaPrep > 0 || ateComum > 0 || ateEfetivaPrep > 0);
+            let teveAgravoAtenuante = (agrComum > 0 || agrEfetivaPrep > 0 || ateComum > 0 || ateEfetivaPrep > 0 || isReincidente);
 
             penaProv += (penaBase * (1/6)) * agrComum;
             penaProv += (penaBase * (1/5)) * agrEfetivaPrep;
@@ -1253,7 +1275,7 @@
                 if (multaProv > maxMulta) multaProv = maxMulta;
             }
 
-            // 3ª FASE - ORDEM CORRETA: 1º MAJORANTES (AUMENTO), DEPOIS MINORANTES (DIMINUIÇÃO)
+            // 3ª FASE - ORDEM: 1º MAJORANTES (AUMENTO), DEPOIS MINORANTES (DIMINUIÇÃO)
             const selMinorante = document.getElementById('minorante');
             const selMajorante = document.getElementById('majorante');
             const minorante = parseFloat(selMinorante.value);
@@ -1340,7 +1362,12 @@
                 texto += `Analisando as diretrizes do art. 59 do Código Penal, verifico que as circunstâncias judiciais são, em sua maioria, favoráveis ou neutras. `;
             }
             texto += `Dessa forma, fixo a pena-base em ${formatarDias(penaBase)}`;
-            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n\n`; else texto += ".\n\n";
+            if(temMulta) texto += ` e ${Math.round(multaBase)} dias-multa.\n`; else texto += ".\n";
+            
+            if (modoDidatico && totalDesfavoraveis > 0) {
+                texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: Segundo entendimento do STJ, o aumento na primeira fase obedece, como regra geral, à fração de 1/6 (ou 1/8 no caso do art. 59) sobre o intervalo entre as penas mínima e máxima para cada circunstância desfavorável.]\n`;
+            }
+            texto += "\n";
 
             texto += "2ª FASE (PENA PROVISÓRIA): ";
             if (listaAgravantes.length > 0 || listaAtenuantes.length > 0) {
@@ -1355,7 +1382,21 @@
             if (aplicouAgravanteSumula) texto += ` Em estrita observância à Súmula 231 do STJ, a incidência da circunstância agravante não pode conduzir à exacerbação da pena acima do máximo legal. `;
             
             texto += `A pena provisória resulta em ${formatarDias(penaProv)}`;
-            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n\n`; else texto += ".\n\n";
+            if(temMulta) texto += ` e ${Math.round(multaProv)} dias-multa.\n`; else texto += ".\n";
+
+            if (modoDidatico) {
+                if (teveAgravoAtenuante) {
+                    texto += `[🎓 FUNDAMENTAÇÃO DIDÁTICA: O Código Penal não estabelece frações fixas para a segunda fase, mas a jurisprudência consolidada do STJ preconiza o uso da fração ideal de 1/6 para cada agravante ou atenuante genérica.`;
+                }
+                if (aplicouCompensacaoEspecial && teveAgravoAtenuante) {
+                    texto += ` Ademais, segundo o STJ (Tema 585), a atenuante da confissão diz respeito à personalidade do agente, devendo ser compensada com a agravante da reincidência genérica, exceto nos casos de multirreincidência, que exige maior reprovação.]\n`;
+                } else if (compensacaoParcialEspecifica && teveAgravoAtenuante) {
+                    texto += ` Ademais, segundo o STJ (Súmula 630), a agravante da reincidência específica prepondera sobre a atenuante da confissão espontânea, ensejando a compensação parcial em desfavor do réu.]\n`;
+                } else if (teveAgravoAtenuante) {
+                    texto += `]\n`;
+                }
+            }
+            texto += "\n";
 
             texto += "3ª FASE (CAUSAS DE AUMENTO E DIMINUIÇÃO): ";
             if (minorante === 0 && majorante === 0) {
@@ -1367,19 +1408,24 @@
             texto += `Sendo assim, torno a pena definitiva em ${formatarDias(penaTerc)}`;
             if(temMulta) texto += ` e ${Math.round(multaTerc)} dias-multa.\n\n`; else texto += ".\n\n";
 
+            if (temMulta) {
+                texto += "PENA DE MULTA:\n";
+                texto += `Considerando as previsões do art. 49 do Código Penal e em juízo de proporcionalidade com a pena acima aplicada, fixo a pena de multa em ${Math.round(penaTerc > 0 ? multaTerc : multaBase)} dias-multa, à razão de 1/30 (um trigésimo) do salário mínimo vigente ao tempo do fato, ante a ausência de maiores informações sobre a capacidade econômica do réu.\n\n`;
+            }
+
             if (totalDetracaoDias > 0) {
-                texto += "DETRAÇÃO (ART. 42, CP): ";
+                texto += "DETRAÇÃO (ART. 42, CP): \n";
                 texto += `Considerando o período de ${formatarDias(totalDetracaoDias)} em que o sentenciado permaneceu preso provisoriamente, procedo ao abatimento do quantum determinado pelo art. 387, § 2º, do CPP. A pena restante a cumprir passa a ser de ${formatarDias(penaFinalDetraida)}.\n\n`;
             }
 
             if (penaFinalDetraida > 0) {
                 texto += "REGIME INICIAL DE CUMPRIMENTO:\n";
-                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, e considerando o quantum de pena a ser cumprido (${formatarDias(penaFinalDetraida)}) bem como a condição do sentenciado (${isReincidente ? 'reincidente' : 'primário'}), fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n\n`;
+                texto += `Nos termos do art. 33, § 2º, ${alineaRegime}, do Código Penal, fixo o regime inicial **${nomeRegime}** para o cumprimento da pena privativa de liberdade.\n\n`;
             }
 
             texto += "--- RESULTADO FINAL ---\n";
             texto += `PENA PRIVATIVA DE LIBERDADE: ${formatarDias(penaFinalDetraida)} (${nomeRegime}).\n`;
-            if (temMulta) texto += `PENA DE MULTA: ${Math.round(multaTerc)} dias-multa.`;
+            if (temMulta) texto += `PENA DE MULTA: ${Math.round(temMulta ? multaTerc : 0)} dias-multa.`;
 
             // Salva o texto no Réu
             if (reus.length > 0) {
