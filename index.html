@@ -1,2118 +1,389 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Dosimetria 2.0 - Calculadora Penal</title>
-    <style>
-        :root {
-            --primary: #1e3a8a;       
-            --primary-hover: #1e40af;
-            --accent: #2563eb;        
-            --success: #059669;       
-            --warning: #d97706;       
-            --danger: #dc2626;        
-            --purple: #6366f1;
-            --bg: #f3f4f6;            
-            --surface: #ffffff;       
-            --text-main: #1f2937;     
-            --text-muted: #6b7280;    
-            --border: #e5e7eb;        
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            line-height: 1.5;
-            padding-bottom: 0px; /* Alterado dinamicamente via JS */
-            transition: padding-bottom 0.3s;
-        }
-
-        .navbar {
-            background-color: var(--surface);
-            color: var(--primary);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .navbar h1 {
-            margin: 0;
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .navbar span {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .btn-manual {
-            background-color: #eff6ff;
-            color: var(--accent);
-            border: 1px solid #bfdbfe;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-manual:hover {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .tabs-container {
-            display: flex;
-            gap: 8px;
-            padding: 20px 40px 0 40px;
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-            position: sticky;
-            top: 65px;
-            z-index: 9;
-            align-items: flex-end;
-        }
-
-        .tab-btn {
-            background: #f1f5f9;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            border-bottom: none;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-            margin-bottom: -1px;
-        }
-
-        .tab-btn:hover { background: #e2e8f0; }
-        
-        .tab-btn.active {
-            background: var(--bg);
-            color: var(--primary);
-            border-top: 3px solid var(--accent);
-            border-bottom: 1px solid var(--bg);
-            padding-bottom: 13px;
-        }
-
-        .tab-close {
-            color: #fca5a5;
-            font-size: 1.1rem;
-            margin-left: 5px;
-            line-height: 1;
-        }
-        
-        .tab-close:hover { color: var(--danger); }
-
-        .tab-add {
-            background: transparent;
-            color: var(--success);
-            border: 1px dashed var(--success);
-            padding: 8px 16px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            margin-left: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .tab-add:hover { background: #ecfdf5; }
-
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-            max-width: 1280px;
-            margin: 30px auto;
-            padding: 0 20px;
-            flex: 1;
-            align-items: start;
-        }
-
-        .forms-column {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);
-            border: 1px solid var(--border);
-        }
-
-        .card-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-header h2 {
-            margin: 0;
-            font-size: 1.15rem;
-            color: var(--primary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-header h2::before {
-            content: '';
-            display: inline-block;
-            width: 4px;
-            height: 18px;
-            background-color: var(--accent);
-            border-radius: 2px;
-        }
-
-        .input-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 20px;
-            align-items: end;
-        }
-
-        .input-box {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-box.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            letter-spacing: 0.3px;
-        }
-
-        input[type="number"], input[type="date"], select {
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            background-color: #fafafa;
-            color: var(--text-main);
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            width: 100%;
-        }
-
-        input:hover, select:hover { border-color: #d1d5db; }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            background-color: var(--surface);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 12px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 14px 16px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            line-height: 1.4;
-            color: var(--text-main);
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            margin-top: 2px;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
-
-        .checkbox-item:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        .checkbox-item:has(input:checked) {
-            background: #eff6ff;
-            border-color: #93c5fd;
-            color: #1e3a8a;
-        }
-
-        .prep-badge {
-            background-color: var(--warning);
-            color: white;
-            font-size: 0.65rem;
-            padding: 3px 6px;
-            border-radius: 4px;
-            margin-left: 5px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .prep-badge.success { background-color: var(--success); }
-
-        .toggle-btn {
-            background: var(--surface);
-            color: var(--warning);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: 1px solid var(--warning);
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .toggle-btn:hover {
-            background: var(--warning);
-            color: white;
-        }
-
-        .results-column {
-            position: sticky;
-            top: 130px;
-        }
-
-        .result-card {
-            background: var(--primary);
-            color: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.4);
-        }
-
-        .result-card h2 {
-            margin: 0 0 25px 0;
-            color: #93c5fd;
-            font-size: 1.05rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 12px;
-        }
-
-        .didatico-toggle {
-            background-color: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .didatico-toggle:hover { background-color: rgba(255,255,255,0.2); }
-
-        .didatico-toggle input {
-            width: 18px;
-            height: 18px;
-            accent-color: #a855f7;
-            cursor: pointer;
-        }
-
-        .didatico-toggle span {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .result-title {
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .result-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #ffffff;
-            line-height: 1.2;
-        }
-
-        .result-multa {
-            color: #fbbf24;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 6px;
-        }
-
-        .regime-badge {
-            background-color: var(--accent);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            display: inline-block;
-            margin-top: 12px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .timeline {
-            border-left: 2px solid rgba(255,255,255,0.2);
-            padding-left: 20px;
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .timeline-item {
-            position: relative;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -26px;
-            top: 6px;
-            width: 10px;
-            height: 10px;
-            background: #93c5fd;
-            border-radius: 50%;
-            box-shadow: 0 0 0 3px var(--primary);
-        }
-
-        .timeline-text {
-            font-size: 0.95rem;
-            color: #f8fafc;
-        }
-
-        .alerta-sumula {
-            display: none;
-            background-color: rgba(245, 158, 11, 0.15);
-            color: #fde68a;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 8px;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .alerta-sumula.maximo {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            border-color: rgba(239, 68, 68, 0.4);
-        }
-
-        .botoes-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 35px;
-        }
-
-        .btn {
-            border: none;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-copiar { background-color: var(--surface); color: var(--primary); }
-        .btn-copiar:hover { background-color: #f8fafc; transform: translateY(-1px); }
-        
-        .btn-calcular { background-color: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-calcular:hover { background-color: rgba(255,255,255,0.2); }
-
-        .btn-limpar { background-color: transparent; color: #cbd5e1; text-decoration: underline; padding: 5px; font-size: 0.9rem;}
-        .btn-limpar:hover { color: white; }
-
-        .fase2-container {
-            max-height: 450px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            background: #fafafa;
-        }
-        
-        .fase2-container::-webkit-scrollbar { width: 8px; }
-        .fase2-container::-webkit-scrollbar-track { background: transparent; }
-        .fase2-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-
-        /* RODAPÉ FIXO DE CONCURSO MATERIAL GLOBAL (INVISÍVEL POR PADRÃO) */
-        .global-footer {
-            display: none; /* Inicia oculto */
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--primary);
-            color: white;
-            padding: 12px 40px;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .gf-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #93c5fd;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .gf-data {
-            display: flex;
-            gap: 30px;
-            background: rgba(0,0,0,0.2);
-            padding: 8px 20px;
-            border-radius: 8px;
-        }
-
-        .gf-item { font-size: 1.1rem; font-weight: bold; }
-        .gf-label { color: #93c5fd; font-weight: normal; font-size: 0.85rem; margin-right: 5px; text-transform: uppercase; }
-
-        /* MODAL DO MANUAL */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background-color: var(--surface);
-            margin: 20px auto;
-            padding: 0;
-            width: 100%;
-            max-width: 900px;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            position: relative;
-            overflow: hidden;
-            animation: modalFadeIn 0.3s ease-out;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-fechar-modal {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            width: 36px;
-            height: 36px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            z-index: 10;
-        }
-
-        .btn-fechar-modal:hover {
-            background: rgba(255,255,255,0.4);
-            transform: scale(1.1);
-        }
-
-        /* ESTILOS INTERNOS DO MANUAL */
-        .m-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-        }
-        .m-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
-        .m-header p { font-size: 1.05rem; color: #cbd5e1; font-weight: 300; }
-        .m-section { padding: 30px 40px; border-bottom: 1px solid var(--border); }
-        .m-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        .m-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        .m-card { background: var(--bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .m-card h4 { font-size: 1rem; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .m-card p { font-size: 0.9rem; color: var(--text-muted); }
-        .m-timeline { display: flex; flex-direction: column; gap: 15px; }
-        .m-step { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; align-items: center; }
-        .m-step-num { background: var(--accent); color: white; font-size: 1.2rem; font-weight: 700; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; flex-shrink: 0; margin-right: 15px; }
-        .m-step-content h4 { font-size: 1.05rem; color: var(--primary); margin-bottom: 4px; }
-        .m-step-content p { font-size: 0.9rem; color: var(--text-muted); }
-        .m-badge { background: #dbeafe; color: var(--accent); font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-top: 6px; display: inline-block; }
-        .m-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); font-size: 0.9rem; }
-        .m-table th, .m-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-        .m-table th { background-color: var(--bg); font-weight: 600; color: var(--primary); }
-        .m-table tr:last-child td { border-bottom: none; }
-        .m-tag { background: #dcfce7; color: var(--success); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
-        .m-tag.partial { background: #fef3c7; color: var(--warning); }
-
-        @media (max-width: 900px) {
-            .dashboard-container { grid-template-columns: 1fr; }
-            .results-column { position: static; order: -1; }
-            .m-step { flex-direction: column; text-align: center; }
-            .m-step-num { margin-right: 0; margin-bottom: 10px; }
-            .navbar { flex-direction: column; gap: 15px; }
-            .global-footer { flex-direction: column; gap: 10px; padding: 15px; }
-            .gf-data { flex-direction: column; gap: 10px; text-align: center; }
-        }
-
-
-        /* ===== MELHORIAS v2.0 ===== */
-        .navbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        .btn-top {
-            border: 1px solid var(--border); background: var(--surface); color: var(--text-main);
-            padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: inherit;
-            transition: all .2s; white-space: nowrap;
-        }
-        .btn-top:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
-        .btn-top.primary { color: var(--accent); border-color: #bfdbfe; background: #eff6ff; }
-        .btn-top.danger { color: var(--danger); border-color: #fecaca; background: #fff7f7; }
-        .save-status { font-size: .76rem; color: var(--text-muted); white-space: nowrap; }
-        .save-status.saved { color: var(--success); }
-
-        .legal-note {
-            margin-top: 14px; padding: 12px 14px; border-radius: 9px; border: 1px solid #fde68a;
-            background: #fffbeb; color: #92400e; font-size: .82rem; line-height: 1.45;
-        }
-        .method-card { border-left: 4px solid var(--purple); }
-        .method-help { font-size: .8rem; color: var(--text-muted); margin: 10px 0 0; }
-        .inline-hint { font-size: .75rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
-
-        .validation-box {
-            display: none; margin-bottom: 18px; padding: 12px 14px; border-radius: 9px;
-            font-size: .84rem; line-height: 1.45; border: 1px solid rgba(255,255,255,.22);
-            background: rgba(255,255,255,.08);
-        }
-        .validation-box.show { display: block; }
-        .validation-box.error { background: rgba(220,38,38,.2); border-color: rgba(248,113,113,.5); color: #fee2e2; }
-        .validation-box.warning { background: rgba(217,119,6,.2); border-color: rgba(251,191,36,.45); color: #fef3c7; }
-        .validation-box.ok { background: rgba(5,150,105,.18); border-color: rgba(52,211,153,.35); color: #d1fae5; }
-        .validation-box ul { margin: 6px 0 0 18px; padding: 0; }
-
-        .result-secondary {
-            margin-top: 16px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,.12);
-        }
-        .result-secondary .result-value { font-size: 1.18rem; color: #dbeafe; }
-        .detraction-note { margin-top: 8px; color: #cbd5e1; font-size: .76rem; line-height: 1.4; }
-
-        .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .info-pill { font-size: .72rem; padding: 4px 8px; border-radius: 999px; background: #eef2ff; color: #4338ca; font-weight: 700; }
-        .info-pill.warn { background: #fff7ed; color: #c2410c; }
-
-        .btn:disabled { opacity: .45; cursor: not-allowed; transform: none !important; }
-        .input-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(220,38,38,.08) !important; }
-        .field-hidden { display: none !important; }
-
-        .toast {
-            position: fixed; right: 22px; bottom: 22px; z-index: 2500; max-width: 380px;
-            padding: 12px 16px; border-radius: 10px; background: #111827; color: white;
-            box-shadow: 0 15px 40px rgba(0,0,0,.28); opacity: 0; transform: translateY(8px);
-            pointer-events: none; transition: all .22s ease; font-size: .88rem;
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 900px) {
-            .navbar-actions { justify-content: center; }
-            .save-status { width: 100%; text-align: center; }
-        }
-
-        @media print {
-            body { background: white !important; padding-bottom: 0 !important; }
-            .navbar, .tabs-container, .forms-column, .global-footer, .botoes-container, .didatico-toggle, .validation-box { display: none !important; }
-            .dashboard-container { display: block !important; max-width: none; margin: 0; padding: 0; }
-            .results-column { position: static !important; }
-            .result-card { box-shadow: none; border-radius: 0; min-height: 100vh; }
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>e-Dosimetria v3.1 — Modo Guiado</title>
+<style>
+:root{--primary:#183a78;--primary2:#102957;--accent:#2563eb;--success:#087f5b;--warning:#b86b08;--danger:#c92a2a;--purple:#7048e8;--bg:#f4f6f9;--surface:#fff;--surface2:#f8fafc;--text:#172033;--muted:#687386;--border:#dfe4ec;--shadow:0 12px 35px rgba(20,36,70,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.45}button,input,select,textarea{font:inherit}button{cursor:pointer}.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;gap:18px;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:12px}.brand-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;color:white;font-size:22px;box-shadow:0 8px 20px rgba(37,99,235,.22)}.brand h1{font-size:18px;margin:0;color:var(--primary)}.brand small{display:block;color:var(--muted);font-weight:600}.top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{border:1px solid var(--border);background:white;color:var(--text);border-radius:9px;padding:9px 12px;font-weight:700}.btn:hover{border-color:#aeb8c8;background:#f8fafc}.btn.primary{background:var(--primary);color:white;border-color:var(--primary)}.btn.success{background:var(--success);color:white;border-color:var(--success)}.btn.danger{color:var(--danger);border-color:#ffc9c9;background:#fff5f5}.btn.small{padding:6px 9px;font-size:12px}.save{font-size:12px;color:var(--success);font-weight:700;padding:7px 10px;border-radius:20px;background:#e9fbf4}.app{max-width:1540px;margin:0 auto;padding:18px;display:grid;grid-template-columns:260px minmax(0,1fr) 385px;gap:18px;align-items:start}.sidebar,.panel,.result-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}.sidebar{position:sticky;top:78px;max-height:calc(100vh - 96px);overflow:auto;padding:14px}.side-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:5px 4px 10px}.reu-item,.crime-item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid transparent;border-radius:9px;padding:9px 10px;margin-bottom:6px;background:#f8fafc}.reu-item.active,.crime-item.active{border-color:#a8c7ff;background:#eef5ff;color:var(--primary)}.reu-main,.crime-main{min-width:0;cursor:pointer;flex:1}.reu-main strong,.crime-main strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reu-main small,.crime-main small{color:var(--muted)}.mini-icon{border:0;background:transparent;color:#8b95a5;padding:2px 4px}.side-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.process-box{background:#edf3ff;border:1px solid #c9dafe;border-radius:10px;padding:10px;margin-bottom:14px}.process-box input{width:100%;border:0;background:transparent;font-weight:800;color:var(--primary);outline:none}.workspace{display:flex;flex-direction:column;gap:15px}.panel{padding:20px}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px}.panel-head h2{margin:0;font-size:16px;color:var(--primary);display:flex;align-items:center;gap:8px}.panel-head h2:before{content:"";width:4px;height:18px;border-radius:2px;background:var(--accent)}.subtle{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.field{grid-column:span 3;display:flex;flex-direction:column;gap:5px}.field.span4{grid-column:span 4}.field.span6{grid-column:span 6}.field.span8{grid-column:span 8}.field.full{grid-column:1/-1}.field label{font-size:12px;color:var(--muted);font-weight:800}.field input,.field select,.field textarea{width:100%;border:1px solid var(--border);border-radius:8px;background:#fbfcfe;padding:10px 11px;color:var(--text);outline:none}.field textarea{min-height:75px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#7ba7f7;box-shadow:0 0 0 3px rgba(37,99,235,.09);background:white}.hint{font-size:11px;color:var(--muted)}.note{padding:11px 13px;border-radius:9px;background:#fff9db;border:1px solid #ffe066;color:#795500;font-size:12px;margin-top:12px}.note.info{background:#eef5ff;border-color:#b6d0ff;color:#244a87}.note.danger{background:#fff1f1;border-color:#ffc9c9;color:#9d1c1c}.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;background:#edf2f7;color:#526071}.badge.blue{background:#e7f0ff;color:#1956a6}.badge.green{background:#e6fcf5;color:#087f5b}.badge.orange{background:#fff4e6;color:#a15300}.badge.red{background:#fff0f0;color:#b42318}.segmented{display:flex;gap:6px;flex-wrap:wrap}.segmented button{border:1px solid var(--border);background:#f8fafc;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:800}.segmented button.active{background:var(--primary);color:white;border-color:var(--primary)}.vetor{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:9px;background:#fcfdff}.vetor-top{display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:start}.vetor-name{font-weight:800;font-size:13px}.vetor textarea{margin-top:8px;width:100%;border:1px solid var(--border);border-radius:8px;padding:9px;min-height:55px;resize:vertical}.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{border:1px solid var(--border);border-radius:9px;padding:9px;background:#fcfdff;display:flex;gap:8px;align-items:flex-start;font-size:12px}.check input{margin-top:2px}.cause-row{display:grid;grid-template-columns:1fr 120px 120px 42px;gap:8px;align-items:end;padding:9px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:#fcfdff}.cause-row input,.cause-row select{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px;background:white}.remove{height:37px;border:1px solid #ffc9c9;background:#fff5f5;color:var(--danger);border-radius:8px;font-weight:900}.result-panel{position:sticky;top:78px;overflow:hidden}.result-head{background:linear-gradient(145deg,var(--primary2),var(--primary));color:white;padding:20px}.result-head h2{margin:0 0 14px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#b9d2ff}.big-result{font-size:27px;font-weight:900;line-height:1.1}.money{color:#ffd43b;font-weight:800;margin-top:5px}.regime{display:inline-block;margin-top:12px;padding:7px 11px;border-radius:8px;font-size:12px;font-weight:900;background:#4c6ef5}.result-body{padding:16px}.score{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.score-card{border:1px solid var(--border);border-radius:9px;padding:10px;background:#fafcff}.score-card small{display:block;color:var(--muted);font-weight:700}.score-card strong{font-size:13px;color:var(--primary)}.flow{border-left:2px solid #d6e2f6;margin-left:5px;padding-left:14px}.flow-item{position:relative;margin:0 0 14px}.flow-item:before{content:"";position:absolute;width:8px;height:8px;background:var(--accent);border-radius:50%;left:-19px;top:5px}.flow-item small{color:var(--muted);font-weight:800}.flow-item div{font-weight:700;font-size:13px}.validation{display:none;padding:10px;border-radius:9px;margin-bottom:12px;background:#fff5f5;border:1px solid #ffc9c9;color:#a61e1e;font-size:11px}.validation.show{display:block}.module-result{border-top:1px solid var(--border);padding-top:12px;margin-top:12px}.module-result h3{font-size:12px;margin:0 0 7px;color:var(--primary)}.module-result p{font-size:11px;margin:5px 0;color:#495468}.footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:15px}.footer-actions .btn{font-size:11px}.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(10,20,40,.55);padding:25px;overflow:auto}.modal.open{display:block}.modal-card{max-width:1050px;margin:0 auto;background:white;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.3);overflow:hidden}.modal-head{background:var(--primary);color:white;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;font-size:17px}.modal-body{padding:22px}.modal-close{border:0;background:rgba(255,255,255,.15);color:white;border-radius:50%;width:34px;height:34px;font-size:20px}.summary-reu{border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:12px}.summary-reu h3{margin:0 0 8px;color:var(--primary)}.summary-table{width:100%;border-collapse:collapse;font-size:12px}.summary-table th,.summary-table td{padding:8px;border-bottom:1px solid var(--border);text-align:left}.summary-table th{color:var(--muted);background:#f8fafc}.memory{white-space:pre-wrap;background:#101827;color:#e6edf8;padding:15px;border-radius:10px;font-family:Consolas,monospace;font-size:12px;max-height:500px;overflow:auto}.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.scenario{border:1px solid var(--border);border-radius:10px;padding:13px}.scenario h4{margin:0 0 8px;color:var(--primary)}.scenario strong{font-size:17px}.text-output{width:100%;min-height:480px;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:Georgia,serif;line-height:1.55}.presc-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.presc-pill{border:1px solid var(--border);background:#f8fafc;border-radius:999px;padding:6px 9px;font-size:11px}.toast{position:fixed;right:22px;bottom:22px;z-index:200;background:#101827;color:white;padding:11px 15px;border-radius:9px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:1180px){.app{grid-template-columns:220px 1fr}.result-panel{position:static;grid-column:2}.sidebar{grid-row:span 2}.field{grid-column:span 4}.field.span4{grid-column:span 4}}
+@media(max-width:800px){.topbar{position:static;flex-direction:column;align-items:stretch}.app{display:block;padding:10px}.sidebar,.result-panel{position:static;max-height:none;margin-bottom:12px}.workspace{margin-bottom:12px}.grid{grid-template-columns:1fr}.field,.field.span4,.field.span6,.field.span8,.field.full{grid-column:1}.check-grid{grid-template-columns:1fr}.vetor-top{grid-template-columns:1fr}.cause-row{grid-template-columns:1fr 1fr}.cause-row .remove{grid-column:2}.scenario-grid{grid-template-columns:1fr}.top-actions{justify-content:flex-start}}
+@media print{.topbar,.sidebar,.workspace,.footer-actions,.validation{display:none!important}.app{display:block;max-width:none;padding:0}.result-panel{position:static;box-shadow:none;border:0}.result-head{print-color-adjust:exact;-webkit-print-color-adjust:exact}.result-body{padding:20px}.module-result{break-inside:avoid}}
+
+/* --- MODO GUIADO v3.1 --- */
+.guided-intro{display:flex;justify-content:space-between;gap:18px;align-items:center;background:linear-gradient(135deg,#edf4ff,#f8fbff);border:1px solid #cfe0ff;border-radius:14px;padding:18px 20px}.guided-intro h2{margin:3px 0 4px;color:var(--primary);font-size:20px}.guided-intro p{margin:0;color:var(--muted);font-size:13px;max-width:720px}.eyebrow{font-size:10px;font-weight:900;letter-spacing:.1em;color:var(--accent)}.quick-result{min-width:160px;text-align:right}.quick-result small{display:block;color:var(--muted);font-weight:700}.quick-result strong{font-size:20px;color:var(--primary)}
+.stepper{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:white;border:1px solid var(--border);border-radius:13px;padding:7px;box-shadow:0 6px 22px rgba(20,36,70,.05)}.stepper button{border:0;background:transparent;border-radius:9px;padding:8px 4px;color:var(--muted);font-size:10px;font-weight:800;min-width:0}.stepper button b{display:grid;place-items:center;margin:0 auto 4px;width:25px;height:25px;border-radius:50%;background:#edf1f6;color:#6b7482;font-size:11px}.stepper button.active{background:#edf4ff;color:var(--primary)}.stepper button.active b{background:var(--primary);color:white}.stepper button.done b{background:#dff7ed;color:var(--success)}
+.step-tip{margin:-2px 0 14px;padding:10px 12px;border-left:3px solid #90b7f7;background:#f7faff;color:#526174;font-size:12px}.advanced-box{grid-column:1/-1;margin-top:8px}.advanced-toggle{width:100%;text-align:left;border:1px dashed #bdc7d6;background:#fafcff;border-radius:9px;padding:9px 11px;color:#536174;font-size:12px;font-weight:800}.advanced-content{display:none;margin-top:10px}.advanced-box.open>.advanced-content{display:grid}.advanced-box.open>.advanced-toggle{border-style:solid;background:#eef5ff;color:var(--primary)}
+.guided-nav{position:sticky;bottom:10px;z-index:20;display:grid;grid-template-columns:140px 1fr 140px;align-items:center;gap:12px;background:rgba(255,255,255,.98);border:1px solid var(--border);border-radius:13px;padding:10px;box-shadow:0 12px 35px rgba(20,36,70,.13)}.guided-nav>div{text-align:center}.guided-nav small{display:block;color:var(--muted);font-weight:800}.guided-nav strong{font-size:12px;color:var(--primary)}
+body.guided-mode .app{grid-template-columns:260px minmax(0,1fr);max-width:1280px}body.guided-mode .result-panel{display:none}body.guided-mode .guided-step{display:none}body.guided-mode .guided-step.active-step{display:block}body.guided-mode .workspace{min-width:0}body.guided-mode .panel{box-shadow:0 8px 28px rgba(20,36,70,.06)}body.guided-mode .note:not(.danger){font-size:11px}body.guided-mode .complement-panel{padding:16px}body.guided-mode .complement-panel .panel-head{margin-bottom:10px}
+body.guided-result .app{grid-template-columns:260px minmax(0,1fr);max-width:1180px}body.guided-result .workspace{display:none}body.guided-result .result-panel{display:block;position:static}body.guided-result .result-body{padding:22px}body.guided-result .result-head{padding:26px}body.guided-result .big-result{font-size:36px}
+body.complete-mode .guided-intro,body.complete-mode .stepper,body.complete-mode .guided-nav{display:none}body.complete-mode .guided-step{display:block}body.complete-mode .advanced-content{display:grid}body.complete-mode .advanced-toggle{display:none}
+@media(max-width:900px){.guided-intro{display:block}.quick-result{text-align:left;margin-top:12px}.stepper{grid-template-columns:repeat(4,1fr)}body.guided-mode .app,body.guided-result .app{display:block}.sidebar{margin-bottom:12px}.guided-nav{grid-template-columns:1fr 1fr}.guided-nav>div{grid-column:1/-1;grid-row:1}.guided-nav #btnAnterior{grid-row:2}.guided-nav #btnProximo{grid-row:2}.advanced-content.grid{grid-template-columns:1fr}.advanced-content.grid .field{grid-column:1/-1}}
+@media print{.guided-intro,.stepper,.guided-nav,#btnModoUso{display:none!important}}
+
+.guided-result-back{display:none;margin-bottom:14px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:white}body.guided-result .guided-result-back{display:inline-flex}.conditional-tentativa.is-hidden,.conditional-concurso.is-hidden,.conditional-multi.is-hidden{display:none!important}
+</style>
 </head>
-<body> 
-
-    <div class="navbar">
-        <div class="navbar-brand">
-            <h1>⚖️ e-Dosimetria</h1>
-            <span>Sistema de Cálculo Penal do Gabinete</span>
-        </div>
-        <div class="navbar-actions">
-            <span id="saveStatus" class="save-status">Sessão local</span>
-            <button class="btn-top" type="button" onclick="exportarProjeto()">💾 Exportar</button>
-            <button class="btn-top" type="button" onclick="document.getElementById('importFile').click()">📂 Importar</button>
-            <button class="btn-top danger" type="button" onclick="novoProjeto()">🧹 Novo</button>
-            <button class="btn-manual" onclick="abrirManual()">📖 Manual</button>
-            <input type="file" id="importFile" accept="application/json,.json" hidden onchange="importarProjeto(event)">
-        </div>
+<body class="guided-mode">
+<header class="topbar">
+  <div class="brand"><div class="brand-logo">⚖</div><div><h1>e-Dosimetria v3.1</h1><small>Dosimetria guiada passo a passo</small></div></div>
+  <div class="top-actions"><button class="btn primary" id="btnModoUso" type="button" onclick="alternarModoUso()">☷ Modo completo</button><span id="saveStatus" class="save">● autosalvo</span><button class="btn" onclick="abrirModal('modalResumo')">▦ Resumo do processo</button><button class="btn" onclick="exportarProjeto()">💾 Exportar</button><button class="btn" onclick="document.getElementById('importFile').click()">📂 Importar</button><input id="importFile" type="file" accept=".json,application/json" hidden onchange="importarProjeto(event)"><button class="btn danger" onclick="novoProjeto()">Novo projeto</button></div>
+</header>
+<div class="app">
+<aside class="sidebar">
+  <div class="process-box"><div class="side-title" style="margin:0 0 3px">Processo</div><input id="processoNumero" placeholder="Número / identificação" oninput="atualizarMetaProjeto()"></div>
+  <div class="side-title">Réus</div><div id="reuList"></div>
+  <div class="side-actions"><button class="btn small success" onclick="adicionarReu()">+ Réu</button><button class="btn small" onclick="renomearReu()">Renomear</button></div>
+  <div class="side-title" style="margin-top:18px">Crimes / fatos do réu</div><div id="crimeList"></div>
+  <div class="side-actions"><button class="btn small success" onclick="adicionarCrime()">+ Crime</button><button class="btn small" onclick="duplicarCrime()">Duplicar</button></div>
+  <div class="note info" style="margin-top:15px"><strong>Estrutura segura:</strong> o concurso material é calculado somente entre crimes do mesmo réu. Réus distintos nunca são somados.</div>
+</aside>
+<main class="workspace">
+  <section class="guided-intro" id="guidedIntro">
+    <div>
+      <span class="eyebrow">MODO GUIADO</span>
+      <h2 id="guidedTitle">1. Identifique o réu</h2>
+      <p id="guidedHelp">Comece pelas informações essenciais. As opções técnicas aparecem somente quando forem necessárias.</p>
     </div>
-
-    <!-- BARRA DE ABAS PARA MÚLTIPLOS RÉUS -->
-    <div class="tabs-container" id="tabsContainer"></div>
-
-    <div class="dashboard-container" id="formsArea" oninput="calcularDosimetria()" onchange="calcularDosimetria()">
-        
-        <div class="forms-column">
-            
-            <!-- FASE 1 - PENA EM ABSTRATO -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Pena em Abstrato</h2>
-                    <button class="toggle-btn" id="btnDrogas" onclick="toggleDrogas()" type="button">Ativar Lei de Drogas (Art. 42)</button>
-                </div>
-                <div class="input-group">
-                    <div class="input-box full-width">
-                        <label>Tipo Penal (Catálogo do CP)</label>
-                        <select id="seletorCrime" onchange="carregarCrime()">
-                            <option value="manual" data-min="1" data-max="4" data-unidade="anos" data-multa="true" data-prisao="reclusao">Outro Crime / Preenchimento Manual</option>
-                            <optgroup label="Crimes Contra a Pessoa">
-                                <option value="121" data-min="6" data-max="20" data-unidade="anos" data-multa="false" data-prisao="reclusao">Homicídio Simples (Art. 121, caput)</option>
-                                <option value="121q" data-min="12" data-max="30" data-unidade="anos" data-multa="false" data-prisao="reclusao">Homicídio Qualificado (Art. 121, § 2º)</option>
-                                <option value="121a" data-min="20" data-max="40" data-unidade="anos" data-multa="false" data-prisao="reclusao">Feminicídio (Art. 121-A)</option>
-                                <option value="129" data-min="3" data-max="12" data-unidade="meses" data-multa="false" data-prisao="detencao">Lesão Corporal Simples (Art. 129, caput)</option>
-                                <option value="129g" data-min="1" data-max="5" data-unidade="anos" data-multa="false" data-prisao="reclusao">Lesão Corporal Grave (Art. 129, § 1º)</option>
-                                <option value="129vd" data-min="2" data-max="5" data-unidade="anos" data-multa="false" data-prisao="reclusao">Lesão Corporal - Violência Doméstica (Art. 129, § 9º)</option>
-                                <option value="147" data-min="1" data-max="6" data-unidade="meses" data-multa="false" data-prisao="detencao">Ameaça (Art. 147)</option>
-                                <option value="148" data-min="1" data-max="3" data-unidade="anos" data-multa="false" data-prisao="reclusao">Sequestro e Cárcere Privado (Art. 148)</option>
-                            </optgroup>
-                            <optgroup label="Crimes Contra o Patrimônio">
-                                <option value="155" data-min="1" data-max="6" data-unidade="anos" data-multa="true" data-prisao="reclusao">Furto Simples (Art. 155, caput)</option>
-                                <option value="155q" data-min="2" data-max="8" data-unidade="anos" data-multa="true" data-prisao="reclusao">Furto Qualificado (Art. 155, § 4º)</option>
-                                <option value="157" data-min="6" data-max="10" data-unidade="anos" data-multa="true" data-prisao="reclusao">Roubo Simples (Art. 157, caput)</option>
-                                <option value="158" data-min="4" data-max="10" data-unidade="anos" data-multa="true" data-prisao="reclusao">Extorsão (Art. 158, caput)</option>
-                                <option value="159" data-min="8" data-max="15" data-unidade="anos" data-multa="false" data-prisao="reclusao">Extorsão mediante Sequestro (Art. 159, caput)</option>
-                                <option value="171" data-min="1" data-max="5" data-unidade="anos" data-multa="true" data-prisao="reclusao">Estelionato (Art. 171, caput)</option>
-                                <option value="180" data-min="2" data-max="6" data-unidade="anos" data-multa="true" data-prisao="reclusao">Receptação Simples (Art. 180, caput)</option>
-                            </optgroup>
-                            <optgroup label="Crimes Contra a Dignidade Sexual">
-                                <option value="213" data-min="6" data-max="10" data-unidade="anos" data-multa="false" data-prisao="reclusao">Estupro (Art. 213, caput)</option>
-                                <option value="215a" data-min="1" data-max="5" data-unidade="anos" data-multa="false" data-prisao="reclusao">Importunação Sexual (Art. 215-A)</option>
-                                <option value="217a" data-min="10" data-max="18" data-unidade="anos" data-multa="true" data-prisao="reclusao">Estupro de Vulnerável (Art. 217-A)</option>
-                            </optgroup>
-                            <optgroup label="Crimes Contra a Administração Pública">
-                                <option value="312" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Peculato (Art. 312, caput)</option>
-                                <option value="316" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Concussão (Art. 316)</option>
-                                <option value="317" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Corrupção Passiva (Art. 317, caput)</option>
-                                <option value="333" data-min="2" data-max="12" data-unidade="anos" data-multa="true" data-prisao="reclusao">Corrupção Ativa (Art. 333, caput)</option>
-                            </optgroup>
-                        </select>
-                    </div>
-
-                    <div class="input-box full-width">
-                        <label class="checkbox-item" style="border: none; padding: 0; background: transparent; width: fit-content; font-weight: 600; color: var(--warning);">
-                            <input type="checkbox" id="temMulta" onchange="toggleMulta()" checked> Este crime prevê Pena de Multa Cumulativa
-                        </label>
-                    </div>
-
-                    <div class="input-box">
-                        <label>Tipo de Prisão</label>
-                        <select id="tipoPrisao" onchange="calcularDosimetria()">
-                            <option value="reclusao">Reclusão</option>
-                            <option value="detencao">Detenção</option>
-                        </select>
-                    </div>
-
-                    <div class="input-box">
-                        <label>Medida</label>
-                        <select id="unidadePena">
-                            <option value="anos">Anos</option>
-                            <option value="meses">Meses</option>
-                        </select>
-                    </div>
-                    <div class="input-box">
-                        <label>Mínimo Legal</label>
-                        <input type="number" id="minPena" value="1" min="0">
-                    </div>
-                    <div class="input-box">
-                        <label>Máximo Legal</label>
-                        <input type="number" id="maxPena" value="4" min="0">
-                    </div>
-                    <div class="input-box" id="boxMinMulta">
-                        <label>Multa Mín. (Dias)</label>
-                        <input type="number" id="minMulta" value="10" min="10">
-                    </div>
-                    <div class="input-box" id="boxMaxMulta">
-                        <label>Multa Máx. (Dias)</label>
-                        <input type="number" id="maxMulta" value="360" min="10">
-                    </div>
-                </div>
-                <div class="legal-note">
-                    <strong>⚠️ Atenção à lei no tempo:</strong> o catálogo é uma ajuda de preenchimento com penas atualmente cadastradas. Confirme sempre a redação legal aplicável à <em>data do fato</em>, inclusive novatio legis, lex mitior e alterações legislativas posteriores.
-                </div>
-            </div>
-
-            <!-- METODOLOGIA -->
-            <div class="card method-card">
-                <div class="card-header"><h2>Metodologia do Cálculo</h2></div>
-                <div class="input-group">
-                    <div class="input-box">
-                        <label>1ª fase — critério por vetor</label>
-                        <select id="metodoFase1" onchange="calcularDosimetria()">
-                            <option value="intervalo8">1/8 do intervalo (máx. − mín.)</option>
-                            <option value="minimo6">1/6 sobre a pena mínima</option>
-                        </select>
-                    </div>
-                    <div class="input-box">
-                        <label>2ª fase — fração padrão</label>
-                        <select id="fracaoFase2" onchange="calcularDosimetria()">
-                            <option value="0.16666666666666666">1/6 da pena-base (padrão)</option>
-                            <option value="0.125">1/8 da pena-base</option>
-                            <option value="0.2">1/5 da pena-base</option>
-                            <option value="0.25">1/4 da pena-base</option>
-                            <option value="0.3333333333333333">1/3 da pena-base</option>
-                        </select>
-                    </div>
-                </div>
-                <p class="method-help">Os parâmetros funcionam como critérios de cálculo, não como frações legalmente obrigatórias. A adoção de patamar diverso deve ser fundamentada conforme o caso concreto.</p>
-            </div>
-
-            <!-- FASE 1 - CIRCUNSTÂNCIAS JUDICIAIS -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>1ª Fase: Circunstâncias Judiciais</h2>
-                </div>
-                <div id="sectionDrogas" class="drogas-section">
-                    <strong style="color: #b45309; display: block; margin-bottom: 10px;">Art. 42, Lei 11.343/06 (preponderância qualitativa — exige fundamentação):</strong>
-                    <div class="checkbox-grid">
-                        <label class="checkbox-item"><input type="checkbox" class="art59 droga"> Natureza da Droga</label>
-                        <label class="checkbox-item"><input type="checkbox" class="art59 droga"> Quantidade de Droga</label>
-                    </div>
-                </div>
-                <div class="checkbox-grid">
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Culpabilidade</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Antecedentes</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Conduta Social</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Personalidade</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Motivos</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Circunstâncias</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Consequências</label>
-                    <label class="checkbox-item"><input type="checkbox" class="art59 normal"> Comp. Vítima</label>
-                </div>
-            </div>
-
-            <!-- FASE 2 - AGRAVANTES E ATENUANTES -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>2ª Fase: Agravantes e Atenuantes</h2>
-                </div>
-
-                <div class="fase2-container" style="margin-bottom: 25px;">
-                    <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--danger);">Indique uma ou mais Agravantes:</h3>
-                    
-                    <div class="checkbox-grid">
-                        <label class="checkbox-item" style="background: #fff5f5; border-color: #fecaca;">
-                            <input type="checkbox" class="agravante prep" id="chkReincidente" onchange="verificarReincidencia()"> 
-                            Reincidência <span class="prep-badge">Prep</span>
-                        </label>
-                    </div>
-                    
-                    <div class="input-box full-width" style="margin-bottom: 15px; margin-top: 10px; display: none;" id="boxMultirreincidencia">
-                        <label style="color: #b91c1c;">Qual a natureza da Reincidência?</label>
-                        <select id="selMultirreincidencia" style="background: #fff5f5; border-color: #fecaca;" onchange="atualizarMultirreincidencia()">
-                            <option value="nao">Reincidência Genérica Simples</option>
-                            <option value="especifica">Reincidência Específica</option>
-                            <option value="sim">Multirreincidência</option>
-                        </select>
-                        <div id="boxSaldoMulti" class="field-hidden" style="margin-top:10px;">
-                            <label style="color:#b91c1c;">Saldo residual após compensação com a confissão</label>
-                            <select id="saldoMultirreincidencia" onchange="calcularDosimetria()" style="background:#fff5f5;border-color:#fecaca;">
-                                <option value="0.08333333333333333">1/12 da pena-base</option>
-                                <option value="0.125">1/8 da pena-base</option>
-                                <option value="0.16666666666666666" selected>1/6 da pena-base</option>
-                                <option value="0.2">1/5 da pena-base</option>
-                                <option value="0.25">1/4 da pena-base</option>
-                                <option value="0.3333333333333333">1/3 da pena-base</option>
-                            </select>
-                            <div class="inline-hint">O Tema 585 admite compensação proporcional na multirreincidência, sem impor uma fração matemática única. Selecione o saldo que corresponda à fundamentação do caso.</div>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-grid" style="margin-top: 12px;">
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="calcularDosimetria()"> Agente que comete o delito por motivo fútil ou torpe <span class="prep-badge">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante prep" onchange="calcularDosimetria()"> Agente que comete o delito para facilitar ou assegurar a execução, a ocultação, a impunidade ou vantagem de outro delito <span class="prep-badge">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito à traição, de emboscada, ou mediante dissimulação, ou outro recurso que dificultou ou tornou impossível a defesa do ofendido</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito com emprego de veneno, fogo, explosivo, tortura ou outro meio insidioso ou cruel</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito contra ascendente, descendente, irmão ou cônjuge</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito com abuso de autoridade ou prevalecendo-se de relações domésticas</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito com abuso de poder ou violação de dever inerente a cargo, ofício, ministério ou profissão</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito contra criança, maior de 60 anos, enfermo ou mulher grávida</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito quando o ofendido estava sob a imediata proteção da autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito em ocasião de incêndio, naufrágio, inundação ou calamidade pública</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que comete o delito em estado de embriaguez preordenada</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que promove, organiza a cooperação ou dirige a atividade dos demais agentes</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que coage ou induz outrem à execução material do delito</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que instiga a cometer o delito alguém sujeito à sua autoridade</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Agente que executa o delito, ou nele participa, mediante paga ou promessa de recompensa</label>
-                        <label class="checkbox-item"><input type="checkbox" class="agravante" onchange="calcularDosimetria()"> Circunstância diversa das elencadas</label>
-                    </div>
-                    
-                    <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
-                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--text-main);">
-                            Outras Agravantes Manuais (Preponderantes):
-                            <input type="number" id="agravantesPrepManual" value="0" min="0" style="width: 80px;" onchange="calcularDosimetria()">
-                        </label>
-                    </div>
-                </div>
-
-                <div class="fase2-container">
-                    <h3 style="font-size: 0.95rem; margin-top: 0; color: var(--success);">Indique uma ou mais Atenuantes:</h3>
-                    <div class="checkbox-grid">
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="calcularDosimetria()"> Agente menor de 21, na data do fato, ou maior de 70 anos, na data da sentença <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Desconhecimento da lei</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep" onchange="calcularDosimetria()"> Ter o agente cometido o delito por motivo de relevante valor social ou moral <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Ter procurado, por espontânea vontade, logo após o delito, evitar ou minorar as consequências, ou reparado o dano</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Ter cometido o delito sob coação resistível, ou sob influência de violenta emoção provocada por ato injusto da vítima</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante prep confissao" onchange="calcularDosimetria()"> Ter confessado espontaneamente, perante a autoridade, a autoria do delito <span class="prep-badge success">Prep</span></label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Ter cometido o delito sob a influência de multidão em tumulto, se não o provocou</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Circunstância relevante, anterior ou posterior ao crime, não prevista expressamente</label>
-                        <label class="checkbox-item"><input type="checkbox" class="atenuante" onchange="calcularDosimetria()"> Circunstância diversa das elencadas</label>
-                    </div>
-                    
-                    <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
-                        <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--text-main);">
-                            Outras Atenuantes Manuais (Preponderantes):
-                            <input type="number" id="atenuantesPrepManual" value="0" min="0" style="width: 80px;" onchange="calcularDosimetria()">
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FASE 3 - MAJORANTES E MINORANTES -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>3ª Fase: Causas de Aumento e Diminuição</h2>
-                </div>
-                <div class="input-group">
-                    <div class="input-box">
-                        <label style="color: var(--danger);">Causas de Aumento (+ Majorantes)</label>
-                        <select id="majorante">
-                            <option value="0">Nenhuma</option>
-                            <option value="0.166666">1/6</option>
-                            <option value="0.2">1/5</option>
-                            <option value="0.25">1/4</option>
-                            <option value="0.333333">1/3</option>
-                            <option value="0.375">3/8</option>
-                            <option value="0.4">2/5</option>
-                            <option value="0.5">1/2 (Metade)</option>
-                            <option value="0.666666">2/3</option>
-                            <option value="0.75">3/4</option>
-                            <option value="1.0">Até o Dobro (100%)</option>
-                            <option value="2.0">Até o Triplo (200%)</option>
-                        </select>
-                    </div>
-                    <div class="input-box">
-                        <label style="color: var(--success);">Causas de Diminuição (- Minorantes)</label>
-                        <select id="minorante">
-                            <option value="0">Nenhuma</option>
-                            <option value="0.166666">1/6</option>
-                            <option value="0.2">1/5</option>
-                            <option value="0.25">1/4</option>
-                            <option value="0.333333">1/3</option>
-                            <option value="0.375">3/8</option>
-                            <option value="0.4">2/5</option>
-                            <option value="0.5">1/2 (Metade)</option>
-                            <option value="0.666666">2/3</option>
-                            <option value="0.75">3/4</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="border-left: 4px solid var(--warning);">
-                <div class="card-header">
-                    <h2>Concurso de Crimes da Própria Aba (Ex: Art. 70 e 71)</h2>
-                </div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0;">*Para <b>Concurso Material (Art. 69)</b>, adicione uma Aba para cada crime. O sistema somará tudo no rodapé automaticamente.</p>
-                <div class="input-group">
-                    <div class="input-box full-width">
-                        <label>Fração sobre a pena atual</label>
-                        <select id="tipoConcurso" onchange="mudarConcurso()">
-                            <option value="nenhum">Não há (crime único nesta aba)</option>
-                            <option value="formal">Concurso Formal (art. 70, CP)</option>
-                            <option value="continuado">Crime Continuado (art. 71, caput, CP)</option>
-                            <option value="continuado_esp">Crime Continuado Específico (art. 71, parágrafo único)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="boxConcursoFracao" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <div class="input-group">
-                        <div class="input-box">
-                            <label>Fração de Aumento (formal/continuado)</label>
-                            <select id="concFracao">
-                                <option value="0.166666">1/6 (2 crimes)</option>
-                                <option value="0.2">1/5 (3 crimes)</option>
-                                <option value="0.25">1/4 (4 crimes)</option>
-                                <option value="0.333333">1/3 (5 crimes)</option>
-                                <option value="0.5">1/2 (6 crimes)</option>
-                                <option value="0.666666">2/3 (7 ou mais crimes)</option>
-                            </select>
-                        </div>
-                        <div class="input-box" id="boxConcMultaQtd">
-                            <label style="color: var(--warning);" title="Art. 72, CP">Nº Total de Crimes</label>
-                            <input type="number" id="concQtdCrimes" value="2" min="2">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="boxConcursoMult" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
-                    <div class="input-group">
-                        <div class="input-box">
-                            <label>Multiplicador</label>
-                            <select id="concMultiplicador">
-                                <option value="2">Até o Dobro (x2)</option>
-                                <option value="3">Até o Triplo (x3)</option>
-                            </select>
-                        </div>
-                        <div class="input-box" id="boxConcMultaQtdEsp">
-                            <label style="color: var(--warning);">Nº Total de Crimes</label>
-                            <input type="number" id="concQtdCrimesEsp" value="2" min="2">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OPÇÃO DE DEFINIÇÃO DO REGIME -->
-            <div class="card" style="border-left: 4px solid var(--primary);">
-                <div class="card-header">
-                    <h2>Critério de Fixação do Regime Inicial (Art. 33, CP)</h2>
-                </div>
-                <div class="input-group">
-                    <div class="input-box full-width">
-                        <label>Modo de Avaliação do Regime</label>
-                        <select id="modoRegime" onchange="atualizarModoRegime()">
-                            <option value="automatico">Orientativo — art. 33 + circunstâncias/reincidência</option>
-                            <option value="manual">Manual — definir o regime na sentença</option>
-                        </select>
-                        <div id="boxRegimeManual" class="field-hidden" style="margin-top:10px;">
-                            <label>Regime escolhido</label>
-                            <select id="regimeManual" onchange="calcularDosimetria()">
-                                <option value="FECHADO">Fechado</option>
-                                <option value="SEMIABERTO">Semiaberto</option>
-                                <option value="ABERTO">Aberto</option>
-                            </select>
-                        </div>
-                        <div class="inline-hint">O modo orientativo não substitui fundamentação individualizada. Para reclusão ≤ 4 anos e reincidência, considera a Súmula 269/STJ quando favoráveis as circunstâncias judiciais.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DETRAÇÃO -->
-            <div class="card" style="border-left: 4px solid var(--accent);">
-                <div class="card-header">
-                    <h2>Detração Penal (Art. 42, CP)</h2>
-                </div>
-                
-                <div class="date-calculator-box">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 10px 0;">Calcule pelo período de prisão (inclui o 1º dia - Art. 10, CP):</p>
-                    <div class="input-group">
-                        <div class="input-box">
-                            <label>Data da Prisão</label>
-                            <input type="date" id="dataPrisao" onchange="calcularDiasPrisao()">
-                        </div>
-                        <div class="input-box">
-                            <label>Data da Soltura / Atual</label>
-                            <input type="date" id="dataSoltura" onchange="calcularDiasPrisao()">
-                        </div>
-                    </div>
-                </div>
-
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0;">Ou insira/ajuste o tempo manualmente:</p>
-                <div class="input-group">
-                    <div class="input-box"><label>Anos</label><input type="number" id="detracaoAnos" value="0" min="0"></div>
-                    <div class="input-box"><label>Meses</label><input type="number" id="detracaoMeses" value="0" min="0"></div>
-                    <div class="input-box"><label>Dias</label><input type="number" id="detracaoDias" value="0" min="0"></div>
-                </div>
-                <div class="legal-note" style="margin-top:15px;">
-                    <strong>Detração na sentença:</strong> o tempo de prisão provisória é computado para a determinação do regime inicial (art. 387, § 2º, CPP). Por isso, a calculadora preserva a <strong>pena aplicada</strong> e exibe separadamente um <strong>saldo de referência</strong> para análise do regime, sem reduzir o quantum da condenação no cúmulo global.
-                </div>
-            </div>
-
-        </div>
-
-        <div class="results-column">
-            <div class="result-card">
-                <h2>Resumo da Sentença</h2>
-
-                <div id="validationBox" class="validation-box"></div>
-
-                <label class="didatico-toggle" title="Ativa explicações sobre a jurisprudência aplicável ao cálculo">
-                    <input type="checkbox" id="chkDidatico" onchange="calcularDosimetria()">
-                    <span>🎓 Ativar Modo Didático (STJ/STF)</span>
-                </label>
-                
-                <div class="result-block">
-                    <div class="result-title">Pena Definitiva Aplicada</div>
-                    <div class="result-value highlight" id="resPenaAplicada">0 dias</div>
-                    <div class="result-multa" id="resMultaDefinitiva" style="display: block;">0 dias-multa</div>
-                    <div class="result-secondary">
-                        <div class="result-title">Saldo de referência após detração</div>
-                        <div class="result-value" id="resPenaDefinitiva">0 dias</div>
-                        <div class="detraction-note">Exibido para auxiliar a análise do regime inicial; não substitui o quantum da pena aplicada.</div>
-                    </div>
-                    <div class="regime-badge" id="resRegimeBadge">REGIME ORIENTATIVO: ABERTO</div>
-                    <div class="pill-row">
-                        <span class="info-pill" id="pillMetodoF1">1ª fase: 1/8 intervalo</span>
-                        <span class="info-pill" id="pillMetodoF2">2ª fase: 1/6</span>
-                    </div>
-                </div>
-
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="result-title">Pena-Base (1ª Fase)</div>
-                        <div class="timeline-text" id="resPenaBase">-</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="result-title">Pena Provisória (2ª Fase)</div>
-                        <div class="timeline-text" id="resPenaProv">-</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px; font-weight: 500;" id="resAnalisePrep"></div>
-                        <div id="avisoSumulaAtenuante" class="alerta-sumula">⚠️ Súmula 231 STJ: Travado no Mínimo</div>
-                        <div id="avisoSumulaAgravante" class="alerta-sumula maximo">⚠️ Limite máximo legal aplicado na 2ª fase</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="result-title">Total da 3ª Fase (Majorantes / Minorantes)</div>
-                        <div class="timeline-text" id="resPenaTerc">-</div>
-                    </div>
-                    <div class="timeline-item" id="resConcursoItem" style="display: none;">
-                        <div class="result-title" style="color: #fbbf24;">Acréscimo Concurso de Crimes (Art. 70/71)</div>
-                        <div class="timeline-text" id="resPenaConcurso">-</div>
-                    </div>
-                    <div class="timeline-item" style="border-left: none;">
-                        <div class="result-title" style="color: #fca5a5;">Detração Aplicada</div>
-                        <div class="timeline-text" style="color: #fca5a5;" id="resDetracao">-</div>
-                    </div>
-                </div>
-
-                <div class="botoes-container">
-                    <button class="btn btn-copiar" id="btnCopiarTexto" onclick="copiarDispositivo()" type="button">📋 Copiar Dispositivo Completo (Todas as Abas)</button>
-                    <button class="btn btn-calcular" onclick="window.print()" type="button">🖨️ Imprimir Resumo Atual</button>
-                    <button class="btn btn-limpar" onclick="limparDados()" type="button">Limpar Aba Atual e Recomeçar</button>
-                </div>
-            </div>
-        </div>
-
+    <div class="quick-result" aria-live="polite">
+      <small>Resultado até aqui</small>
+      <strong id="quickResult">0 dias</strong>
     </div>
-
-    <!-- RODAPÉ FIXO DE CONCURSO MATERIAL GLOBAL -->
-    <div id="globalFooter" class="global-footer">
-        <div class="gf-title">🔗 CONCURSO MATERIAL — SOMA DAS PENAS APLICADAS (ART. 69, CP)</div>
-        <div class="gf-data">
-            <div class="gf-item"><span class="gf-label">Reclusão:</span> <span id="gfRec">0 dias</span></div>
-            <div class="gf-item"><span class="gf-label">Detenção:</span> <span id="gfDet">0 dias</span></div>
-            <div class="gf-item"><span class="gf-label">Multa Total:</span> <span id="gfMulta">0</span> dias</div>
-        </div>
+  </section>
+  <nav class="stepper" id="stepper" aria-label="Etapas da dosimetria">
+    <button type="button" data-go-step="1"><b>1</b><span>Réu</span></button>
+    <button type="button" data-go-step="2"><b>2</b><span>Crime</span></button>
+    <button type="button" data-go-step="3"><b>3</b><span>1ª fase</span></button>
+    <button type="button" data-go-step="4"><b>4</b><span>2ª fase</span></button>
+    <button type="button" data-go-step="5"><b>5</b><span>3ª fase</span></button>
+    <button type="button" data-go-step="6"><b>6</b><span>Complementos</span></button>
+    <button type="button" data-go-step="7"><b>7</b><span>Resultado</span></button>
+  </nav>
+  <section class="panel guided-step" data-step="1">
+    <div class="panel-head"><h2>1. Identificação do réu</h2><span class="badge blue" id="reuBadge">Réu 1</span></div>
+    <p class="step-tip">Informe apenas os dados necessários para este cálculo. Dados complementares podem ser preenchidos depois.</p>
+    <div class="grid">
+      <div class="field span6"><label>Nome do réu</label><input id="reuNome" oninput="updateReuField('nome',this.value)"></div>
+      <div class="field full advanced-box"><button class="advanced-toggle" type="button">⚙ Dados pessoais, reincidência e regime</button><div class="advanced-content grid"><div class="field"><label>Idade na data do fato (referência)</label><input id="idadeFato" type="number" min="0" oninput="updateReuField('idadeFato',num(this.value))"></div>
+      <div class="field"><label>Idade na sentença</label><input id="idadeSentenca" type="number" min="0" oninput="updateReuField('idadeSentenca',num(this.value))"></div>
+      <div class="field span4"><label>Reincidência em crime doloso</label><select id="reuReincDol" onchange="updateReuField('reincidenteDoloso',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+      <div class="field span4"><label>Reincidência pelo mesmo crime</label><select id="reuMesmoCrime" onchange="updateReuField('reincidenciaMesmoCrime',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+      <div class="field span4"><label>Circunstâncias pessoais indicam suficiência (art. 44/77)</label><select id="reuCircSuf" onchange="updateReuField('circunstanciasSuficientes',this.value==='sim')"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+      <div class="field span6"><label>Saúde justifica sursis humanitário?</label><select id="reuSaude" onchange="updateReuField('sursisSaude',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+      <div class="field span6"><label>Regime inicial</label><select id="reuRegimeModo" onchange="updateReuField('regimeModo',this.value)"><option value="orientativo">Orientativo pelo sistema</option><option value="FECHADO">Manual: fechado</option><option value="SEMIABERTO">Manual: semiaberto</option><option value="ABERTO">Manual: aberto</option></select></div></div></div>
     </div>
+  </section>
 
-    <!-- MODAL DO MANUAL VISUAL LAW -->
-    <div id="modalManual" class="modal-overlay">
-        <div class="modal-content">
-            <button class="btn-fechar-modal" onclick="fecharManual()">&times;</button>
-            
-            <header class="m-header">
-                <h2>⚖️ e-Dosimetria</h2>
-                <p>Guia Prático e Visual para o uso do sistema automatizado de cálculo penal.</p>
-            </header>
-
-            <section class="m-section">
-                <h3 class="m-title">👥 Gestão de Múltiplos Réus e Fatos</h3>
-                <p style="margin-bottom: 20px; color: var(--text-muted);">Organize processos complexos e concursos materiais de crimes.</p>
-                <div class="m-grid">
-                    <div class="m-card">
-                        <h4>➕ Criar Novo</h4>
-                        <p>Clique em <strong>"+ Adicionar Fato/Crime"</strong> para abrir uma aba em branco, preservando os cálculos anteriores.</p>
-                    </div>
-                    <div class="m-card">
-                        <h4>🔗 Concurso Material</h4>
-                        <p>Crie uma aba para CADA crime. O sistema detectará as abas extras e mostrará uma barra inferior somando as penas automaticamente (separando reclusão e detenção).</p>
-                    </div>
-                    <div class="m-card">
-                        <h4>🧹 Limpar</h4>
-                        <p>O botão <strong>"Limpar Aba Atual"</strong> zera exclusivamente os dados da tela que você está visualizando.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="m-section">
-                <h3 class="m-title">⚙️ A Engenharia do Cálculo</h3>
-                <div class="m-timeline">
-                    <div class="m-step">
-                        <div class="m-step-num">1</div>
-                        <div class="m-step-content">
-                            <h4>Pena-Base (Art. 59, CP)</h4>
-                            <p>Selecione os vetores desfavoráveis e escolha o critério matemático. O sistema oferece 1/8 sobre o intervalo ou 1/6 sobre a pena mínima como parâmetros orientativos, sempre sujeitos à fundamentação.</p>
-                        </div>
-                    </div>
-                    <div class="m-step">
-                        <div class="m-step-num">2</div>
-                        <div class="m-step-content">
-                            <h4>Pena Provisória (Agravantes e Atenuantes)</h4>
-                            <p>A calculadora observa a <strong>Súmula 231/STJ</strong> para impedir que a atenuante conduza a pena abaixo do mínimo legal e também controla o teto abstrato na segunda fase.</p>
-                        </div>
-                    </div>
-                    <div class="m-step">
-                        <div class="m-step-num">3</div>
-                        <div class="m-step-content">
-                            <h4>Pena Definitiva (Majorantes e Minorantes)</h4>
-                            <p>A ordem matemática é automática: o sistema calcula <strong>primeiro os aumentos</strong> e <strong>depois as diminuições</strong> sucessivamente.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="m-section">
-                <h3 class="m-title">🧠 O "Cérebro" Jurisprudencial</h3>
-                <table class="m-table">
-                    <thead>
-                        <tr>
-                            <th>Concurso de Circunstâncias (2ª Fase)</th>
-                            <th>Ação Automática do Sistema</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Reincidência Genérica + Confissão Espontânea</td>
-                            <td><span class="m-tag">Compensação Integral</span> (Tema 585 / STJ)</td>
-                        </tr>
-                        <tr>
-                            <td>Reincidência Específica + Confissão Espontânea</td>
-                            <td><span class="m-tag">Compensação Integral</span> (Tema 585 / STJ)</td>
-                        </tr>
-                        <tr>
-                            <td>Multirreincidência + Confissão Espontânea</td>
-                            <td><span class="m-tag partial">Compensação Proporcional</span> com saldo configurável (Tema 585 / STJ)</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            <section class="m-section">
-                <h3 class="m-title">🚀 Geração da Minuta</h3>
-                <div class="m-grid">
-                    <div class="m-card" style="border: 1px dashed #cbd5e1;">
-                        <h4>🎓 Modo Didático</h4>
-                        <p>Insere notas explicativas no texto citando Súmulas e Temas Repetitivos. Perfeito para fundamentação exaustiva.</p>
-                    </div>
-                    <div class="m-card" style="border: 1px dashed #cbd5e1;">
-                        <h4>📋 Copiar Dispositivo</h4>
-                        <p>Redige o texto da sentença unindo o cálculo de <strong>todas as abas abertas</strong> e gera o cúmulo material das penas aplicadas, sem descontar a detração do quantum condenatório.</p>
-                    </div>
-                </div>
-            </section>
-        </div>
+  <section class="panel guided-step" data-step="2">
+    <div class="panel-head"><h2>2. Crime e pena em abstrato</h2><span id="leiBadge" class="badge orange">conferir data</span></div>
+    <p class="step-tip">Selecione o tipo penal e a data do fato. A pena em abstrato é preenchida automaticamente e pode ser conferida nas opções avançadas.</p>
+    <div class="grid">
+      <div class="field span8"><label>Tipo penal / catálogo</label><select id="crimeCatalogo" onchange="aplicarCatalogo(this.value)"></select></div>
+      <div class="field span4"><label>Data do fato</label><input id="dataFato" type="date" onchange="updateCrimeField('dataFato',this.value);aplicarLeiNoTempo()"></div>
+      <div class="field span6"><label>Descrição curta do fato/crime</label><input id="crimeNome" oninput="updateCrimeField('nome',this.value)"></div>
+      <div class="field full advanced-box"><button class="advanced-toggle" type="button">⚙ Conferir pena em abstrato e dados técnicos</button><div class="advanced-content grid"><div class="field span6"><label>Observação sobre lei aplicável</label><input id="leiObs" oninput="updateCrimeField('leiObs',this.value)" placeholder="Ex.: redação anterior mais benéfica"></div>
+      <div class="field"><label>Espécie</label><select id="tipoPrisao" onchange="updateCrimeField('tipoPrisao',this.value)"><option value="reclusao">Reclusão</option><option value="detencao">Detenção</option></select></div>
+      <div class="field"><label>Unidade</label><select id="unidadePena" onchange="updateCrimeField('unidade',this.value)"><option value="anos">Anos</option><option value="meses">Meses</option></select></div>
+      <div class="field"><label>Mínimo legal</label><input id="minPena" type="number" step="0.01" min="0" oninput="updateCrimeField('minPena',num(this.value))"></div>
+      <div class="field"><label>Máximo legal</label><input id="maxPena" type="number" step="0.01" min="0" oninput="updateCrimeField('maxPena',num(this.value))"></div>
+      <div class="field span4"><label>Crime culposo?</label><select id="culposo" onchange="updateCrimeField('culposo',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+      <div class="field span4"><label>Violência ou grave ameaça à pessoa?</label><select id="violencia" onchange="updateCrimeField('violencia',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+      <div class="field span4"><label>Violência sexual contra mulher? (art. 115)</label><select id="violenciaSexualMulher" onchange="updateCrimeField('violenciaSexualMulher',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div></div></div>
     </div>
-
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-    <script>
-        const STORAGE_KEY = 'eDosimetria_v2_projeto';
-        let moduloDrogasAtivo = false;
-        let reus = [];
-        let reuAtualId = 1;
-        let nextId = 2;
-        let estadoPadrao = null;
-        let autosaveTimer = null;
-        let inicializando = true;
-
-        const inputIds = [
-            'seletorCrime', 'temMulta', 'tipoPrisao', 'unidadePena', 'minPena', 'maxPena',
-            'minMulta', 'maxMulta', 'chkReincidente', 'selMultirreincidencia', 'saldoMultirreincidencia',
-            'minorante', 'majorante', 'modoRegime', 'regimeManual', 'tipoConcurso',
-            'concFracao', 'concQtdCrimes', 'concMultiplicador', 'concQtdCrimesEsp',
-            'dataPrisao', 'dataSoltura', 'detracaoAnos', 'detracaoMeses', 'detracaoDias',
-            'chkDidatico', 'agravantesPrepManual', 'atenuantesPrepManual',
-            'metodoFase1', 'fracaoFase2'
-        ];
-
-        function $(id) { return document.getElementById(id); }
-        function numero(id, fallback = 0) {
-            const el = $(id);
-            if (!el) return fallback;
-            const v = Number(el.value);
-            return Number.isFinite(v) ? v : fallback;
-        }
-        function inteiro(id, fallback = 0) { return Math.max(0, Math.trunc(numero(id, fallback))); }
-        function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
-
-        function mostrarToast(msg) {
-            const t = $('toast');
-            if (!t) return;
-            t.textContent = msg;
-            t.classList.add('show');
-            clearTimeout(t._timer);
-            t._timer = setTimeout(() => t.classList.remove('show'), 2400);
-        }
-
-        function abrirManual() { $('modalManual').style.display = 'block'; }
-        function fecharManual() { $('modalManual').style.display = 'none'; }
-        window.addEventListener('click', event => {
-            const modal = $('modalManual');
-            if (event.target === modal) fecharManual();
-        });
-        window.addEventListener('keydown', event => {
-            if (event.key === 'Escape') fecharManual();
-        });
-
-        function getValoresAtuais() {
-            const state = {};
-            inputIds.forEach(id => {
-                const el = $(id);
-                if (!el) return;
-                state[id] = el.type === 'checkbox' ? el.checked : el.value;
-            });
-            state.art59 = Array.from(document.querySelectorAll('.art59')).map(cb => cb.checked);
-            state.agravantes = Array.from(document.querySelectorAll('.agravante')).map(cb => cb.checked);
-            state.atenuantes = Array.from(document.querySelectorAll('.atenuante')).map(cb => cb.checked);
-            state.moduloDrogasAtivo = moduloDrogasAtivo;
-            return state;
-        }
-
-        function salvarEstadoAtual() {
-            if (!reus.length) return;
-            const reu = reus.find(r => r.id === reuAtualId);
-            if (reu) reu.state = getValoresAtuais();
-        }
-
-        function aplicarArrayChecks(selector, valores) {
-            const cbs = document.querySelectorAll(selector);
-            cbs.forEach((cb, i) => cb.checked = Boolean(valores?.[i]));
-        }
-
-        function carregarEstado(state) {
-            if (!state) return;
-            inputIds.forEach(id => {
-                const el = $(id);
-                if (!el || state[id] === undefined) return;
-                if (el.type === 'checkbox') el.checked = Boolean(state[id]);
-                else el.value = state[id];
-            });
-            aplicarArrayChecks('.art59', state.art59);
-            aplicarArrayChecks('.agravante', state.agravantes);
-            aplicarArrayChecks('.atenuante', state.atenuantes);
-            moduloDrogasAtivo = Boolean(state.moduloDrogasAtivo);
-            atualizarVisibilidadeDrogas();
-            atualizarMultirreincidencia(false);
-            atualizarModoRegime(false);
-            mudarConcurso(false);
-            toggleMulta(false);
-            calcularDosimetria();
-        }
-
-        function renderTabs() {
-            const container = $('tabsContainer');
-            container.innerHTML = '';
-            reus.forEach(reu => {
-                const btn = document.createElement('div');
-                btn.className = `tab-btn ${reu.id === reuAtualId ? 'active' : ''}`;
-                btn.title = 'Clique para alternar • duplo clique no nome para renomear';
-                btn.onclick = () => alternarReu(reu.id);
-
-                const spanNome = document.createElement('span');
-                spanNome.textContent = reu.nome;
-                spanNome.ondblclick = e => { e.stopPropagation(); renomearReu(reu.id); };
-                btn.appendChild(spanNome);
-
-                const closeBtn = document.createElement('span');
-                closeBtn.className = 'tab-close';
-                closeBtn.innerHTML = '&times;';
-                closeBtn.title = 'Fechar aba';
-                closeBtn.onclick = e => removerReu(e, reu.id);
-                btn.appendChild(closeBtn);
-                container.appendChild(btn);
-            });
-
-            const addBtn = document.createElement('button');
-            addBtn.className = 'tab-add';
-            addBtn.type = 'button';
-            addBtn.textContent = '+ Adicionar Fato/Crime';
-            addBtn.onclick = adicionarReu;
-            container.appendChild(addBtn);
-            atualizarRodapeGlobal();
-        }
-
-        function alternarReu(id) {
-            if (id === reuAtualId) return;
-            salvarEstadoAtual();
-            reuAtualId = id;
-            const reu = reus.find(r => r.id === id);
-            if (reu) carregarEstado(reu.state);
-            renderTabs();
-            agendarAutosave();
-        }
-
-        function adicionarReu() {
-            salvarEstadoAtual();
-            const id = nextId++;
-            const novo = { id, nome: `Fato/Crime ${id}`, state: deepClone(estadoPadrao), textoGerado: '', resultado: null };
-            reus.push(novo);
-            reuAtualId = id;
-            carregarEstado(novo.state);
-            renderTabs();
-            agendarAutosave();
-        }
-
-        function removerReu(e, id) {
-            e.stopPropagation();
-            if (reus.length === 1) return mostrarToast('É necessário manter ao menos uma aba.');
-            const alvo = reus.find(r => r.id === id);
-            if (!confirm(`Remover a aba “${alvo?.nome || 'selecionada'}”?`)) return;
-            reus = reus.filter(r => r.id !== id);
-            if (reuAtualId === id) {
-                reuAtualId = reus[0].id;
-                carregarEstado(reus[0].state);
-            }
-            renderTabs();
-            calcularDosimetria();
-            agendarAutosave();
-        }
-
-        function renomearReu(id) {
-            const reu = reus.find(r => r.id === id);
-            if (!reu) return;
-            const novoNome = prompt('Identificação do réu/fato/crime:', reu.nome);
-            if (novoNome && novoNome.trim()) {
-                reu.nome = novoNome.trim().slice(0, 80);
-                if (reu.id === reuAtualId) calcularDosimetria();
-                renderTabs();
-                agendarAutosave();
-            }
-        }
-
-        function verificarReincidencia() {
-            const reinc = $('chkReincidente').checked;
-            $('boxMultirreincidencia').style.display = reinc ? 'block' : 'none';
-            if (!reinc) $('selMultirreincidencia').value = 'nao';
-            atualizarMultirreincidencia(false);
-            calcularDosimetria();
-        }
-
-        function atualizarMultirreincidencia(recalcular = true) {
-            const show = $('chkReincidente')?.checked && $('selMultirreincidencia')?.value === 'sim';
-            $('boxSaldoMulti')?.classList.toggle('field-hidden', !show);
-            if (recalcular) calcularDosimetria();
-        }
-
-        function atualizarModoRegime(recalcular = true) {
-            $('boxRegimeManual')?.classList.toggle('field-hidden', $('modoRegime')?.value !== 'manual');
-            if (recalcular) calcularDosimetria();
-        }
-
-        function limparDados() {
-            if (!confirm('Limpar somente a aba atual e restaurar os valores padrão?')) return;
-            carregarEstado(deepClone(estadoPadrao));
-            salvarEstadoAtual();
-            agendarAutosave();
-            mostrarToast('Aba atual restaurada.');
-        }
-
-        function novoProjeto() {
-            if (!confirm('Iniciar um novo projeto? As abas atuais serão apagadas deste navegador.')) return;
-            localStorage.removeItem(STORAGE_KEY);
-            reuAtualId = 1;
-            nextId = 2;
-            const base = deepClone(estadoPadrao);
-            moduloDrogasAtivo = Boolean(base.moduloDrogasAtivo);
-            reus = [{ id: 1, nome: 'Fato 1', state: base, textoGerado: '', resultado: null }];
-            carregarEstado(base);
-            renderTabs();
-            calcularDosimetria();
-            salvarProjetoLocal();
-            mostrarToast('Novo projeto iniciado.');
-        }
-
-        function toggleMulta(recalcular = true) {
-            const temMulta = $('temMulta').checked;
-            $('boxMinMulta').style.display = temMulta ? 'flex' : 'none';
-            $('boxMaxMulta').style.display = temMulta ? 'flex' : 'none';
-            $('resMultaDefinitiva').style.display = temMulta ? 'block' : 'none';
-            const tipo = $('tipoConcurso').value;
-            $('boxConcMultaQtd').style.display = temMulta && tipo === 'formal' ? 'flex' : 'none';
-            $('boxConcMultaQtdEsp').style.display = 'none';
-            if (recalcular) calcularDosimetria();
-        }
-
-        function mudarConcurso(recalcular = true) {
-            const tipo = $('tipoConcurso').value;
-            $('boxConcursoFracao').style.display = (tipo === 'formal' || tipo === 'continuado') ? 'block' : 'none';
-            $('boxConcursoMult').style.display = tipo === 'continuado_esp' ? 'block' : 'none';
-            toggleMulta(false);
-            if (recalcular) calcularDosimetria();
-        }
-
-        function carregarCrime(recalcular = true) {
-            const select = $('seletorCrime');
-            const option = select.options[select.selectedIndex];
-            if (select.value !== 'manual') {
-                $('minPena').value = option.dataset.min;
-                $('maxPena').value = option.dataset.max;
-                $('unidadePena').value = option.dataset.unidade;
-                $('tipoPrisao').value = option.dataset.prisao;
-                $('temMulta').checked = option.dataset.multa === 'true';
-                // Multa não é padronizada por todos os tipos; mantém valores previamente editáveis.
-                if (moduloDrogasAtivo) {
-                    moduloDrogasAtivo = false;
-                    atualizarVisibilidadeDrogas();
-                }
-            } else if (!inicializando) {
-                // Em modo manual, preserva o que já foi digitado.
-            }
-            toggleMulta(false);
-            if (recalcular) calcularDosimetria();
-        }
-
-        function atualizarVisibilidadeDrogas() {
-            $('sectionDrogas').style.display = moduloDrogasAtivo ? 'block' : 'none';
-            $('btnDrogas').innerText = moduloDrogasAtivo ? 'Desativar Lei de Drogas' : 'Ativar Lei de Drogas (Art. 42)';
-        }
-
-        function toggleDrogas() {
-            moduloDrogasAtivo = !moduloDrogasAtivo;
-            atualizarVisibilidadeDrogas();
-            if (moduloDrogasAtivo) {
-                $('seletorCrime').value = 'manual';
-                $('unidadePena').value = 'anos';
-                $('minPena').value = 5;
-                $('maxPena').value = 15;
-                $('tipoPrisao').value = 'reclusao';
-                $('temMulta').checked = true;
-                $('minMulta').value = 500;
-                $('maxMulta').value = 1500;
-            } else {
-                document.querySelectorAll('.art59.droga').forEach(cb => cb.checked = false);
-            }
-            toggleMulta(false);
-            calcularDosimetria();
-        }
-
-        function calcularDiasPrisao() {
-            const inic = $('dataPrisao').value;
-            const fim = $('dataSoltura').value;
-            if (!inic || !fim) return calcularDosimetria();
-            const di = new Date(`${inic}T12:00:00`);
-            const df = new Date(`${fim}T12:00:00`);
-            if (df < di) return calcularDosimetria();
-            const diasCorridos = Math.floor((df - di) / 86400000) + 1;
-            const anos = Math.floor(diasCorridos / 360);
-            const resto = diasCorridos % 360;
-            $('detracaoAnos').value = anos;
-            $('detracaoMeses').value = Math.floor(resto / 30);
-            $('detracaoDias').value = resto % 30;
-            calcularDosimetria();
-        }
-
-        function formatarDias(totalDias) {
-            if (!Number.isFinite(totalDias) || totalDias <= 0) return '0 dias';
-            totalDias = Math.round(totalDias);
-            const anos = Math.floor(totalDias / 360);
-            const resto = totalDias % 360;
-            const meses = Math.floor(resto / 30);
-            const dias = resto % 30;
-            const partes = [];
-            if (anos) partes.push(`${anos} ${anos === 1 ? 'ano' : 'anos'}`);
-            if (meses) partes.push(`${meses} ${meses === 1 ? 'mês' : 'meses'}`);
-            if (dias) partes.push(`${dias} ${dias === 1 ? 'dia' : 'dias'}`);
-            return partes.join(', ') || '0 dias';
-        }
-
-        function fracaoLabel(valor) {
-            const mapa = new Map([
-                [1/12, '1/12'], [1/8, '1/8'], [1/6, '1/6'], [1/5, '1/5'],
-                [1/4, '1/4'], [1/3, '1/3'], [1/2, '1/2'], [2/3, '2/3'], [3/4, '3/4']
-            ]);
-            let best = null, dist = Infinity;
-            for (const [v, l] of mapa) {
-                const d = Math.abs(v - valor);
-                if (d < dist) { dist = d; best = l; }
-            }
-            return dist < 0.00001 ? best : `${(valor*100).toFixed(2)}%`;
-        }
-
-        function helperRegime(tipo, penaAplicadaDias, saldoDetracaoDias, isReincidente, modoRegime, temDesfavoraveis) {
-            if (penaAplicadaDias <= 0) return { nome: 'SEM PENA', fundamento: '' };
-            if (modoRegime === 'manual') return { nome: $('regimeManual').value, fundamento: 'regime definido manualmente' };
-
-            // Art. 387, §2º CPP: saldo é referência para a análise do regime; não altera o quantum aplicado.
-            const diasRef = Math.max(0, Math.min(penaAplicadaDias, saldoDetracaoDias));
-            const anos = diasRef / 360;
-            let nome;
-            let fundamento;
-
-            if (tipo === 'detencao') {
-                if (anos > 4 || isReincidente || temDesfavoraveis) nome = 'SEMIABERTO';
-                else nome = 'ABERTO';
-                fundamento = 'art. 33, caput e §§ 2º/3º, CP';
-            } else if (anos > 8) {
-                nome = 'FECHADO'; fundamento = "art. 33, § 2º, 'a', CP";
-            } else if (anos > 4) {
-                nome = isReincidente ? 'FECHADO' : 'SEMIABERTO';
-                fundamento = "art. 33, § 2º, 'b', c/c § 3º, CP";
-            } else {
-                if (isReincidente) {
-                    nome = temDesfavoraveis ? 'FECHADO' : 'SEMIABERTO';
-                    fundamento = 'art. 33, §§ 2º/3º, CP e Súmula 269/STJ';
-                } else {
-                    nome = temDesfavoraveis ? 'SEMIABERTO' : 'ABERTO';
-                    fundamento = "art. 33, § 2º, 'c', c/c § 3º, CP";
-                }
-            }
-            return { nome, fundamento };
-        }
-
-        function limparErrosVisuais() {
-            ['minPena','maxPena','minMulta','maxMulta','dataPrisao','dataSoltura','detracaoAnos','detracaoMeses','detracaoDias'].forEach(id => $(id)?.classList.remove('input-error'));
-        }
-
-        function validarEntradas() {
-            limparErrosVisuais();
-            const erros = [], avisos = [];
-            const min = numero('minPena');
-            const max = numero('maxPena');
-            if (min < 0 || max <= 0 || min > max) {
-                erros.push('Confira os limites da pena em abstrato: o mínimo deve ser não negativo e não pode superar o máximo.');
-                $('minPena').classList.add('input-error'); $('maxPena').classList.add('input-error');
-            }
-            if ($('temMulta').checked) {
-                const mi = numero('minMulta'), ma = numero('maxMulta');
-                if (mi < 0 || ma < mi) {
-                    erros.push('Confira os limites de dias-multa.');
-                    $('minMulta').classList.add('input-error'); $('maxMulta').classList.add('input-error');
-                }
-            }
-            if ($('dataPrisao').value && $('dataSoltura').value && $('dataSoltura').value < $('dataPrisao').value) {
-                erros.push('A data final da prisão não pode ser anterior à data inicial.');
-                $('dataPrisao').classList.add('input-error'); $('dataSoltura').classList.add('input-error');
-            }
-            if (moduloDrogasAtivo && document.querySelectorAll('.art59.droga:checked').length) {
-                avisos.push('Art. 42 da Lei de Drogas: natureza e quantidade têm preponderância qualitativa; confirme se a metodologia numérica escolhida traduz a fundamentação do caso.');
-            }
-            if ($('fracaoFase2').value !== '0.16666666666666666') {
-                avisos.push('Foi escolhida fração de 2ª fase diversa do parâmetro usual de 1/6; registre fundamentação concreta no texto final.');
-            }
-            if (reus.length > 1 && (inteiro('detracaoAnos') || inteiro('detracaoMeses') || inteiro('detracaoDias'))) {
-                avisos.push('Há múltiplas abas: a detração desta aba não é abatida da soma global das penas aplicadas, evitando duplicidade no cúmulo material.');
-            }
-            return { erros, avisos };
-        }
-
-        function atualizarValidacao(erros, avisos) {
-            const box = $('validationBox');
-            box.className = 'validation-box show';
-            if (erros.length) {
-                box.classList.add('error');
-                box.innerHTML = `<strong>⛔ Corrija antes de copiar:</strong><ul>${erros.map(e => `<li>${e}</li>`).join('')}</ul>`;
-            } else if (avisos.length) {
-                box.classList.add('warning');
-                box.innerHTML = `<strong>⚠️ Pontos de conferência:</strong><ul>${avisos.map(e => `<li>${e}</li>`).join('')}</ul>`;
-            } else {
-                box.classList.add('ok');
-                box.textContent = '✓ Entradas consistentes. Confira a fundamentação jurídica antes de usar o texto na sentença.';
-            }
-            $('btnCopiarTexto').disabled = erros.length > 0;
-        }
-
-        function calcularPenaBase(minDias, maxDias, totalDesfavoraveis) {
-            const metodo = $('metodoFase1').value;
-            if (metodo === 'minimo6') {
-                return minDias + (minDias * (1/6) * totalDesfavoraveis);
-            }
-            return minDias + (((maxDias - minDias) / 8) * totalDesfavoraveis);
-        }
-
-        function calcularMultaBase(minMulta, maxMulta, totalDesfavoraveis) {
-            const metodo = $('metodoFase1').value;
-            if (metodo === 'minimo6') return minMulta + (minMulta * (1/6) * totalDesfavoraveis);
-            return minMulta + (((maxMulta - minMulta) / 8) * totalDesfavoraveis);
-        }
-
-        function calcularDosimetria() {
-            if (!$('minPena')) return;
-            const valid = validarEntradas();
-            atualizarValidacao(valid.erros, valid.avisos);
-            if (valid.erros.length) {
-                salvarEstadoAtual();
-                agendarAutosave();
-                return;
-            }
-
-            const temMulta = $('temMulta').checked;
-            const modoDidatico = $('chkDidatico').checked;
-            const modoRegime = $('modoRegime').value;
-            const unidade = $('unidadePena').value;
-            const minInput = numero('minPena');
-            const maxInput = numero('maxPena');
-            const isReclusao = $('tipoPrisao').value === 'reclusao';
-            const minMulta = temMulta ? numero('minMulta', 10) : 0;
-            const maxMulta = temMulta ? numero('maxMulta', 360) : 0;
-            const minDias = unidade === 'anos' ? minInput * 360 : minInput * 30;
-            const maxDias = unidade === 'anos' ? maxInput * 360 : maxInput * 30;
-
-            // 1ª FASE
-            const checksArt59 = Array.from(document.querySelectorAll('.art59:checked'));
-            const listaDesfavoraveis = checksArt59.map(cb => cb.parentNode.textContent.trim().replace(/\s+/g,' '));
-            const totalDesfavoraveis = checksArt59.length;
-            let penaBase = calcularPenaBase(minDias, maxDias, totalDesfavoraveis);
-            let multaBase = temMulta ? calcularMultaBase(minMulta, maxMulta, totalDesfavoraveis) : 0;
-            // A pena-base não deve exceder o máximo abstrato no cálculo automático.
-            penaBase = Math.min(penaBase, maxDias);
-            if (temMulta) multaBase = Math.min(multaBase, maxMulta);
-
-            // 2ª FASE
-            const fracaoFase2 = numero('fracaoFase2', 1/6);
-            const listaAgravantes = [];
-            const listaAtenuantes = [];
-            let agrPrep = inteiro('agravantesPrepManual');
-            let agrComum = 0;
-            let atePrep = inteiro('atenuantesPrepManual');
-            let ateComum = 0;
-
-            const isReincidente = $('chkReincidente').checked;
-            const natureza = $('selMultirreincidencia').value;
-            const isMulti = isReincidente && natureza === 'sim';
-            const isEspecifica = isReincidente && natureza === 'especifica';
-            const confissaoCb = document.querySelector('.atenuante.confissao');
-            const temConfissao = Boolean(confissaoCb?.checked);
-
-            document.querySelectorAll('.agravante:checked').forEach(cb => {
-                if (cb.id === 'chkReincidente') return;
-                listaAgravantes.push(cb.parentNode.textContent.trim().replace(/\s*Prep\s*/g,' ').trim());
-                if (cb.classList.contains('prep')) agrPrep++; else agrComum++;
-            });
-            if (isReincidente) {
-                listaAgravantes.unshift(isMulti ? 'Multirreincidência' : (isEspecifica ? 'Reincidência específica' : 'Reincidência'));
-            }
-
-            document.querySelectorAll('.atenuante:checked').forEach(cb => {
-                listaAtenuantes.push(cb.parentNode.textContent.trim().replace(/\s*Prep\s*/g,' ').trim());
-                if (cb.classList.contains('prep')) atePrep++; else ateComum++;
-            });
-
-            let textoAnalise = '';
-            let acrescimoEspecial = 0;
-
-            // Reincidência e confissão são tratadas separadamente para aplicar o Tema 585 corretamente.
-            if (isReincidente) {
-                if (temConfissao) {
-                    atePrep = Math.max(0, atePrep - 1); // retira a confissão da conta geral
-                    if (isMulti) {
-                        const saldo = numero('saldoMultirreincidencia', 1/6);
-                        acrescimoEspecial += penaBase * saldo;
-                        textoAnalise += `Tema 585/STJ: na multirreincidência, a reincidência prepondera e admite compensação proporcional com a confissão; foi adotado saldo residual de ${fracaoLabel(saldo)} da pena-base. `;
-                    } else {
-                        textoAnalise += 'Tema 585/STJ: a reincidência e a confissão espontânea foram integralmente compensadas, inclusive na reincidência específica. ';
-                    }
-                } else {
-                    agrPrep += 1;
-                }
-            }
-
-            // Compensação entre demais circunstâncias preponderantes antagônicas.
-            if (agrPrep > 0 && atePrep > 0) {
-                const comp = Math.min(agrPrep, atePrep);
-                agrPrep -= comp; atePrep -= comp;
-                textoAnalise += 'Houve compensação entre circunstâncias preponderantes antagônicas. ';
-            }
-            if (agrComum > 0 && ateComum > 0) {
-                const comp = Math.min(agrComum, ateComum);
-                agrComum -= comp; ateComum -= comp;
-                textoAnalise += 'Circunstâncias genéricas antagônicas foram compensadas. ';
-            }
-
-            let penaProv = penaBase + acrescimoEspecial;
-            let multaProv = multaBase;
-            penaProv += penaBase * fracaoFase2 * (agrComum + agrPrep);
-            penaProv -= penaBase * fracaoFase2 * (ateComum + atePrep);
-            if (temMulta) {
-                multaProv += multaBase * fracaoFase2 * (agrComum + agrPrep);
-                multaProv -= multaBase * fracaoFase2 * (ateComum + atePrep);
-                if (isMulti && temConfissao) multaProv += multaBase * numero('saldoMultirreincidencia', 1/6);
-            }
-
-            let aplicouAtenuanteSumula = false;
-            let aplicouTetoFase2 = false;
-            if (penaProv < minDias) { penaProv = minDias; aplicouAtenuanteSumula = true; }
-            if (penaProv > maxDias) { penaProv = maxDias; aplicouTetoFase2 = true; }
-            if (temMulta) multaProv = Math.min(maxMulta, Math.max(minMulta, multaProv));
-
-            // 3ª FASE
-            const selMinorante = $('minorante');
-            const selMajorante = $('majorante');
-            const minorante = numero('minorante');
-            const majorante = numero('majorante');
-            let penaTerc = penaProv;
-            let multaTerc = multaProv;
-            if (majorante > 0) { penaTerc *= (1 + majorante); if (temMulta) multaTerc *= (1 + majorante); }
-            if (minorante > 0) { penaTerc *= (1 - minorante); if (temMulta) multaTerc *= (1 - minorante); }
-
-            // CONCURSO NA ABA
-            const tipoConc = $('tipoConcurso').value;
-            let penaConcurso = penaTerc;
-            let multaConcurso = multaTerc;
-            let aplicouConcurso = false;
-            let textoConcurso = '';
-            if (tipoConc === 'formal') {
-                const frac = numero('concFracao');
-                const qtd = Math.max(2, inteiro('concQtdCrimes', 2));
-                penaConcurso = penaTerc * (1 + frac);
-                if (temMulta) multaConcurso = multaTerc * qtd; // art. 72 no concurso formal
-                aplicouConcurso = true;
-                textoConcurso = `Concurso formal: aumento de ${fracaoLabel(frac)}; multa cumulada em ${qtd} crimes (art. 72, CP).`;
-            } else if (tipoConc === 'continuado') {
-                const frac = numero('concFracao');
-                penaConcurso = penaTerc * (1 + frac);
-                if (temMulta) multaConcurso = multaTerc * (1 + frac); // art. 72 não se aplica ao crime continuado
-                aplicouConcurso = true;
-                textoConcurso = `Crime continuado: aumento de ${fracaoLabel(frac)}; pena de multa segue o critério da continuidade delitiva.`;
-            } else if (tipoConc === 'continuado_esp') {
-                const mult = numero('concMultiplicador', 2);
-                penaConcurso = penaTerc * mult;
-                if (temMulta) multaConcurso = multaTerc * mult;
-                aplicouConcurso = true;
-                textoConcurso = `Crime continuado específico: multiplicador x${mult}; art. 72 não aplicado à multa.`;
-            }
-
-            // DETRAÇÃO — saldo de referência, sem reduzir o quantum da condenação.
-            const totalDetracaoDias = inteiro('detracaoAnos') * 360 + inteiro('detracaoMeses') * 30 + inteiro('detracaoDias');
-            const saldoDetracao = Math.max(0, penaConcurso - totalDetracaoDias);
-            const regimeInfo = helperRegime(isReclusao ? 'reclusao' : 'detencao', penaConcurso, saldoDetracao, isReincidente, modoRegime, totalDesfavoraveis > 0);
-
-            const reuObj = reus.find(r => r.id === reuAtualId);
-            const nomeReu = reuObj?.nome || 'FATO/RÉU';
-            const metodo1Label = $('metodoFase1').value === 'intervalo8' ? '1/8 do intervalo' : '1/6 sobre o mínimo';
-            const metodo2Label = fracaoLabel(fracaoFase2);
-
-            // TEXTO DA MINUTA
-            let texto = `--- DOSIMETRIA: ${nomeReu.toUpperCase()} ---\n\n`;
-            texto += '1ª FASE (PENA-BASE): ';
-            texto += listaDesfavoraveis.length
-                ? `À luz do art. 59 do Código Penal, valoro negativamente: ${listaDesfavoraveis.join('; ')}. `
-                : 'As circunstâncias judiciais do art. 59 do Código Penal são favoráveis ou neutras. ';
-            texto += `Adoto, como critério matemático de referência, ${metodo1Label}, e fixo a pena-base em ${formatarDias(penaBase)}`;
-            texto += temMulta ? ` e ${Math.round(multaBase)} dias-multa.\n` : '.\n';
-            if (modoDidatico) texto += `[NOTA: os parâmetros matemáticos da 1ª fase não são obrigatórios; exigem fundamentação adequada e proporcionalidade no caso concreto.]\n`;
-            texto += '\n';
-
-            texto += '2ª FASE (PENA INTERMEDIÁRIA): ';
-            if (listaAgravantes.length) texto += `Reconheço a(s) agravante(s): ${listaAgravantes.join('; ')}. `;
-            if (listaAtenuantes.length) texto += `Reconheço a(s) atenuante(s): ${listaAtenuantes.join('; ')}. `;
-            if (!listaAgravantes.length && !listaAtenuantes.length) texto += 'Inexistem agravantes ou atenuantes genéricas. ';
-            if (textoAnalise) texto += textoAnalise;
-            texto += `A fração-padrão selecionada para as circunstâncias não compensadas é ${metodo2Label} da pena-base. `;
-            if (aplicouAtenuanteSumula) texto += 'Em observância à Súmula 231/STJ, a atenuante não conduz a pena aquém do mínimo legal. ';
-            if (aplicouTetoFase2) texto += 'O resultado matemático foi limitado ao máximo abstratamente cominado na segunda fase. ';
-            texto += `A pena intermediária resulta em ${formatarDias(penaProv)}`;
-            texto += temMulta ? ` e ${Math.round(multaProv)} dias-multa.\n\n` : '.\n\n';
-
-            texto += '3ª FASE (CAUSAS DE AUMENTO E DIMINUIÇÃO): ';
-            if (!majorante && !minorante) texto += 'Não incidem causas de aumento ou de diminuição. ';
-            if (majorante) texto += `Incide causa de aumento de ${selMajorante.options[selMajorante.selectedIndex].text}. `;
-            if (minorante) texto += `Incide causa de diminuição de ${selMinorante.options[selMinorante.selectedIndex].text}. `;
-            texto += `A pena definitiva, antes de eventual concurso de crimes, é de ${formatarDias(penaTerc)}`;
-            texto += temMulta ? ` e ${Math.round(multaTerc)} dias-multa.\n\n` : '.\n\n';
-
-            if (aplicouConcurso) {
-                texto += `CONCURSO DE CRIMES: ${textoConcurso} A pena desta aba passa a ${formatarDias(penaConcurso)}`;
-                texto += temMulta ? ` e ${Math.round(multaConcurso)} dias-multa.\n\n` : '.\n\n';
-            }
-
-            if (totalDetracaoDias > 0) {
-                texto += 'DETRAÇÃO PARA FINS DE REGIME (ART. 387, § 2º, CPP): ';
-                texto += `Computo ${formatarDias(totalDetracaoDias)} de prisão provisória para a análise do regime inicial. A pena aplicada permanece em ${formatarDias(penaConcurso)}, e o saldo de referência é de ${formatarDias(saldoDetracao)}.\n\n`;
-            }
-            texto += `REGIME INICIAL: ${regimeInfo.nome} (${regimeInfo.fundamento}).\n`;
-            texto += `SUBTOTAL DA PENA APLICADA NESTE FATO: ${formatarDias(penaConcurso)} de ${isReclusao ? 'reclusão' : 'detenção'}.`;
-
-            if (reuObj) {
-                reuObj.textoGerado = texto;
-                reuObj.resultado = {
-                    rec: isReclusao ? penaConcurso : 0,
-                    det: !isReclusao ? penaConcurso : 0,
-                    saldoRec: isReclusao ? saldoDetracao : 0,
-                    saldoDet: !isReclusao ? saldoDetracao : 0,
-                    multa: temMulta ? multaConcurso : 0,
-                    detracao: totalDetracaoDias,
-                    isReincidente,
-                    modoRegime,
-                    regimeManual: $('regimeManual').value,
-                    temDesfav: totalDesfavoraveis > 0
-                };
-                reuObj.state = getValoresAtuais();
-            }
-
-            // UI
-            const txtMulta = val => temMulta ? `<br><span style="color:#fbbf24">Multa: ${Math.round(val)} dias-multa</span>` : '';
-            $('resPenaBase').innerHTML = `<b>P. Lib.:</b> ${formatarDias(penaBase)}${txtMulta(multaBase)}`;
-            $('resPenaProv').innerHTML = `<b>P. Lib.:</b> ${formatarDias(penaProv)}${txtMulta(multaProv)}`;
-            $('resAnalisePrep').innerText = textoAnalise;
-            $('resPenaTerc').innerHTML = `<b>P. Lib.:</b> ${formatarDias(penaTerc)}${txtMulta(multaTerc)}`;
-            $('avisoSumulaAtenuante').style.display = aplicouAtenuanteSumula ? 'block' : 'none';
-            $('avisoSumulaAgravante').style.display = aplicouTetoFase2 ? 'block' : 'none';
-
-            if (aplicouConcurso) {
-                $('resConcursoItem').style.display = 'block';
-                $('resPenaConcurso').innerHTML = `<b>P. Lib.:</b> ${formatarDias(penaConcurso)}${txtMulta(multaConcurso)}<br><span style="font-size:.78rem;color:#cbd5e1">${textoConcurso}</span>`;
-            } else $('resConcursoItem').style.display = 'none';
-
-            $('resDetracao').innerText = totalDetracaoDias ? `- ${formatarDias(totalDetracaoDias)} (referência de regime)` : 'Sem detração computada';
-            $('resPenaAplicada').innerText = formatarDias(penaConcurso);
-            $('resPenaDefinitiva').innerText = formatarDias(saldoDetracao);
-            if (temMulta) $('resMultaDefinitiva').innerText = `${Math.round(multaConcurso)} dias-multa`;
-            $('resRegimeBadge').innerText = `${modoRegime === 'manual' ? 'REGIME DEFINIDO' : 'REGIME ORIENTATIVO'}: ${regimeInfo.nome}`;
-            $('resRegimeBadge').style.backgroundColor = regimeInfo.nome === 'FECHADO' ? 'var(--danger)' : regimeInfo.nome === 'SEMIABERTO' ? 'var(--warning)' : regimeInfo.nome === 'ABERTO' ? 'var(--success)' : '#64748b';
-            $('pillMetodoF1').innerText = `1ª fase: ${metodo1Label}`;
-            $('pillMetodoF2').innerText = `2ª fase: ${metodo2Label}`;
-
-            atualizarRodapeGlobal();
-            agendarAutosave();
-        }
-
-        function atualizarRodapeGlobal() {
-            let totalRec = 0, totalDet = 0, totalMulta = 0;
-            reus.forEach(r => {
-                if (!r.resultado) return;
-                totalRec += r.resultado.rec || 0;
-                totalDet += r.resultado.det || 0;
-                totalMulta += r.resultado.multa || 0;
-            });
-            $('gfRec').innerText = formatarDias(totalRec);
-            $('gfDet').innerText = formatarDias(totalDet);
-            $('gfMulta').innerText = Math.round(totalMulta);
-            const footer = $('globalFooter');
-            const show = reus.length > 1;
-            footer.style.display = show ? 'flex' : 'none';
-            document.body.style.paddingBottom = show ? '85px' : '0';
-        }
-
-        function montarTextoGlobal() {
-            salvarEstadoAtual();
-            // Garante que a aba atual esteja recalculada antes de compor.
-            calcularDosimetria();
-            let textoFinal = reus.map(r => r.textoGerado).filter(Boolean).join('\n\n=======================================================\n\n');
-            if (reus.length > 1) {
-                let totalRec = 0, totalDet = 0, totalMulta = 0;
-                let reinc = false, desfav = false;
-                reus.forEach(r => {
-                    if (!r.resultado) return;
-                    totalRec += r.resultado.rec || 0;
-                    totalDet += r.resultado.det || 0;
-                    totalMulta += r.resultado.multa || 0;
-                    reinc ||= Boolean(r.resultado.isReincidente);
-                    desfav ||= Boolean(r.resultado.temDesfav);
-                });
-                let globalText = '\n\n=======================================================\n--- CONCURSO MATERIAL (ART. 69, CP) ---\n\n';
-                globalText += 'Somam-se as penas aplicadas nos fatos autônomos. A detração eventualmente informada em cada aba não reduz o quantum do cúmulo material, servindo apenas à análise do regime inicial, nos termos do art. 387, § 2º, do CPP.\n\n';
-                if (totalRec > 0) {
-                    const reg = helperRegime('reclusao', totalRec, totalRec, reinc, 'automatico', desfav);
-                    globalText += `- ${formatarDias(totalRec)} de RECLUSÃO (regime global orientativo: ${reg.nome}).\n`;
-                }
-                if (totalDet > 0) {
-                    const reg = helperRegime('detencao', totalDet, totalDet, reinc, 'automatico', desfav);
-                    globalText += `- ${formatarDias(totalDet)} de DETENÇÃO (regime global orientativo: ${reg.nome}).\n`;
-                }
-                if (totalMulta > 0) globalText += `- ${Math.round(totalMulta)} dias-multa.\n`;
-                textoFinal += globalText;
-            }
-            return textoFinal;
-        }
-
-        async function copiarDispositivo() {
-            if ($('btnCopiarTexto').disabled) return mostrarToast('Corrija os campos destacados antes de copiar.');
-            const texto = montarTextoGlobal();
-            try {
-                await navigator.clipboard.writeText(texto);
-            } catch (e) {
-                const ta = document.createElement('textarea');
-                ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-                document.body.appendChild(ta); ta.select();
-                document.execCommand('copy'); ta.remove();
-            }
-            const btn = $('btnCopiarTexto');
-            const original = btn.innerText;
-            btn.innerText = '✅ Texto copiado';
-            setTimeout(() => btn.innerText = original, 1800);
-            mostrarToast('Texto completo copiado.');
-        }
-
-        function salvarProjetoLocal() {
-            if (inicializando) return;
-            salvarEstadoAtual();
-            const payload = { version: 2, savedAt: new Date().toISOString(), reus, reuAtualId, nextId };
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-                const status = $('saveStatus');
-                status.textContent = `✓ salvo ${new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}`;
-                status.classList.add('saved');
-            } catch (e) {
-                $('saveStatus').textContent = 'Não foi possível salvar localmente';
-            }
-        }
-
-        function agendarAutosave() {
-            if (inicializando) return;
-            clearTimeout(autosaveTimer);
-            $('saveStatus').textContent = 'salvando…';
-            $('saveStatus').classList.remove('saved');
-            autosaveTimer = setTimeout(salvarProjetoLocal, 350);
-        }
-
-        function exportarProjeto() {
-            salvarEstadoAtual();
-            const payload = { version: 2, exportedAt: new Date().toISOString(), reus, reuAtualId, nextId };
-            const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `e-dosimetria-${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a); a.click(); a.remove();
-            URL.revokeObjectURL(url);
-            mostrarToast('Projeto exportado em JSON.');
-        }
-
-        function validarProjetoImportado(data) {
-            return data && Array.isArray(data.reus) && data.reus.length > 0 && data.reus.every(r => r && Number.isFinite(Number(r.id)) && r.state);
-        }
-
-        function importarProjeto(event) {
-            const file = event.target.files?.[0];
-            event.target.value = '';
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                try {
-                    const data = JSON.parse(reader.result);
-                    if (!validarProjetoImportado(data)) throw new Error('estrutura inválida');
-                    reus = data.reus;
-                    reuAtualId = Number(data.reuAtualId) || reus[0].id;
-                    nextId = Number(data.nextId) || (Math.max(...reus.map(r => Number(r.id))) + 1);
-                    const atual = reus.find(r => r.id === reuAtualId) || reus[0];
-                    reuAtualId = atual.id;
-                    carregarEstado(atual.state);
-                    renderTabs();
-                    salvarProjetoLocal();
-                    mostrarToast('Projeto importado com sucesso.');
-                } catch (e) {
-                    alert('Arquivo de projeto inválido ou incompatível.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function tentarRestaurarProjeto() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (!raw) return false;
-                const data = JSON.parse(raw);
-                if (!validarProjetoImportado(data)) return false;
-                reus = data.reus;
-                reuAtualId = Number(data.reuAtualId) || reus[0].id;
-                nextId = Number(data.nextId) || (Math.max(...reus.map(r => Number(r.id))) + 1);
-                return true;
-            } catch { return false; }
-        }
-
-        window.addEventListener('beforeunload', () => {
-            if (!inicializando) salvarProjetoLocal();
-        });
-
-        window.onload = function() {
-            inicializando = true;
-            // Estado inicial coerente com o HTML.
-            atualizarVisibilidadeDrogas();
-            toggleMulta(false);
-            mudarConcurso(false);
-            atualizarModoRegime(false);
-            atualizarMultirreincidencia(false);
-            estadoPadrao = getValoresAtuais();
-
-            if (tentarRestaurarProjeto()) {
-                const atual = reus.find(r => r.id === reuAtualId) || reus[0];
-                reuAtualId = atual.id;
-                carregarEstado(atual.state);
-                $('saveStatus').textContent = '✓ sessão restaurada';
-                $('saveStatus').classList.add('saved');
-            } else {
-                reus = [{ id: 1, nome: 'Fato 1', state: deepClone(estadoPadrao), textoGerado: '', resultado: null }];
-                reuAtualId = 1; nextId = 2;
-                carregarEstado(reus[0].state);
-            }
-            renderTabs();
-            inicializando = false;
-            calcularDosimetria();
-            salvarProjetoLocal();
-        };
-    </script>
+    <div id="leiTempoAviso" class="note info"></div>
+  </section>
+
+  <section class="panel guided-step" data-step="3">
+    <div class="panel-head"><h2>3. Pena-base — circunstâncias judiciais</h2><span class="badge">art. 59 CP</span></div>
+    <p class="step-tip">Marque somente os vetores realmente desfavoráveis e registre a fundamentação. O critério matemático fica em opções avançadas.</p>
+    <div class="advanced-box" data-advanced="fase1"><button class="advanced-toggle" type="button">⚙ Opções avançadas da 1ª fase</button><div class="advanced-content"><div class="grid" style="margin-bottom:12px"><div class="field span6"><label>Critério matemático por vetor desfavorável</label><select id="metodoFase1" onchange="updateCrimeField('metodoFase1',this.value)"><option value="intervalo8">1/8 do intervalo entre mínimo e máximo</option><option value="minimo6">1/6 sobre a pena mínima</option><option value="custom">Fração personalizada sobre o intervalo</option></select></div><div class="field span6"><label>Fração personalizada (decimal: 0,125 = 1/8)</label><input id="fracaoCustomF1" type="number" step="0.001" min="0" max="1" oninput="updateCrimeField('fracaoCustomF1',num(this.value))"></div></div></div></div>
+    <div id="drogasArt42Box" style="display:none;margin:12px 0;padding:12px;border:1px solid #ffd8a8;border-radius:10px;background:#fff9f0">
+      <div style="font-weight:800;color:#9a5b00;margin-bottom:8px">Lei de Drogas — art. 42 (natureza e quantidade preponderantes)</div>
+      <div class="grid">
+        <div class="field span4"><label>Natureza da droga desfavorável?</label><select id="art42Natureza" onchange="updateCrimeField('art42Natureza',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+        <div class="field span4"><label>Quantidade da droga desfavorável?</label><select id="art42Quantidade" onchange="updateCrimeField('art42Quantidade',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+        <div class="field span4"><label>Peso matemático de referência de cada vetor</label><select id="pesoArt42" onchange="updateCrimeField('pesoArt42',num(this.value))"><option value="1">1 vetor</option><option value="1.5">1,5 vetor</option><option value="2">2 vetores</option></select></div>
+        <div class="field full"><label>Fundamentação do art. 42</label><textarea id="art42Fund" oninput="updateCrimeField('art42Fund',this.value)" placeholder="Natureza, quantidade, contexto e justificativa da preponderância"></textarea></div>
+      </div>
+      <div class="hint">A lei estabelece preponderância qualitativa; o peso numérico é apenas um parâmetro explícito de cálculo e deve ser fundamentado.</div>
+    </div>
+    <div id="vetoresContainer"></div>
+    <div class="note"><strong>Fundamentação primeiro, matemática depois.</strong> O sistema só valora como desfavorável o vetor marcado como tal e guarda a justificativa individual para a minuta.</div>
+  </section>
+
+  <section class="panel guided-step" data-step="4">
+    <div class="panel-head"><h2>4. Agravantes e atenuantes</h2><span class="badge blue">Tema 585/STJ</span></div>
+    <div class="grid"><div class="field span6"><label>Reincidência nesta dosimetria</label><select id="reincidenciaTipo" onchange="updateCrimeField('reincidenciaTipo',this.value);atualizarCamposCondicionais()"><option value="nenhuma">Nenhuma</option><option value="generica">Genérica</option><option value="especifica">Específica</option><option value="multi">Multirreincidência</option></select></div></div><div class="advanced-box"><button class="advanced-toggle" type="button">⚙ Frações e critérios matemáticos</button><div class="advanced-content grid"><div class="field span6"><label>Fração padrão por circunstância não compensada</label><select id="fracaoFase2" onchange="updateCrimeField('fracaoFase2',num(this.value))"><option value="0.1666666667">1/6</option><option value="0.125">1/8</option><option value="0.2">1/5</option><option value="0.25">1/4</option></select></div><div class="field span6 conditional-multi"><label>Saldo residual na multirreincidência após confissão</label><select id="saldoMulti" onchange="updateCrimeField('saldoMulti',num(this.value))"><option value="0.0833333333">1/12</option><option value="0.125">1/8</option><option value="0.1666666667">1/6</option><option value="0.25">1/4</option></select></div></div></div>
+    <div class="check-grid" id="agravantesContainer" style="margin-top:12px"></div>
+    <h3 style="font-size:13px;color:var(--success);margin-top:16px">Atenuantes</h3><div class="check-grid" id="atenuantesContainer"></div>
+    <div class="note info">Reincidência genérica ou específica pode ser compensada integralmente com a confissão espontânea. Na multirreincidência, a reincidência prepondera e a compensação é proporcional; a fração residual deve refletir a fundamentação do caso.</div>
+  </section>
+
+  <section class="panel guided-step" data-step="5">
+    <div class="panel-head"><h2>5. Causas de aumento e diminuição</h2><button class="btn small success" onclick="adicionarCausa()">+ Causa</button></div>
+    <div class="grid" style="margin-bottom:12px"><div class="field span8"><label>Causas típicas sugeridas para o crime selecionado</label><select id="causaPreset"></select></div><div class="field span4" style="justify-content:end"><button class="btn success" type="button" onclick="adicionarCausaPreset()">Adicionar causa típica</button></div></div>
+    <div class="advanced-box"><button class="advanced-toggle" type="button">⚙ Critérios avançados da 3ª fase</button><div class="advanced-content grid"><div class="field span6"><label>Tratamento de causas da Parte Especial</label><select id="modoCausas" onchange="updateCrimeField('modoCausas',this.value)"><option value="sucessivas">Aplicar todas sucessivamente</option><option value="art68">Art. 68, parágrafo único: uma de aumento e/ou diminuição, a mais intensa</option></select></div><div class="field span6"><label>Observação da 3ª fase</label><input id="obsFase3" oninput="updateCrimeField('obsFase3',this.value)" placeholder="Fundamentação sobre cumulação/seleção"></div></div></div>
+    <div id="causasContainer" style="margin-top:12px"></div>
+    <div class="grid" style="margin-top:14px"><div class="field span4"><label>Tentativa (art. 14, II)</label><select id="tentativa" onchange="updateCrimeField('tentativa',this.value==='sim');atualizarCamposCondicionais()"><option value="nao">Não</option><option value="sim">Sim</option></select></div><div class="field span4 conditional-tentativa"><label>Redução pela tentativa</label><select id="tentativaFrac" onchange="updateCrimeField('tentativaFrac',num(this.value))"><option value="0.3333333333">1/3 — próximo da consumação</option><option value="0.5">1/2 — intermediário</option><option value="0.6666666667">2/3 — distante da consumação</option></select></div><div class="field span4 conditional-tentativa"><label>Fundamento do iter criminis</label><input id="tentativaFund" oninput="updateCrimeField('tentativaFund',this.value)" placeholder="Descreva o iter percorrido"></div></div>
+  </section>
+
+  <section class="panel guided-step complement-panel" data-step="6">
+    <div class="panel-head"><h2>Concurso de crimes</h2><span class="badge orange">arts. 70/71 CP</span></div>
+    <div class="grid"><div class="field span4"><label>Modalidade</label><select id="concursoTipo" onchange="updateCrimeField('concursoTipo',this.value);atualizarCamposCondicionais()"><option value="nenhum">Crime único</option><option value="formal">Concurso formal próprio</option><option value="continuado">Crime continuado</option><option value="continuadoEsp">Crime continuado específico</option></select></div><div class="field span4 conditional-concurso"><label>Número de infrações</label><input id="concursoQtd" type="number" min="2" value="2" oninput="updateCrimeField('concursoQtd',int(this.value))"></div><div class="field span4 conditional-concurso"><label>Fração / multiplicador</label><select id="concursoFrac" onchange="updateCrimeField('concursoFrac',num(this.value))"><option value="0.1666666667">1/6</option><option value="0.2">1/5</option><option value="0.25">1/4</option><option value="0.3333333333">1/3</option><option value="0.5">1/2</option><option value="0.6666666667">2/3</option><option value="2">x2 (continuado específico)</option><option value="3">x3 (continuado específico)</option></select></div></div>
+    <div class="note info">No concurso formal próprio, o sistema compara a exasperação com a soma material simulada para respeitar o concurso material benéfico. Para multa, aplica cumulação no concurso formal; na continuidade delitiva, não aplica o art. 72.</div>
+  </section>
+
+  <section class="panel guided-step complement-panel" data-step="6">
+    <div class="panel-head"><h2>Pena de multa</h2><span class="badge">arts. 49 e 60 CP</span></div>
+    <div class="grid"><div class="field span3"><label>Há multa?</label><select id="temMulta" onchange="updateCrimeField('temMulta',this.value==='sim')"><option value="sim">Sim</option><option value="nao">Não</option></select></div><div class="field span3"><label>Mínimo dias-multa</label><input id="minMulta" type="number" min="0" oninput="updateCrimeField('minMulta',num(this.value))"></div><div class="field span3"><label>Máximo dias-multa</label><input id="maxMulta" type="number" min="0" oninput="updateCrimeField('maxMulta',num(this.value))"></div><div class="field span3"><label>Valor do dia-multa em salários mínimos</label><input id="diaMultaSM" type="number" step="0.001" min="0.0333333333" max="5" oninput="updateCrimeField('diaMultaSM',num(this.value))" placeholder="0,0333 = 1/30"></div><div class="field span4"><label>Salário mínimo de referência (R$)</label><input id="salarioMinimo" type="number" step="0.01" min="0" oninput="updateCrimeField('salarioMinimo',num(this.value))"></div><div class="field span4"><label>Multiplicador econômico (art. 60, §1º)</label><select id="multaEco" onchange="updateCrimeField('multaEco',num(this.value))"><option value="1">x1</option><option value="1.5">x1,5</option><option value="2">x2</option><option value="3">x3</option></select></div><div class="field span4"><label>Fundamentação econômica</label><input id="multaFund" oninput="updateCrimeField('multaFund',this.value)"></div></div>
+  </section>
+
+  <section class="panel guided-step complement-panel" data-step="6">
+    <div class="panel-head"><h2>Detração do réu</h2><span class="badge blue">art. 387, §2º CPP</span></div>
+    <div class="grid"><div class="field span3"><label>Data da prisão</label><input id="detInicio" type="date" onchange="updateDetracao()"></div><div class="field span3"><label>Data da soltura/fim</label><input id="detFim" type="date" onchange="updateDetracao()"></div><div class="field span3"><label>Dias manuais adicionais</label><input id="detManual" type="number" min="0" oninput="updateDetracao()"></div><div class="field span3"><label>Total computado</label><input id="detTotal" readonly></div></div>
+    <div class="note info">A detração é armazenada no réu e não em cada crime. A pena aplicada permanece intacta; o saldo é exibido apenas como referência para a determinação do regime inicial.</div>
+  </section>
+
+  <section class="panel guided-step complement-panel" data-step="6">
+    <div class="panel-head"><h2>Prescrição</h2><span class="badge red">arts. 109 a 117 CP</span></div>
+    <div class="grid"><div class="field span3"><label>Recebimento da denúncia/queixa</label><input id="dataDenuncia" type="date" onchange="updateCrimeField('dataDenuncia',this.value)"></div><div class="field span3"><label>Publicação da sentença</label><input id="dataSentencaCrime" type="date" onchange="updateCrimeField('dataSentenca',this.value)"></div><div class="field span3"><label>Base do prazo</label><select id="prescBase" onchange="updateCrimeField('prescBase',this.value)"><option value="abstrata">Máximo abstrato</option><option value="aplicada">Pena aplicada (quando juridicamente cabível)</option></select></div><div class="field span3"><label>Reincidência aumenta prazo pós-trânsito?</label><select id="prescReinc" onchange="updateCrimeField('prescReinc',this.value==='sim')"><option value="nao">Não</option><option value="sim">Sim</option></select></div></div>
+    <div id="prescricaoResultado" class="note info"></div>
+  </section>
+  <div class="guided-nav" id="guidedNav">
+    <button class="btn" type="button" id="btnAnterior" onclick="mudarEtapa(-1)">← Anterior</button>
+    <div><small id="stepCounter">Etapa 1 de 7</small><strong id="stepActionHint">Preencha o essencial e avance.</strong></div>
+    <button class="btn primary" type="button" id="btnProximo" onclick="mudarEtapa(1)">Próximo →</button>
+  </div>
+</main>
+
+<aside class="result-panel" data-result-step="7">
+  <div class="result-head"><button class="btn guided-result-back" type="button" onclick="mostrarEtapa(6)">← Voltar aos complementos</button><h2>Resultado do réu</h2><div class="big-result" id="resTotalReu">0 dias</div><div class="money" id="resMultaReu">0 dias-multa</div><div class="regime" id="resRegime">REGIME: —</div></div>
+  <div class="result-body"><div id="validation" class="validation"></div>
+    <div class="score"><div class="score-card"><small>Crime atual</small><strong id="resCrimeAtual">0 dias</strong></div><div class="score-card"><small>Detração do réu</small><strong id="resDetracao">0 dias</strong></div><div class="score-card"><small>Saldo p/ regime</small><strong id="resSaldo">0 dias</strong></div><div class="score-card"><small>Crimes no réu</small><strong id="resQtdCrimes">1</strong></div></div>
+    <div class="flow"><div class="flow-item"><small>1ª fase</small><div id="resF1">—</div></div><div class="flow-item"><small>2ª fase</small><div id="resF2">—</div></div><div class="flow-item"><small>3ª fase</small><div id="resF3">—</div></div><div class="flow-item"><small>Concurso interno</small><div id="resConcurso">—</div></div></div>
+    <div class="module-result"><h3>Art. 44 — substituição</h3><p id="resArt44">—</p></div>
+    <div class="module-result"><h3>Art. 77 — sursis</h3><p id="resSursis">—</p></div>
+    <div class="module-result"><h3>Multa em valor</h3><p id="resMultaValor">—</p></div>
+    <div class="footer-actions"><button class="btn" onclick="abrirMemoria()">🧮 Memória</button><button class="btn" onclick="abrirCenarios()">◫ Cenários</button><button class="btn primary" onclick="abrirTexto()">📋 Gerar texto</button><button class="btn" onclick="window.print()">🖨 Imprimir</button></div>
+  </div>
+</aside>
+</div>
+
+<div class="modal" id="modalResumo"><div class="modal-card"><div class="modal-head"><h2>Resumo do processo</h2><button class="modal-close" onclick="fecharModal('modalResumo')">×</button></div><div class="modal-body" id="resumoBody"></div></div></div>
+<div class="modal" id="modalMemoria"><div class="modal-card"><div class="modal-head"><h2>Memória matemática auditável</h2><button class="modal-close" onclick="fecharModal('modalMemoria')">×</button></div><div class="modal-body"><div id="memoryText" class="memory"></div></div></div></div>
+<div class="modal" id="modalCenarios"><div class="modal-card"><div class="modal-head"><h2>Comparador de cenários da 1ª fase</h2><button class="modal-close" onclick="fecharModal('modalCenarios')">×</button></div><div class="modal-body"><div id="scenarioBody" class="scenario-grid"></div></div></div></div>
+<div class="modal" id="modalTexto"><div class="modal-card"><div class="modal-head"><h2>Gerador de minuta</h2><button class="modal-close" onclick="fecharModal('modalTexto')">×</button></div><div class="modal-body"><div class="grid" style="margin-bottom:12px"><div class="field span6"><label>Nível do texto</label><select id="textoNivel" onchange="renderTexto()"><option value="estruturado">Estruturado para sentença</option><option value="completo">Completo</option><option value="conciso">Conciso</option></select></div><div class="field span6"><label>Escopo</label><select id="textoEscopo" onchange="renderTexto()"><option value="reu">Réu selecionado</option><option value="processo">Todos os réus</option></select></div></div><textarea id="textoOutput" class="text-output"></textarea><div style="display:flex;gap:8px;margin-top:10px"><button class="btn primary" onclick="copiarTextoGerado()">Copiar texto</button><button class="btn" onclick="downloadTexto()">Salvar .txt</button></div></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const STORAGE='eDosimetriaV3';
+const VETORES=['Culpabilidade','Antecedentes','Conduta social','Personalidade','Motivos','Circunstâncias','Consequências','Comportamento da vítima'];
+const AGRAVANTES=['Motivo fútil ou torpe','Facilitar/assegurar outro crime','Traição, emboscada, dissimulação ou recurso que dificulte defesa','Meio insidioso, cruel ou perigo comum','Contra ascendente, descendente, irmão ou cônjuge','Abuso de autoridade/relações domésticas','Abuso de poder ou violação de dever','Contra criança, maior de 60, enfermo ou gestante','Ofendido sob proteção da autoridade','Calamidade/desgraça particular','Embriaguez preordenada','Dependências de instituição de ensino','Promove/organiza/dirige cooperação','Coage/induz execução material','Instiga pessoa sujeita à autoridade','Paga ou promessa de recompensa'];
+const ATENUANTES=['Menor de 21 na data do fato ou maior de 70 na sentença','Desconhecimento da lei','Relevante valor social ou moral','Evitar/minorar consequências ou reparar dano','Coação resistível ou violenta emoção','Confissão espontânea','Influência de multidão em tumulto','Circunstância relevante do art. 66'];
+const CATALOGO={
+ manual:{label:'Outro crime / preenchimento manual',min:1,max:4,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ '121':{label:'Homicídio simples — art. 121, caput',min:6,max:20,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '121q':{label:'Homicídio qualificado — art. 121, §2º',min:12,max:30,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '121a':{label:'Feminicídio — art. 121-A',min:20,max:40,unidade:'anos',tipo:'reclusao',multa:false,violencia:true,effective:'2024-10-10'},
+ '121b':{label:'Vicaricídio — art. 121-B',min:20,max:40,unidade:'anos',tipo:'reclusao',multa:false,violencia:true,effective:'2026-04-10'},
+ '129':{label:'Lesão corporal simples — art. 129, caput',min:3,max:12,unidade:'meses',tipo:'detencao',multa:false,violencia:true},
+ '129g':{label:'Lesão corporal grave — art. 129, §1º',min:1,max:5,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '129vd':{label:'Lesão corporal em violência doméstica — art. 129, §9º',min:2,max:5,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '147':{label:'Ameaça — art. 147',min:1,max:6,unidade:'meses',tipo:'detencao',multa:false,violencia:true},
+ '148':{label:'Sequestro e cárcere privado — art. 148',min:1,max:3,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '155':{label:'Furto simples — art. 155, caput',min:1,max:6,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360,versions:[{until:'2026-04-29',min:1,max:4},{from:'2026-04-30',min:1,max:6}]},
+ '155q':{label:'Furto qualificado — art. 155, §4º',min:2,max:8,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ '157':{label:'Roubo simples — art. 157, caput',min:6,max:10,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360,violencia:true,versions:[{until:'2026-04-29',min:4,max:10},{from:'2026-04-30',min:6,max:10}]},
+ '158':{label:'Extorsão — art. 158, caput',min:4,max:10,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360,violencia:true},
+ '159':{label:'Extorsão mediante sequestro — art. 159, caput',min:8,max:15,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '171':{label:'Estelionato — art. 171, caput',min:1,max:5,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ '180':{label:'Receptação simples — art. 180, caput',min:2,max:6,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360,versions:[{until:'2026-04-29',min:1,max:4},{from:'2026-04-30',min:2,max:6}]},
+ '213':{label:'Estupro — art. 213, caput',min:6,max:10,unidade:'anos',tipo:'reclusao',multa:false,violencia:true,sexualMulher:true},
+ '215a':{label:'Importunação sexual — art. 215-A',min:1,max:5,unidade:'anos',tipo:'reclusao',multa:false},
+ '217a':{label:'Estupro de vulnerável — art. 217-A',min:10,max:18,unidade:'anos',tipo:'reclusao',multa:false,violencia:true},
+ '312':{label:'Peculato — art. 312, caput',min:2,max:12,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ '316':{label:'Concussão — art. 316',min:2,max:12,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ '317':{label:'Corrupção passiva — art. 317',min:2,max:12,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ '333':{label:'Corrupção ativa — art. 333',min:2,max:12,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ 'drogas33':{label:'Tráfico de drogas — art. 33, caput, Lei 11.343/06',min:5,max:15,unidade:'anos',tipo:'reclusao',multa:true,minM:500,maxM:1500,drogas:true},
+ 'drogas35':{label:'Associação para o tráfico — art. 35, Lei 11.343/06',min:3,max:10,unidade:'anos',tipo:'reclusao',multa:true,minM:700,maxM:1200,drogas:true},
+ 'arma12':{label:'Posse irregular de arma de fogo — art. 12, Lei 10.826/03',min:1,max:3,unidade:'anos',tipo:'detencao',multa:true,minM:10,maxM:360},
+ 'arma14':{label:'Porte ilegal de arma de fogo — art. 14, Lei 10.826/03',min:2,max:4,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ 'arma16':{label:'Posse/porte de arma de uso restrito — art. 16, Lei 10.826/03',min:3,max:6,unidade:'anos',tipo:'reclusao',multa:true,minM:10,maxM:360},
+ 'eca244b':{label:'Corrupção de menores — art. 244-B, ECA',min:1,max:4,unidade:'anos',tipo:'reclusao',multa:false},
+ 'ctb306':{label:'Embriaguez ao volante — art. 306, CTB',min:6,max:36,unidade:'meses',tipo:'detencao',multa:true,minM:10,maxM:360},
+ 'ctb302':{label:'Homicídio culposo no trânsito — art. 302, CTB',min:2,max:4,unidade:'anos',tipo:'detencao',multa:false,culposo:true}
+};
+const CAUSAS_TIPICAS={
+  geral:[
+    {nome:'Participação de menor importância — art. 29, §1º, CP (ajuste entre 1/6 e 1/3)',tipo:'diminuicao',fracao:1/6},
+    {nome:'Cooperação dolosamente distinta — art. 29, §2º, CP (ajustar ao caso)',tipo:'aumento',fracao:.5}
+  ],
+  '121':[{nome:'Homicídio privilegiado — art. 121, §1º (ajuste entre 1/6 e 1/3)',tipo:'diminuicao',fracao:1/6}],
+  '121a':[{nome:'Feminicídio — causa de aumento do §2º (ajuste entre 1/3 e 1/2)',tipo:'aumento',fracao:1/3}],
+  '121b':[{nome:'Vicaricídio — parágrafo único (ajuste entre 1/3 e 1/2)',tipo:'aumento',fracao:1/3}],
+  '155':[{nome:'Repouso noturno — art. 155, §1º',tipo:'aumento',fracao:.5},{nome:'Furto privilegiado — art. 155, §2º (redução; ajuste entre 1/3 e 2/3)',tipo:'diminuicao',fracao:1/3}],
+  '157':[{nome:'Roubo — art. 157, §2º (ajuste entre 1/3 e 1/2)',tipo:'aumento',fracao:1/3},{nome:'Emprego de arma de fogo — art. 157, §2º-A, I',tipo:'aumento',fracao:2/3},{nome:'Arma de fogo de uso restrito/proibido — art. 157, §2º-B (pena em dobro)',tipo:'aumento',fracao:1}],
+  '158':[{nome:'Extorsão — art. 158, §1º (ajuste entre 1/3 e 1/2)',tipo:'aumento',fracao:1/3}],
+  '159':[{nome:'Delação que facilita libertação — art. 159, §4º (ajuste entre 1/3 e 2/3)',tipo:'diminuicao',fracao:1/3}],
+  '171':[{nome:'Estelionato contra idoso/vulnerável — art. 171, §4º (ajuste entre 1/3 e dobro)',tipo:'aumento',fracao:1/3}],
+  'drogas33':[{nome:'Tráfico privilegiado — art. 33, §4º, Lei 11.343/06 (ajuste entre 1/6 e 2/3)',tipo:'diminuicao',fracao:2/3},{nome:'Majorante do art. 40, Lei 11.343/06 (ajuste entre 1/6 e 2/3)',tipo:'aumento',fracao:1/6}],
+  'drogas35':[{nome:'Majorante do art. 40, Lei 11.343/06 (ajuste entre 1/6 e 2/3)',tipo:'aumento',fracao:1/6}]
+};
+let project,activeReuId,activeCrimeId,saveTimer;
+const $=id=>document.getElementById(id); const num=v=>Number(String(v).replace(',','.'))||0; const int=v=>parseInt(v)||0; const clone=o=>JSON.parse(JSON.stringify(o));
+function newCrime(id=Date.now()){return{id,nome:'Novo crime',catalogo:'manual',dataFato:'',leiObs:'',tipoPrisao:'reclusao',unidade:'anos',minPena:1,maxPena:4,culposo:false,violencia:false,violenciaSexualMulher:false,art42Natureza:false,art42Quantidade:false,pesoArt42:1,art42Fund:'',metodoFase1:'intervalo8',fracaoCustomF1:.125,vetores:VETORES.map(n=>({nome:n,status:'neutro',fund:''})),fracaoFase2:0.1666666667,reincidenciaTipo:'nenhuma',saldoMulti:1/8,agravantes:AGRAVANTES.map(n=>({nome:n,checked:false})),atenuantes:ATENUANTES.map(n=>({nome:n,checked:false})),modoCausas:'sucessivas',obsFase3:'',causas:[],tentativa:false,tentativaFrac:0.3333333333,tentativaFund:'',concursoTipo:'nenhum',concursoQtd:2,concursoFrac:0.1666666667,temMulta:true,minMulta:10,maxMulta:360,diaMultaSM:1/30,salarioMinimo:0,multaEco:1,multaFund:'',dataDenuncia:'',dataSentenca:'',prescBase:'abstrata',prescReinc:false,calc:null};}
+function newReu(id=Date.now()){let c=newCrime(id+1);return{id,nome:'Réu',idadeFato:0,idadeSentenca:0,reincidenteDoloso:false,reincidenciaMesmoCrime:false,circunstanciasSuficientes:true,sursisSaude:false,regimeModo:'orientativo',detInicio:'',detFim:'',detManual:0,crimes:[c],total:null};}
+function defaultProject(){let r=newReu(1);r.nome='Réu 1';r.crimes[0].id=11;r.crimes[0].nome='Fato 1';return{version:3,processo:'',created:new Date().toISOString(),reus:[r]};}
+function getReu(){return project.reus.find(r=>r.id===activeReuId)||project.reus[0]} function getCrime(){let r=getReu();return r.crimes.find(c=>c.id===activeCrimeId)||r.crimes[0]}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1800)}
+function scheduleSave(){clearTimeout(saveTimer);$('saveStatus').textContent='● salvando…';saveTimer=setTimeout(()=>{localStorage.setItem(STORAGE,JSON.stringify(project));$('saveStatus').textContent='● autosalvo'},250)}
+function atualizarMetaProjeto(){project.processo=$('processoNumero').value;scheduleSave()}
+function updateReuField(k,v){getReu()[k]=v;recalcularTudo();renderSidebar();renderResults();scheduleSave()}
+function updateCrimeField(k,v){getCrime()[k]=v;recalcularTudo();renderSidebar();renderResults();scheduleSave()}
+function initCatalog(){let groups={"Preenchimento":['manual'],"Código Penal — pessoa":['121','121q','121a','121b','129','129g','129vd','147','148'],"Código Penal — patrimônio":['155','155q','157','158','159','171','180'],"Dignidade sexual":['213','215a','217a'],"Administração Pública":['312','316','317','333'],"Lei de Drogas":['drogas33','drogas35'],"Estatuto do Desarmamento":['arma12','arma14','arma16'],"ECA / CTB":['eca244b','ctb306','ctb302']};$('crimeCatalogo').innerHTML='';Object.entries(groups).forEach(([g,ids])=>{let og=document.createElement('optgroup');og.label=g;ids.forEach(id=>{let o=document.createElement('option');o.value=id;o.textContent=CATALOGO[id].label;og.appendChild(o)});$('crimeCatalogo').appendChild(og)})}
+function aplicarCatalogo(id){let c=getCrime(),x=CATALOGO[id];if(!x)return;c.catalogo=id;c.nome=x.label;c.tipoPrisao=x.tipo;c.unidade=x.unidade;c.minPena=x.min;c.maxPena=x.max;c.temMulta=!!x.multa;c.minMulta=x.minM||10;c.maxMulta=x.maxM||360;c.violencia=!!x.violencia;c.culposo=!!x.culposo;c.violenciaSexualMulher=!!x.sexualMulher;aplicarLeiNoTempo(false);renderCrime();recalcularTudo();renderSidebar();scheduleSave()}
+function aplicarLeiNoTempo(render=true){let c=getCrime(),x=CATALOGO[c.catalogo];if(!x)return;let d=c.dataFato;if(x.versions&&d){let v=x.versions.find(v=>(!v.from||d>=v.from)&&(!v.until||d<=v.until));if(v){c.minPena=v.min;c.maxPena=v.max}}if(render){renderCrime();recalcularTudo();scheduleSave()}}
+function leiTempoInfo(c){let x=CATALOGO[c.catalogo];if(!x)return{badge:'manual',text:'Preenchimento manual: confira a legislação aplicável.'};if(!c.dataFato)return{badge:'sem data',text:'Informe a data do fato para ativar a conferência temporal automática das alterações cadastradas.'};if(x.effective&&c.dataFato<x.effective)return{badge:'alerta temporal',danger:true,text:`O tipo selecionado foi cadastrado como vigente a partir de ${dateBR(x.effective)}. Para fato anterior, revise o enquadramento e a lei aplicável.`};if(x.versions){let v=x.versions.find(v=>(!v.from||c.dataFato>=v.from)&&(!v.until||c.dataFato<=v.until));if(v)return{badge:'versão temporal aplicada',text:`A pena em abstrato foi ajustada à versão cadastrada para a data do fato (${formatRaw(v.min,c.unidade)} a ${formatRaw(v.max,c.unidade)}). Confirme eventual lex mitior/novatio legis.`}}return{badge:'data conferida',text:'Não há versão temporal alternativa cadastrada para este tipo. Ainda assim, confirme a redação legal e causas especiais aplicáveis ao caso concreto.'}}
+function renderSidebar(){let r=getReu();$('reuList').innerHTML=project.reus.map(x=>`<div class="reu-item ${x.id===r.id?'active':''}"><div class="reu-main" onclick="selecionarReu(${x.id})"><strong>${esc(x.nome)}</strong><small>${x.crimes.length} crime(s)</small></div>${project.reus.length>1?`<button class="mini-icon" onclick="removerReu(${x.id})">×</button>`:''}</div>`).join('');$('crimeList').innerHTML=r.crimes.map(c=>`<div class="crime-item ${c.id===activeCrimeId?'active':''}"><div class="crime-main" onclick="selecionarCrime(${c.id})"><strong>${esc(c.nome)}</strong><small>${c.calc?formatDias(c.calc.final):'—'}</small></div>${r.crimes.length>1?`<button class="mini-icon" onclick="removerCrime(${c.id})">×</button>`:''}</div>`).join('')}
+function selecionarReu(id){activeReuId=id;let r=getReu();activeCrimeId=r.crimes[0].id;renderAll()}
+function selecionarCrime(id){activeCrimeId=id;renderAll()}
+function adicionarReu(){let r=newReu(Date.now());r.nome=`Réu ${project.reus.length+1}`;project.reus.push(r);activeReuId=r.id;activeCrimeId=r.crimes[0].id;renderAll();scheduleSave()}
+function removerReu(id){if(project.reus.length<=1)return;if(!confirm('Remover este réu e todos os crimes dele?'))return;project.reus=project.reus.filter(r=>r.id!==id);activeReuId=project.reus[0].id;activeCrimeId=project.reus[0].crimes[0].id;recalcularTudo();renderAll();scheduleSave()}
+function renomearReu(){let r=getReu(),n=prompt('Nome do réu:',r.nome);if(n){r.nome=n;renderAll();scheduleSave()}}
+function adicionarCrime(){let r=getReu(),c=newCrime(Date.now());c.nome=`Fato ${r.crimes.length+1}`;r.crimes.push(c);activeCrimeId=c.id;renderAll();scheduleSave()}
+function duplicarCrime(){let r=getReu(),c=clone(getCrime());c.id=Date.now();c.nome+= ' — cópia';c.calc=null;r.crimes.push(c);activeCrimeId=c.id;renderAll();scheduleSave()}
+function removerCrime(id){let r=getReu();if(r.crimes.length<=1)return;if(!confirm('Remover este crime?'))return;r.crimes=r.crimes.filter(c=>c.id!==id);activeCrimeId=r.crimes[0].id;recalcularTudo();renderAll();scheduleSave()}
+function renderAll(){recalcularTudo();renderSidebar();renderReu();renderCrime();renderResults();$('processoNumero').value=project.processo||''}
+function renderReu(){let r=getReu();$('reuBadge').textContent=r.nome;$('reuNome').value=r.nome;$('idadeFato').value=r.idadeFato||'';$('idadeSentenca').value=r.idadeSentenca||'';$('reuReincDol').value=r.reincidenteDoloso?'sim':'nao';$('reuMesmoCrime').value=r.reincidenciaMesmoCrime?'sim':'nao';$('reuCircSuf').value=r.circunstanciasSuficientes?'sim':'nao';$('reuSaude').value=r.sursisSaude?'sim':'nao';$('reuRegimeModo').value=r.regimeModo||'orientativo';$('detInicio').value=r.detInicio||'';$('detFim').value=r.detFim||'';$('detManual').value=r.detManual||0;$('detTotal').value=formatDias(calcDetracao(r))}
+function renderCrime(){let c=getCrime();$('crimeCatalogo').value=c.catalogo;$('dataFato').value=c.dataFato||'';$('crimeNome').value=c.nome;$('leiObs').value=c.leiObs||'';$('tipoPrisao').value=c.tipoPrisao;$('unidadePena').value=c.unidade;$('minPena').value=c.minPena;$('maxPena').value=c.maxPena;$('culposo').value=c.culposo?'sim':'nao';$('violencia').value=c.violencia?'sim':'nao';$('violenciaSexualMulher').value=c.violenciaSexualMulher?'sim':'nao';$('metodoFase1').value=c.metodoFase1;$('fracaoCustomF1').value=c.fracaoCustomF1;$('fracaoFase2').value=String(c.fracaoFase2);$('reincidenciaTipo').value=c.reincidenciaTipo;$('saldoMulti').value=String(c.saldoMulti);$('modoCausas').value=c.modoCausas;$('obsFase3').value=c.obsFase3||'';$('tentativa').value=c.tentativa?'sim':'nao';$('tentativaFrac').value=String(c.tentativaFrac);$('tentativaFund').value=c.tentativaFund||'';$('concursoTipo').value=c.concursoTipo;$('concursoQtd').value=c.concursoQtd;$('concursoFrac').value=String(c.concursoFrac);$('temMulta').value=c.temMulta?'sim':'nao';$('minMulta').value=c.minMulta;$('maxMulta').value=c.maxMulta;$('diaMultaSM').value=c.diaMultaSM;$('salarioMinimo').value=c.salarioMinimo||'';$('multaEco').value=String(c.multaEco);$('multaFund').value=c.multaFund||'';$('dataDenuncia').value=c.dataDenuncia||'';$('dataSentencaCrime').value=c.dataSentenca||'';$('prescBase').value=c.prescBase;$('prescReinc').value=c.prescReinc?'sim':'nao';$('art42Natureza').value=c.art42Natureza?'sim':'nao';$('art42Quantidade').value=c.art42Quantidade?'sim':'nao';$('pesoArt42').value=String(c.pesoArt42||1);$('art42Fund').value=c.art42Fund||'';$('drogasArt42Box').style.display=CATALOGO[c.catalogo]?.drogas?'block':'none';renderCausePresets(c);renderVetores(c);renderChecks(c);renderCausas(c);let li=leiTempoInfo(c);$('leiBadge').textContent=li.badge;$('leiBadge').className='badge '+(li.danger?'red':'orange');$('leiTempoAviso').className='note '+(li.danger?'danger':'info');$('leiTempoAviso').textContent=li.text+(c.leiObs?` Observação: ${c.leiObs}`:'');renderPrescricao(c)}
+function renderVetores(c){$('vetoresContainer').innerHTML=c.vetores.map((v,i)=>`<div class="vetor"><div class="vetor-top"><div class="vetor-name">${esc(v.nome)}</div><div class="segmented"><button class="${v.status==='favoravel'?'active':''}" onclick="setVetor(${i},'favoravel')">Favorável</button><button class="${v.status==='neutro'?'active':''}" onclick="setVetor(${i},'neutro')">Neutro</button><button class="${v.status==='desfavoravel'?'active':''}" onclick="setVetor(${i},'desfavoravel')">Desfavorável</button></div></div><textarea placeholder="Fundamentação individual (especialmente necessária se desfavorável)" oninput="setVetorFund(${i},this.value)">${esc(v.fund||'')}</textarea></div>`).join('')}
+function setVetor(i,s){getCrime().vetores[i].status=s;recalcularTudo();renderCrime();renderResults();scheduleSave()} function setVetorFund(i,v){getCrime().vetores[i].fund=v;scheduleSave()}
+function renderChecks(c){$('agravantesContainer').innerHTML=c.agravantes.map((a,i)=>`<label class="check"><input type="checkbox" ${a.checked?'checked':''} onchange="toggleCirc('agravantes',${i},this.checked)"><span>${esc(a.nome)}</span></label>`).join('');$('atenuantesContainer').innerHTML=c.atenuantes.map((a,i)=>`<label class="check"><input type="checkbox" ${a.checked?'checked':''} onchange="toggleCirc('atenuantes',${i},this.checked)"><span>${esc(a.nome)}</span></label>`).join('')}
+function toggleCirc(k,i,v){getCrime()[k][i].checked=v;recalcularTudo();renderResults();scheduleSave()}
+function renderCausePresets(c){let arr=[...(CAUSAS_TIPICAS[c.catalogo]||[]),...CAUSAS_TIPICAS.geral];$('causaPreset').innerHTML=arr.length?arr.map((x,i)=>`<option value="${i}">${esc(x.nome)}</option>`).join(''):'<option value="">Nenhuma sugestão específica</option>'; $('causaPreset').dataset.items=JSON.stringify(arr)}
+function adicionarCausaPreset(){let arr=JSON.parse($('causaPreset').dataset.items||'[]'),x=arr[int($('causaPreset').value)];if(!x)return;getCrime().causas.push({...x,parteEspecial:true});renderCausas(getCrime());recalcularTudo();renderResults();scheduleSave()}
+function adicionarCausa(){getCrime().causas.push({nome:'Nova causa',tipo:'aumento',fracao:1/3,parteEspecial:true});renderCausas(getCrime());recalcularTudo();renderResults();scheduleSave()}
+function renderCausas(c){$('causasContainer').innerHTML=c.causas.length?c.causas.map((x,i)=>`<div class="cause-row"><div><label class="hint">Descrição</label><input value="${esc(x.nome)}" oninput="updateCausa(${i},'nome',this.value)"></div><div><label class="hint">Natureza</label><select onchange="updateCausa(${i},'tipo',this.value)"><option value="aumento" ${x.tipo==='aumento'?'selected':''}>Aumento</option><option value="diminuicao" ${x.tipo==='diminuicao'?'selected':''}>Diminuição</option></select></div><div><label class="hint">Fração</label><select onchange="updateCausa(${i},'fracao',num(this.value))">${fracOptions(x.fracao)}</select></div><button class="remove" onclick="removeCausa(${i})">×</button></div>`).join(''):'<div class="subtle">Nenhuma causa cadastrada. Use “+ Causa” para inserir majorantes/minorantes simultâneas.</div>'}
+function fracOptions(sel){return[[1/6,'1/6'],[.2,'1/5'],[.25,'1/4'],[1/3,'1/3'],[.375,'3/8'],[.4,'2/5'],[.5,'1/2'],[2/3,'2/3'],[.75,'3/4'],[1,'100%']].map(([v,l])=>`<option value="${v}" ${Math.abs(v-sel)<.00001?'selected':''}>${l}</option>`).join('')}
+function updateCausa(i,k,v){getCrime().causas[i][k]=v;recalcularTudo();renderResults();scheduleSave()}function removeCausa(i){getCrime().causas.splice(i,1);renderCausas(getCrime());recalcularTudo();renderResults();scheduleSave()}
+function updateDetracao(){let r=getReu();r.detInicio=$('detInicio').value;r.detFim=$('detFim').value;r.detManual=int($('detManual').value);recalcularTudo();renderResults();$('detTotal').value=formatDias(calcDetracao(r));scheduleSave()}
+function toDays(v,u){return u==='anos'?v*360:v*30}function formatRaw(v,u){return `${v} ${u}`}
+function formatDias(d){d=Math.max(0,Math.round(d||0));let a=Math.floor(d/360),rest=d%360,m=Math.floor(rest/30),dd=rest%30,parts=[];if(a)parts.push(`${a} ${a===1?'ano':'anos'}`);if(m)parts.push(`${m} ${m===1?'mês':'meses'}`);if(dd||!parts.length)parts.push(`${dd} ${dd===1?'dia':'dias'}`);return parts.join(', ')}
+function fracLabel(v){let list=[[1/12,'1/12'],[1/10,'1/10'],[1/8,'1/8'],[1/6,'1/6'],[1/5,'1/5'],[1/4,'1/4'],[1/3,'1/3'],[3/8,'3/8'],[2/5,'2/5'],[1/2,'1/2'],[2/3,'2/3'],[3/4,'3/4']];let f=list.find(x=>Math.abs(x[0]-v)<.002);return f?f[1]:(v*100).toFixed(1)+'%'}
+function calcDetracao(r){let d=r.detManual||0;if(r.detInicio&&r.detFim){let a=new Date(r.detInicio+'T12:00:00'),b=new Date(r.detFim+'T12:00:00');let diff=Math.floor((b-a)/86400000)+1;if(diff>0)d+=diff}return d}
+function calcCrime(c,methodOverride=null){let min=toDays(c.minPena,c.unidade),max=toDays(c.maxPena,c.unidade),neg=c.vetores.filter(v=>v.status==='desfavoravel').length,art42=(CATALOGO[c.catalogo]?.drogas?((c.art42Natureza?1:0)+(c.art42Quantidade?1:0))*(c.pesoArt42||1):0),negEfetivo=neg+art42,method=methodOverride||c.metodoFase1,inc=0;if(method==='intervalo8')inc=(max-min)/8;else if(method==='minimo6')inc=min/6;else inc=(max-min)*(c.fracaoCustomF1||0);let f1=Math.min(max,min+inc*negEfetivo);
+ let multaBase=c.temMulta?(c.minMulta+((c.maxMulta-c.minMulta)/8)*negEfetivo):0;
+ let agr=c.agravantes.filter(a=>a.checked).length,conf=!!c.atenuantes[5]?.checked,ateOutras=c.atenuantes.filter((a,i)=>a.checked&&i!==5).length;let reinc=c.reincidenciaTipo!=='nenhuma';let balance=agr-ateOutras-(conf&&!reinc?1:0);let tema='';
+ if(reinc){if(conf&&(c.reincidenciaTipo==='generica'||c.reincidenciaTipo==='especifica')){tema='Reincidência e confissão integralmente compensadas (Tema 585/STJ).';}else if(conf&&c.reincidenciaTipo==='multi'){tema=`Multirreincidência: compensação proporcional; saldo residual ${fracLabel(c.saldoMulti)}.`;}else balance+=1}
+ let f2=f1,m2=multaBase;if(conf&&reinc&&c.reincidenciaTipo==='multi'){let factor=1+balance*c.fracaoFase2+c.saldoMulti;f2*=Math.max(0,factor);m2*=Math.max(0,factor)}else{let factor=1+balance*c.fracaoFase2;f2*=Math.max(0,factor);m2*=Math.max(0,factor)}let sumMin=false,sumMax=false;if(f2<min){f2=min;sumMin=true}if(f2>max){f2=max;sumMax=true}if(c.temMulta){m2=Math.max(c.minMulta,Math.min(c.maxMulta,m2))}
+ let f3=f2,m3=m2,causas=c.causas.slice();if(c.modoCausas==='art68'){let a=causas.filter(x=>x.tipo==='aumento').sort((x,y)=>y.fracao-x.fracao)[0],d=causas.filter(x=>x.tipo==='diminuicao').sort((x,y)=>y.fracao-x.fracao)[0];causas=[a,d].filter(Boolean)}causas.forEach(x=>{let factor=x.tipo==='aumento'?1+x.fracao:1-x.fracao;f3*=factor;if(c.temMulta)m3*=factor});if(c.tentativa){f3*=1-c.tentativaFrac;if(c.temMulta)m3*=1-c.tentativaFrac}
+ let final=f3,mFinal=m3,concText='Crime único';if(c.concursoTipo==='formal'){let ex=f3*(1+c.concursoFrac),mat=f3*Math.max(2,c.concursoQtd);final=Math.min(ex,mat);mFinal=c.temMulta?m3*Math.max(2,c.concursoQtd):0;concText=`Formal: ${fracLabel(c.concursoFrac)}; teto pelo material benéfico ${formatDias(mat)}.`}else if(c.concursoTipo==='continuado'){final=f3*(1+c.concursoFrac);mFinal=c.temMulta?m3*(1+c.concursoFrac):0;concText=`Continuado: +${fracLabel(c.concursoFrac)}; art. 72 não aplicado à multa.`}else if(c.concursoTipo==='continuadoEsp'){let mult=c.concursoFrac>=2?c.concursoFrac:2;final=f3*mult;mFinal=c.temMulta?m3*mult:0;concText=`Continuado específico: x${mult}.`}
+ let valorDia=c.salarioMinimo>0?c.salarioMinimo*(c.diaMultaSM||1/30):0,totalMultaValor=c.temMulta?Math.round(mFinal)*valorDia*(c.multaEco||1):0;
+ let memory=`PENA EM ABSTRATO\nMínimo: ${formatDias(min)} (${Math.round(min)} dias)\nMáximo: ${formatDias(max)} (${Math.round(max)} dias)\n\n1ª FASE\nVetores art. 59 desfavoráveis: ${neg}\nPeso adicional art. 42: ${art42}\nIncremento por unidade de vetor: ${Math.round(inc)} dias\nPena-base: ${formatDias(f1)} (${Math.round(f1)} dias)\n\n2ª FASE\nAgravantes marcadas: ${agr}${reinc?' + reincidência':''}\nAtenuantes marcadas: ${ateOutras+(conf?1:0)}\n${tema}\nResultado: ${formatDias(f2)} (${Math.round(f2)} dias)${sumMin?' — limitado ao mínimo legal':''}${sumMax?' — limitado ao máximo legal':''}\n\n3ª FASE\nCausas aplicadas: ${causas.length}${c.tentativa?' + tentativa':''}\nResultado: ${formatDias(f3)} (${Math.round(f3)} dias)\n\nCONCURSO INTERNO\n${concText}\nResultado final do núcleo: ${formatDias(final)} (${Math.round(final)} dias)`;
+ return{min,max,neg,art42,inc,f1,f2,f3,final,multa:Math.max(0,mFinal),multaValor:totalMultaValor,tema,sumMin,sumMax,concText,memory}}
+function recalcularTudo(){project.reus.forEach(r=>{let rec=0,det=0,multa=0,valor=0;r.crimes.forEach(c=>{c.calc=calcCrime(c);if(c.tipoPrisao==='reclusao')rec+=c.calc.final;else det+=c.calc.final;multa+=c.calc.multa;valor+=c.calc.multaValor});let total=rec+det,detra=calcDetracao(r),saldo=Math.max(0,total-detra);r.total={rec,det,total,multa,valor,detra,saldo,regime:calcRegime(r,saldo),art44:calcArt44(r,total),sursis:null};r.total.sursis=calcSursis(r,total,r.total.art44)})}
+function calcRegime(r,saldo){if(r.regimeModo&&r.regimeModo!=='orientativo')return r.regimeModo;let hasRec=r.reincidenteDoloso||r.crimes.some(c=>c.reincidenciaTipo!=='nenhuma'),desfav=r.crimes.some(c=>c.vetores.some(v=>v.status==='desfavoravel'));if(saldo>8*360)return'FECHADO';if(saldo>4*360)return hasRec||desfav?'FECHADO':'SEMIABERTO';if(hasRec)return desfav?'FECHADO':'SEMIABERTO';return desfav?'SEMIABERTO':'ABERTO'}
+function calcArt44(r,total){let anyViol=r.crimes.some(c=>c.violencia&&!c.culposo),allCulp=r.crimes.every(c=>c.culposo),penaOk=total<=4*360||allCulp;if(!penaOk)return{ok:false,text:'Em princípio, não preenchido o requisito objetivo de quantidade da pena do art. 44, I.'};if(anyViol)return{ok:false,text:'Em princípio, incabível: há crime doloso cometido com violência ou grave ameaça à pessoa.'};if(!r.circunstanciasSuficientes)return{ok:false,text:'Requisito subjetivo do art. 44, III, marcado como não suficiente.'};if(r.reincidenteDoloso){if(r.reincidenciaMesmoCrime)return{ok:false,text:'Reincidência dolosa pelo mesmo crime: a exceção do art. 44, §3º, não se aplica.'};return{ok:true,exception:true,text:'Possível em caráter excepcional (art. 44, §3º), se socialmente recomendável e a reincidência não for pelo mesmo crime.'}}return{ok:true,text:total<=360?'Em princípio cabível; até 1 ano, verificar as modalidades do art. 44, §2º.':'Em princípio cabível; acima de 1 ano, verificar as modalidades do art. 44, §2º.'}}
+function calcSursis(r,total,a44){let especial=(r.idadeSentenca>70||r.sursisSaude)&&total<=4*360;if(especial)return{ok:true,text:'Há hipótese objetiva para análise do sursis etário/humanitário (art. 77, §2º), sujeita aos demais requisitos.'};if(total>2*360)return{ok:false,text:'Pena superior a 2 anos: fora do limite do art. 77, caput, salvo hipótese do §2º.'};if(r.reincidenteDoloso)return{ok:false,text:'Reincidência em crime doloso: requisito do art. 77, I, não preenchido.'};if(!r.circunstanciasSuficientes)return{ok:false,text:'Circunstâncias pessoais foram marcadas como insuficientes para o benefício.'};if(a44.ok)return{ok:false,text:'Sursis é subsidiário: o art. 77, III exige que não seja indicada ou cabível a substituição do art. 44.'};return{ok:true,text:'Em princípio, hipótese para análise do sursis comum, desde que preenchidos os requisitos do art. 77.'}}
+function renderResults(){let r=getReu(),c=getCrime(),t=r.total;$('resTotalReu').textContent=formatDias(t.total);$('resMultaReu').textContent=`${Math.round(t.multa)} dias-multa`;$('resRegime').textContent=`REGIME ${r.regimeModo==='orientativo'?'ORIENTATIVO':'MANUAL'}: ${t.regime}`;$('resRegime').style.background=t.regime==='FECHADO'?'#c92a2a':t.regime==='SEMIABERTO'?'#b86b08':'#087f5b';$('resCrimeAtual').textContent=formatDias(c.calc.final);$('resDetracao').textContent=formatDias(t.detra);$('resSaldo').textContent=formatDias(t.saldo);$('resQtdCrimes').textContent=r.crimes.length;$('resF1').textContent=formatDias(c.calc.f1);$('resF2').textContent=formatDias(c.calc.f2);$('resF3').textContent=formatDias(c.calc.f3);$('resConcurso').textContent=c.calc.concText;$('resArt44').textContent=t.art44.text;$('resSursis').textContent=t.sursis.text;$('resMultaValor').textContent=t.valor>0?brl(t.valor):'Informe salário mínimo/valor do dia-multa para estimar o valor monetário.';renderValidation(c,r);renderPrescricao(c)}
+function renderValidation(c,r){let a=[];if(c.maxPena<c.minPena)a.push('Máximo legal inferior ao mínimo.');c.vetores.filter(v=>v.status==='desfavoravel'&&!v.fund.trim()).forEach(v=>a.push(`${v.nome}: marcada desfavorável sem fundamentação.`));if(CATALOGO[c.catalogo]?.drogas&&(c.art42Natureza||c.art42Quantidade)&&!String(c.art42Fund||'').trim())a.push('Art. 42 da Lei de Drogas: natureza/quantidade valorada sem fundamentação.');if(!c.dataFato)a.push('Data do fato não informada: lei no tempo não conferida.');if(c.temMulta&&c.maxMulta<c.minMulta)a.push('Multa máxima inferior à mínima.');if(c.temMulta&&(c.diaMultaSM<(1/30)-1e-9||c.diaMultaSM>5))a.push('Valor do dia-multa fora da faixa geral de 1/30 a 5 salários mínimos (art. 49, § 1º, CP).');if(c.concursoTipo!=='nenhum'&&c.concursoQtd<2)a.push('Concurso exige ao menos 2 infrações.');let li=leiTempoInfo(c);if(li.danger)a.push(li.text);$('validation').classList.toggle('show',a.length>0);$('validation').innerHTML=a.length?'<strong>Conferências pendentes</strong><br>• '+a.join('<br>• '):''}
+function prazoPrescricao(days){let y=days/360;if(y>12)return 20;if(y>8)return 16;if(y>4)return 12;if(y>2)return 8;if(y>=1)return 4;return 3}
+function renderPrescricao(c){if(!c.calc)return;let r=getReu(),base=c.prescBase==='aplicada'?c.calc.final:c.calc.max,p=prazoPrescricao(base),reduc=(r.idadeFato>0&&r.idadeFato<21)||(r.idadeSentenca>70);if(reduc&&!c.violenciaSexualMulher)p/=2;if(c.prescBase==='aplicada'&&c.prescReinc)p*=4/3;let parts=[`Prazo-base estimado: ${fmtNum(p)} anos.`];if(reduc&&c.violenciaSexualMulher)parts.push('Redução etária do art. 115 não aplicada porque o campo “violência sexual contra mulher” está marcado.');else if(reduc)parts.push('Prazo reduzido pela metade pelo art. 115, conforme dados etários informados.');let intervals=[];if(c.dataFato&&c.dataDenuncia)intervals.push(['fato → denúncia',yearsBetween(c.dataFato,c.dataDenuncia)]);if(c.dataDenuncia&&c.dataSentenca)intervals.push(['denúncia → sentença',yearsBetween(c.dataDenuncia,c.dataSentenca)]);if(intervals.length)parts.push(intervals.map(([n,y])=>`${n}: ${y.toFixed(2)} ano(s)${y>=p?' ⚠️':''}`).join(' | '));parts.push('Conferência apenas orientativa: revise causas interruptivas/suspensivas, termo inicial e regime jurídico concreto.');$('prescricaoResultado').textContent=parts.join(' ')}
+function yearsBetween(a,b){return Math.max(0,(new Date(b+'T12:00')-new Date(a+'T12:00'))/86400000/365.2425)}
+function abrirModal(id){if(id==='modalResumo')renderResumo();$(id).classList.add('open')}function fecharModal(id){$(id).classList.remove('open')}
+function abrirMemoria(){$('memoryText').textContent=getCrime().calc.memory;abrirModal('modalMemoria')}
+function abrirCenarios(){let c=getCrime(),methods=[['1/8 do intervalo','intervalo8'],['1/6 sobre o mínimo','minimo6'],['Personalizado','custom']];$('scenarioBody').innerHTML=methods.map(([n,m])=>{let x=calcCrime(c,m);return`<div class="scenario"><h4>${n}</h4><div class="subtle">Pena-base</div><strong>${formatDias(x.f1)}</strong><div class="subtle" style="margin-top:8px">Pena final simulada</div><div>${formatDias(x.final)}</div></div>`}).join('');abrirModal('modalCenarios')}
+function renderResumo(){recalcularTudo();$('resumoBody').innerHTML=project.reus.map(r=>`<div class="summary-reu"><h3>${esc(r.nome)} — ${formatDias(r.total.total)}</h3><table class="summary-table"><thead><tr><th>Crime</th><th>1ª fase</th><th>2ª fase</th><th>Final</th><th>Multa</th></tr></thead><tbody>${r.crimes.map(c=>`<tr><td>${esc(c.nome)}</td><td>${formatDias(c.calc.f1)}</td><td>${formatDias(c.calc.f2)}</td><td>${formatDias(c.calc.final)}</td><td>${Math.round(c.calc.multa)} dias</td></tr>`).join('')}</tbody></table><p><strong>Total do réu:</strong> ${formatDias(r.total.total)} | <strong>Detração:</strong> ${formatDias(r.total.detra)} | <strong>Saldo para regime:</strong> ${formatDias(r.total.saldo)} | <strong>Regime:</strong> ${r.total.regime}</p></div>`).join('')}
+function abrirTexto(){renderTexto();abrirModal('modalTexto')}
+function gerarTextoCrime(c,nivel){let neg=c.vetores.filter(v=>v.status==='desfavoravel'),agr=c.agravantes.filter(a=>a.checked),ate=c.atenuantes.filter(a=>a.checked),x=c.calc;if(nivel==='conciso')return `${c.nome}: pena-base de ${formatDias(x.f1)}; pena provisória de ${formatDias(x.f2)}; pena definitiva do núcleo em ${formatDias(x.final)}${c.temMulta?` e ${Math.round(x.multa)} dias-multa`:''}.`;
+ let f1=neg.length?`Considerando desfavoráveis ${neg.map(v=>v.nome).join(', ')}, fixo a pena-base em ${formatDias(x.f1)}. ${neg.map(v=>`${v.nome}: ${v.fund||'[fundamentar]'}.`).join(' ')}`:`Todas as circunstâncias judiciais foram consideradas favoráveis ou neutras, razão pela qual a pena-base é fixada no mínimo legal, em ${formatDias(x.f1)}.`;
+ let f2=(agr.length||ate.length||c.reincidenciaTipo!=='nenhuma')?`Na segunda fase, reconheço ${agr.length?`as agravantes de ${agr.map(a=>a.nome).join(', ')}`:'nenhuma agravante genérica adicional'} e ${ate.length?`as atenuantes de ${ate.map(a=>a.nome).join(', ')}`:'nenhuma atenuante'}. ${x.tema} A pena provisória resulta em ${formatDias(x.f2)}.`:`Inexistem agravantes ou atenuantes reconhecidas, permanecendo a pena em ${formatDias(x.f2)}.`;
+ let f3=`Na terceira fase, ${c.causas.length||c.tentativa?'aplico as causas cadastradas no sistema':'não há causas de aumento ou diminuição cadastradas'}. A pena alcança ${formatDias(x.f3)}. ${c.concursoTipo!=='nenhum'?x.concText+' ':''}Fixo a pena deste núcleo em ${formatDias(x.final)}${c.temMulta?` e ${Math.round(x.multa)} dias-multa`:''}.`;
+ if(nivel==='completo')return `${c.nome}. ${f1} ${f2} ${f3}`;return `### ${c.nome}\n\n**Primeira fase.** ${f1}\n\n**Segunda fase.** ${f2}\n\n**Terceira fase.** ${f3}`}
+function gerarTextoReu(r,nivel){let crimes=r.crimes.map(c=>gerarTextoCrime(c,nivel)).join(nivel==='estruturado'?'\n\n':' '),tot=r.total,final=nivel==='estruturado'?`\n\n**Pena total do réu.** Em concurso material entre os núcleos autônomos acima, as penas do réu totalizam ${formatDias(tot.total)}${tot.multa?` e ${Math.round(tot.multa)} dias-multa`:''}. A detração informada é de ${formatDias(tot.detra)}, considerada separadamente para a análise do regime inicial. O saldo de referência é ${formatDias(tot.saldo)}. O regime ${r.regimeModo==='orientativo'?'orientativamente indicado':'selecionado'} é o ${tot.regime.toLowerCase()}.\n\n**Substituição (art. 44).** ${tot.art44.text}\n\n**Sursis (art. 77).** ${tot.sursis.text}`:` Pena total: ${formatDias(tot.total)}. Regime: ${tot.regime}. ${tot.art44.text} ${tot.sursis.text}`;return nivel==='estruturado'?`## DOSIMETRIA — ${r.nome.toUpperCase()}\n\n${crimes}${final}`:`${r.nome}: ${crimes}${final}`}
+function renderTexto(){let nivel=$('textoNivel').value,escopo=$('textoEscopo').value;$('textoOutput').value=escopo==='processo'?project.reus.map(r=>gerarTextoReu(r,nivel)).join('\n\n============================================================\n\n'):gerarTextoReu(getReu(),nivel)}
+async function copiarTextoGerado(){try{await navigator.clipboard.writeText($('textoOutput').value);toast('Texto copiado')}catch(e){$('textoOutput').select();document.execCommand('copy');toast('Texto copiado')}}
+function downloadTexto(){let b=new Blob([$('textoOutput').value],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='dosimetria.txt';a.click();URL.revokeObjectURL(a.href)}
+function exportarProjeto(){recalcularTudo();let data=JSON.stringify(project,null,2),b=new Blob([data],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`e-dosimetria-${(project.processo||'projeto').replace(/[^a-zA-Z0-9_-]/g,'_')}.json`;a.click();URL.revokeObjectURL(a.href);toast('Projeto exportado')}
+function importarProjeto(ev){let f=ev.target.files[0];if(!f)return;let rd=new FileReader();rd.onload=()=>{try{let p=JSON.parse(rd.result);if(!p.reus?.length)throw Error();project=p;activeReuId=project.reus[0].id;activeCrimeId=project.reus[0].crimes[0].id;renderAll();scheduleSave();toast('Projeto importado')}catch(e){alert('Arquivo de projeto inválido.')}};rd.readAsText(f);ev.target.value=''}
+function novoProjeto(){if(!confirm('Criar novo projeto? O autosalvamento atual será substituído.'))return;project=defaultProject();activeReuId=project.reus[0].id;activeCrimeId=project.reus[0].crimes[0].id;renderAll();scheduleSave()}
+function dateBR(s){if(!s)return'';let [y,m,d]=s.split('-');return`${d}/${m}/${y}`}function brl(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v)}function fmtNum(v){return Number.isInteger(v)?v:String(v.toFixed(2)).replace('.',',')}function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+window.addEventListener('click',e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('open')});
+window.addEventListener('load',()=>{initCatalog();try{project=JSON.parse(localStorage.getItem(STORAGE))||defaultProject()}catch(e){project=defaultProject()}if(!project.version||project.version<3)project=defaultProject();activeReuId=project.reus[0].id;activeCrimeId=project.reus[0].crimes[0].id;renderAll()});
+
+
+// ===== EXPERIÊNCIA GUIADA v3.1 =====
+
+function atualizarCamposCondicionais(){
+  const tent=document.getElementById('tentativa');
+  document.querySelectorAll('.conditional-tentativa').forEach(el=>el.classList.toggle('is-hidden',!tent||tent.value!=='sim'));
+  const conc=document.getElementById('concursoTipo');
+  document.querySelectorAll('.conditional-concurso').forEach(el=>el.classList.toggle('is-hidden',!conc||conc.value==='nenhum'));
+  const rein=document.getElementById('reincidenciaTipo');
+  document.querySelectorAll('.conditional-multi').forEach(el=>el.classList.toggle('is-hidden',!rein||rein.value!=='multi'));
+}
+
+let etapaGuiada = 1;
+const ETAPAS_GUIADAS = {
+  1:{titulo:'1. Identifique o réu', ajuda:'Informe quem está sendo dosimetrado. Os dados pessoais complementares podem ser ajustados conforme o caso.', dica:'Depois, escolha o crime.'},
+  2:{titulo:'2. Selecione o crime', ajuda:'Escolha o tipo penal e informe a data do fato. O sistema preenche a pena em abstrato quando houver item no catálogo.', dica:'Confira e avance para a pena-base.'},
+  3:{titulo:'3. Fixe a pena-base', ajuda:'Valore as circunstâncias judiciais do art. 59. Para cada vetor desfavorável, registre a fundamentação correspondente.', dica:'Avance para agravantes e atenuantes.'},
+  4:{titulo:'4. Analise agravantes e atenuantes', ajuda:'Marque somente as circunstâncias reconhecidas no caso. As regras de compensação são calculadas automaticamente.', dica:'Avance para a 3ª fase.'},
+  5:{titulo:'5. Aplique causas de aumento e diminuição', ajuda:'Adicione apenas as causas incidentes. A tentativa aparece aqui porque repercute na pena definitiva.', dica:'Revise os complementos finais.'},
+  6:{titulo:'6. Complete apenas o que se aplica', ajuda:'Concurso, multa, detração e prescrição ficam reunidos aqui. Se um módulo não se aplica, simplesmente deixe-o como está.', dica:'Veja o resultado final.'},
+  7:{titulo:'7. Confira o resultado', ajuda:'Revise a pena, regime, detração e módulos complementares. Depois gere a minuta ou a memória do cálculo.', dica:'Cálculo concluído.'}
+};
+function alternarModoUso(){
+  const completo=document.body.classList.contains('complete-mode');
+  document.body.classList.toggle('complete-mode',!completo);
+  document.body.classList.toggle('guided-mode',completo);
+  document.body.classList.remove('guided-result');
+  const b=document.getElementById('btnModoUso');
+  if(b) b.textContent=completo?'☷ Modo completo':'☰ Modo guiado';
+  if(completo) mostrarEtapa(etapaGuiada,false);
+}
+function mostrarEtapa(n,scroll=true){
+  etapaGuiada=Math.max(1,Math.min(7,n));
+  if(document.body.classList.contains('complete-mode')) return;
+  document.body.classList.add('guided-mode');
+  document.body.classList.toggle('guided-result',etapaGuiada===7);
+  document.querySelectorAll('.guided-step').forEach(el=>el.classList.toggle('active-step',Number(el.dataset.step)===etapaGuiada));
+  document.querySelectorAll('#stepper [data-go-step]').forEach(btn=>{const s=Number(btn.dataset.goStep);btn.classList.toggle('active',s===etapaGuiada);btn.classList.toggle('done',s<etapaGuiada)});
+  const meta=ETAPAS_GUIADAS[etapaGuiada];
+  const title=document.getElementById('guidedTitle'), help=document.getElementById('guidedHelp');
+  if(title) title.textContent=meta.titulo;if(help) help.textContent=meta.ajuda;
+  const c=document.getElementById('stepCounter'), h=document.getElementById('stepActionHint');
+  if(c)c.textContent=`Etapa ${etapaGuiada} de 7`;if(h)h.textContent=meta.dica;
+  const ant=document.getElementById('btnAnterior'), prox=document.getElementById('btnProximo');
+  if(ant) ant.disabled=etapaGuiada===1;
+  if(prox){prox.style.visibility=etapaGuiada===7?'hidden':'visible';prox.textContent=etapaGuiada===6?'Ver resultado →':'Próximo →'}
+  if(scroll) window.scrollTo({top:0,behavior:'smooth'});
+}
+function mudarEtapa(delta){mostrarEtapa(etapaGuiada+delta)}
+function atualizarResumoRapido(){
+  const src=document.getElementById('resCrimeAtual');const dst=document.getElementById('quickResult');
+  if(src&&dst) dst.textContent=src.textContent||'0 dias';
+}
+function inicializarModoGuiado(){
+  document.querySelectorAll('#stepper [data-go-step]').forEach(b=>b.addEventListener('click',()=>mostrarEtapa(Number(b.dataset.goStep))));
+  document.addEventListener('change',()=>setTimeout(atualizarCamposCondicionais,0));
+  document.querySelectorAll('.advanced-toggle').forEach(b=>b.addEventListener('click',()=>b.closest('.advanced-box')?.classList.toggle('open')));
+  // Complementos começam compactos e podem ser expandidos pelo cabeçalho.
+  document.querySelectorAll('.complement-panel').forEach(panel=>{
+    const head=panel.querySelector('.panel-head'); if(!head) return;
+    const bt=document.createElement('button');bt.type='button';bt.className='btn small';bt.textContent='Abrir módulo';head.appendChild(bt);
+    [...panel.children].forEach(ch=>{if(ch!==head) ch.dataset.complementBody='1'});
+    panel.classList.add('compact-module');
+    bt.addEventListener('click',()=>{const open=panel.classList.toggle('module-open');bt.textContent=open?'Fechar módulo':'Abrir módulo'});
+  });
+  const style=document.createElement('style');style.textContent='body.guided-mode .compact-module:not(.module-open)>[data-complement-body="1"]{display:none} body.complete-mode .compact-module>[data-complement-body="1"]{display:block!important}';document.head.appendChild(style);
+  const src=document.getElementById('resCrimeAtual');if(src&&window.MutationObserver)new MutationObserver(atualizarResumoRapido).observe(src,{childList:true,subtree:true,characterData:true});
+  atualizarResumoRapido();atualizarCamposCondicionais();mostrarEtapa(1,false);
+}
+setTimeout(inicializarModoGuiado,0);
+
+</script>
 </body>
 </html>
